@@ -1,9 +1,9 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Competition Hub - v1.7.0</title>
+    <title>Competition Hub - v1.8.0</title>
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -188,7 +188,7 @@
         background: var(--bg-score-d1); 
         z-index: 4000; 
         padding: 15px 20px 0;
-        margin: -20px 0 10px 0; 
+       margin: 0;
         border-bottom: 1px solid rgba(255,255,255,0.1);
     }
         .score-list-container { display: flex; flex-direction: column; gap: 8px; max-width: 1400px; margin: 0 auto; }
@@ -671,7 +671,7 @@ body.stage-score-d2 #subBtn-2 { background: var(--card); color: var(--green-colo
 </div>
 
 <script>
-    const APP_VERSION = "v1.7.0";
+    const APP_VERSION = "v1.8.0";
     document.getElementById('vTag').innerText = APP_VERSION;
 
     const zones = ['RED', 'YELLOW', 'GREEN', 'BLUE'];
