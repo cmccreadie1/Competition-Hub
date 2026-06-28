@@ -11,7 +11,8 @@
     <style>
         :root {
             /* v7.4.0 Light Mode Palette */
-            --bg-base: #f8fafc; 
+            --bg-base: #f8fafc; /* Draw Stage Background */
+            --bg-score: #f0f9ff; /* Score Stage Background (Ice Blue) */
             --card: #ffffff; 
             
             --text-dark: #0f172a; 
@@ -51,9 +52,10 @@
             overflow-x: hidden; 
             padding-bottom: 120px;
             font-variant-numeric: tabular-nums; 
+            transition: background-color 0.4s ease; /* Smooth stage transition */
         }
 
-        /* Pill Inputs globally adapted */
+        /* Base Inputs */
         input, select, textarea { 
             text-transform: uppercase; 
             font-weight: 800 !important; 
@@ -94,263 +96,124 @@
             color: var(--red-color) !important;
         }
 
-        /* Fixed Header & Tabs */
+        /* Fixed Header */
         .fixed-header { 
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            right: 0; 
-            z-index: 5000; 
+            position: fixed; top: 0; left: 0; right: 0; z-index: 5000; 
             background: rgba(255, 255, 255, 0.98); 
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--border); 
-            padding: 14px 20px 20px; 
+            padding: 14px 20px 0px; /* Tabs connect to bottom */
             box-shadow: 0 4px 15px rgba(0,0,0,0.03);
         }
 
         .header-content { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            max-width: 1400px; 
-            margin: 0 auto 15px; 
+            display: flex; justify-content: space-between; align-items: center; 
+            max-width: 1400px; margin: 0 auto 15px; 
         }
 
-        .brand-name { 
-            font-size: 20px; 
-            font-weight: 900; 
-            letter-spacing: -0.5px; 
-            color: var(--text-dark); 
-            display: flex; 
-            align-items: center; 
-        }
+        .brand-name { font-size: 20px; font-weight: 900; letter-spacing: -0.5px; color: var(--text-dark); display: flex; align-items: center; }
+        .v-tag { font-size: 12px; color: var(--accent); margin-left: 10px; font-weight: 900; background: var(--accent-glow); padding: 4px 8px; border-radius: 20px; }
 
-        .v-tag { 
-            font-size: 12px; 
-            color: var(--accent); 
-            margin-left: 10px; 
-            font-weight: 900; 
-            background: var(--accent-glow);
-            padding: 4px 8px;
-            border-radius: 20px;
-        }
-
-        /* Tab Navigation */
+        /* Tweak 1: True Tab Navigation */
         .tab-nav {
-            display: flex; justify-content: center; gap: 16px; max-width: 1400px; margin: 0 auto;
+            display: flex; justify-content: center; gap: 8px; max-width: 1400px; margin: 0 auto; align-items: flex-end;
         }
 
         .tab-btn {
-            flex: 1; max-width: 400px; padding: 16px 20px;
-            background: #f1f5f9; border: 2px solid var(--border);
-            border-radius: 16px; font-weight: 900; font-size: 15px;
+            flex: 1; max-width: 400px; padding: 14px 20px;
+            background: #e2e8f0; border: 2px solid var(--border); border-bottom: none;
+            border-radius: 16px 16px 0 0; font-weight: 900; font-size: 15px;
             color: var(--text-light); cursor: pointer; transition: all 0.2s;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
         }
 
         .tab-btn.active {
-            background: var(--text-dark); color: white; border-color: var(--text-dark);
-            box-shadow: 0 6px 16px rgba(0,0,0,0.15); transform: translateY(-2px);
+            color: var(--text-dark);
+            padding-bottom: 20px; /* Overlaps bottom border */
+            margin-bottom: -1px;
+            z-index: 10;
         }
 
-        /* Container Padding */
         .tab-content { padding: 160px 20px 40px; }
         
         #entrySection, #resultsSection, #dispatchSection, #rosterSection, #registrationPrintSection { 
-            max-width: 1400px; 
-            margin: 0 auto; 
+            max-width: 1400px; margin: 0 auto; 
         }
 
         /* Draw Setup Control Panel */
         .control-panel { 
-            background: var(--card); 
-            border-radius: 20px; 
-            padding: 25px; 
-            border: 1px solid var(--border); 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-            text-align: center; 
-            margin-bottom: 20px; 
+            background: var(--card); border-radius: 20px; padding: 25px; 
+            border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            text-align: center; margin-bottom: 20px; 
         }
 
-        .bucket-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); 
-            gap: 20px; 
-        }
+        .bucket-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
 
-        .duration-toggle { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 8px; 
-            background: #f1f5f9; 
-            padding: 6px; 
-            border-radius: 50px; 
-            width: 100%; 
-            margin: 0 auto; 
-        }
-
-        .dt-opt { 
-            padding: 10px; 
-            border-radius: 50px; 
-            cursor: pointer; 
-            font-weight: 800; 
-            font-size: 13px; 
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            color: var(--text-light); 
-            background: transparent; 
-        }
-
-        .dt-opt.active { 
-            color: var(--text-dark); 
-            background: #ffffff; 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
+        .duration-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; background: #f1f5f9; padding: 6px; border-radius: 50px; width: 100%; margin: 0 auto; }
+        .dt-opt { padding: 10px; border-radius: 50px; cursor: pointer; font-weight: 800; font-size: 13px; display: flex; align-items: center; justify-content: center; color: var(--text-light); }
+        .dt-opt.active { color: var(--text-dark); background: #ffffff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
 
         /* Setup Zone Cards */
         .zone-card { 
-            background: var(--card); 
-            border: 1px solid var(--border); 
-            border-radius: 20px; 
-            padding: 12px 0; 
-            position: relative; 
-            transition: transform 0.2s, box-shadow 0.2s; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            break-inside: avoid; 
-            page-break-inside: avoid; 
-            overflow: hidden; 
+            background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 12px 0; 
+            position: relative; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            break-inside: avoid; page-break-inside: avoid; overflow: hidden; 
         }
 
-        .zone-card:hover {
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-            transform: translateY(-2px);
-        }
-
+        .zone-card:hover { box-shadow: 0 8px 25px rgba(0,0,0,0.1); transform: translateY(-2px); }
         .zone-card.solo-card { height: fit-content; align-self: start; }
 
-        .zone-header { 
-            font-size: 13px; 
-            font-weight: 900; 
-            color: var(--text-dark); 
-            margin: 0 0 10px 0; 
-            padding: 0 16px 10px 16px; 
-            border-bottom: 1px solid #f1f5f9; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-        }
-
-        .res-row { 
-            display: grid; 
-            grid-template-columns: 1fr 95px 95px; 
-            gap: 12px; 
-            align-items: center; 
-            padding: 6px 16px; 
-            border-bottom: none; 
-        }
-
-        .angler-name { 
-            font-size: 13px; 
-            font-weight: 800; 
-            color: var(--text-dark);
-            pointer-events: none; 
-            line-height: 1.3;
-        }
+        .zone-header { font-size: 13px; font-weight: 900; color: var(--text-dark); margin: 0 0 10px 0; padding: 0 16px 10px 16px; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; }
+        .res-row { display: grid; grid-template-columns: 1fr 95px 95px; gap: 12px; align-items: center; padding: 6px 16px; border-bottom: none; }
+        .angler-name { font-size: 13px; font-weight: 800; color: var(--text-dark); pointer-events: none; line-height: 1.3; }
 
         .draw-pill { 
-            padding: 8px 10px; 
-            border-radius: 12px; 
-            font-size: 11px; 
-            font-weight: 900; 
-            text-align: center; 
-            border: 2px solid transparent; 
-            color: white; 
-            cursor: default;
-            transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
+            padding: 8px 10px; border-radius: 12px; font-size: 11px; font-weight: 900; text-align: center; 
+            border: 2px solid transparent; color: white; cursor: default; transition: all 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 4px;
         }
 
-        .draw-pill.swap-active { 
-            cursor: pointer; 
-            border: 2px dashed var(--text-dark); 
-            background: transparent !important;
-            color: var(--text-dark);
-            opacity: 0.7;
-        }
-
-        .draw-pill.swap-selected { 
-            border: 2px solid var(--text-dark) !important; 
-            background: var(--text-dark) !important;
-            color: white !important;
-            opacity: 1;
-            z-index: 10;
-            position: relative;
-            transform: scale(1.1);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        }
-
-        .clash-glow { 
-            border: 2px solid var(--red-color) !important; 
-            background: var(--red-soft) !important; 
-            color: var(--red-color) !important; 
-            box-shadow: 0 0 12px rgba(239, 68, 68, 0.3) !important;
-        }
+        .draw-pill.swap-active { cursor: pointer; border: 2px dashed var(--text-dark); background: transparent !important; color: var(--text-dark); opacity: 0.7; }
+        .draw-pill.swap-selected { border: 2px solid var(--text-dark) !important; background: var(--text-dark) !important; color: white !important; opacity: 1; z-index: 10; position: relative; transform: scale(1.1); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+        .clash-glow { border: 2px solid var(--red-color) !important; background: var(--red-soft) !important; color: var(--red-color) !important; box-shadow: 0 0 12px rgba(239, 68, 68, 0.3) !important; }
 
         .peg-num { font-size: 15px; font-weight: 900; }
         .a-tag { color: var(--a-color); font-weight: 900; margin-left: 6px; font-size: 12px; }
 
-        .anomaly-banner {
-            background: var(--red-soft);
-            border: 1px solid var(--red-color);
-            border-left: 4px solid var(--red-color);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-            display: none;
-        }
-
-        .anomaly-banner.warning {
-            background: var(--yellow-soft);
-            border-color: var(--yellow-color);
-            border-left-color: var(--yellow-color);
-        }
-
+        .anomaly-banner { background: var(--red-soft); border: 1px solid var(--red-color); border-left: 4px solid var(--red-color); border-radius: 12px; padding: 16px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); display: none; }
+        .anomaly-banner.warning { background: var(--yellow-soft); border-color: var(--yellow-color); border-left-color: var(--yellow-color); }
         .anomaly-banner h3 { color: var(--red-color); margin: 0 0 8px 0; font-size: 14px; text-align: left; }
         .anomaly-banner.warning h3 { color: var(--yellow-color); }
         .anomaly-banner ul { color: var(--text-dark); font-size: 12px; font-weight: 600; margin: 0; padding-left: 20px; text-transform: none; }
         .anomaly-banner li { margin-bottom: 4px; }
 
-        /* SCORECARD: Horizontal Linear Layout */
-        .day-sub-nav { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+        /* ========================================== */
+        /* TWEAK 3 & 4: SCORECARD GRID & TABS         */
+        /* ========================================== */
         
-        .day-sub-btn {
-            padding: 10px 30px; font-weight: 900; font-size: 14px; border-radius: 50px;
-            background: #f1f5f9; color: var(--text-light); border: 1px solid var(--border);
-            cursor: pointer; transition: 0.2s;
+        .day-tab-nav {
+            display: flex; justify-content: center; gap: 4px; margin-bottom: 20px; align-items: flex-end;
+            border-bottom: 2px solid var(--border);
+        }
+        
+        .day-tab-btn {
+            padding: 12px 30px; font-weight: 900; font-size: 14px;
+            border-radius: 12px 12px 0 0; background: #e2e8f0; color: var(--text-light);
+            border: 2px solid var(--border); border-bottom: none;
+            cursor: pointer; transition: 0.2s; margin-bottom: -2px;
         }
 
-        .day-sub-btn.active {
-            background: var(--accent); color: white; border-color: var(--accent);
-            box-shadow: 0 4px 10px var(--accent-glow);
+        .day-tab-btn.active {
+            background: var(--card); color: var(--accent); border-color: var(--border);
+            padding-bottom: 14px; z-index: 10;
         }
 
-        .score-list-container {
-            display: flex; flex-direction: column; gap: 8px; max-width: 1400px; margin: 0 auto;
-        }
+        .score-list-container { display: flex; flex-direction: column; gap: 8px; max-width: 1400px; margin: 0 auto; }
 
         /* 7 Columns: Name, Team, Peg, Len, Cnt, Big, Spec */
         .score-list-header, .score-row {
             display: grid;
             grid-template-columns: minmax(180px, 2fr) minmax(140px, 1.5fr) 130px 90px 90px 90px 90px;
-            gap: 12px;
-            align-items: center;
+            gap: 12px; align-items: center;
         }
 
         .score-list-header {
@@ -361,21 +224,35 @@
         .score-row {
             background: var(--card); border: 1px solid var(--border);
             border-radius: 12px; padding: 10px 20px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.02); transition: 0.2s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02); transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        /* Active Focus Highlight (Foolproof UX) */
+        .score-row.focused-row {
+            border: 2px solid var(--accent);
+            background: #ffffff;
+            transform: scale(1.02);
+            box-shadow: 0 8px 25px rgba(14, 165, 233, 0.2);
+            z-index: 10;
+            position: relative;
+        }
+
+        .score-row input {
+            width: 100%; text-align: center; font-size: 15px; padding: 10px 4px;
+            background: #f8fafc; border: 1px solid var(--border);
         }
         
-        .score-row:hover { border-color: var(--accent); box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+        .score-row.focused-row input:focus {
+            background: #ffffff;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px var(--accent-glow);
+        }
+        
+        .score-row input::placeholder { font-size: 10px; color: #94a3b8; }
 
         .s-name { font-size: 14px; font-weight: 900; color: var(--text-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .s-team { font-size: 12px; font-weight: 800; color: var(--text-light); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .s-peg { font-size: 13px; font-weight: 900; }
-
-        .score-row input {
-            width: 100%; text-align: center; font-size: 15px; padding: 10px 4px;
-            background: #f8fafc;
-        }
-        .score-row input:focus { background: white; }
-        .score-row input::placeholder { font-size: 10px; color: #94a3b8; }
 
         .scorecard-scroll-wrapper { width: 100%; overflow-x: auto; padding-bottom: 20px; }
 
@@ -396,10 +273,7 @@
             font-size: 14px; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
 
-        .btn-action-outline:hover {
-            border-color: var(--text-dark); color: white; background: var(--text-dark);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
+        .btn-action-outline:hover { border-color: var(--text-dark); color: white; background: var(--text-dark); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
         
         .btn-tool { 
             background: #f8fafc; border: 1px solid var(--border); color: var(--text-dark); 
@@ -409,21 +283,20 @@
 
         .btn-tool:hover { border-color: var(--accent); color: var(--accent); background: white; }
 
-        /* Master Menus */
+        /* TWEAK 2: POPUP MENU MODALS */
         .master-menu-grid { 
-            display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; 
-            max-width: 1400px; margin: 0 auto 30px; padding: 0 10px;
+            display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; width: 100%;
         }
 
         .btn-ui { 
-            flex: 1 1 200px; background: var(--card); border: 1px solid var(--border); 
+            flex: 1 1 200px; background: #f8fafc; border: 1px solid var(--border); 
             border-radius: 16px; padding: 16px 20px; text-align: left; cursor: pointer; 
             display: flex; flex-direction: column; justify-content: center;
             min-width: 150px; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05); color: var(--text-dark);
+            color: var(--text-dark);
         }
 
-        .btn-ui:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 8px 25px rgba(14, 165, 233, 0.15); }
+        .btn-ui:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 8px 25px rgba(14, 165, 233, 0.15); background: white; }
         .btn-ui strong { font-size: 14px; font-weight: 900; margin-bottom: 6px; color: var(--text-dark); }
         .btn-ui span { font-size: 11px; font-weight: 600; text-transform: none; line-height: 1.4; color: var(--text-light); }
 
@@ -537,7 +410,7 @@
         }
     </style>
 </head>
-<body>
+<body class="stage-draw">
 
 <div id="toastBanner" class="no-print">ACTION COMPLETED</div>
 
@@ -545,15 +418,21 @@
     <div class="header-content">
         <div class="brand-name">COMPETITION HUB <span id="vTag" class="v-tag"></span></div>
         <div id="saveIndicator" style="position: fixed; top: 18px; right: 20px; background: var(--green-color); color: white; padding: 4px 10px; border-radius: 50px; font-weight: 800; font-size: 11px; opacity: 0; transition: opacity 0.3s; z-index: 9999; pointer-events: none; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);">✓ SAVED</div>
-        <button id="masterResetBtn" onclick="showWipeModal()" class="btn-action-outline btn-danger-outline" style="padding: 8px 16px; font-size: 11px;">🏁 FINISH & RESET</button>
+        
+        <!-- Tweak 5: Renamed Reset Button -->
+        <button id="masterResetBtn" onclick="showWipeModal()" class="btn-action-outline btn-danger-outline" style="padding: 10px 16px; font-size: 11px; font-weight: 900;">🏁 FINISH AND RESET COMPETITION</button>
     </div>
     
+    <!-- Tweak 1: True Tab Navigation -->
     <div class="tab-nav">
         <button id="tabBtn-draw" class="tab-btn active" onclick="switchTab('draw')">1. DRAW SETUP</button>
         <button id="tabBtn-score" class="tab-btn" onclick="switchTab('score')">2. SCORECARDS</button>
     </div>
 </div>
 
+<!-- ========================================== -->
+<!-- TAB 1: DRAW SETUP (ORIGINAL ZONEDRAW)      -->
+<!-- ========================================== -->
 <div id="drawTab" class="tab-content active">
 
     <div id="entrySection" class="no-print">
@@ -674,53 +553,6 @@
     </div>
 
     <div id="resultsSection">
-        
-        <div id="manageMenu" class="master-menu-grid no-print" style="display:none;">
-            <button class="btn-ui" onclick="handleSafeEdit()">
-                <strong>✏️ AMEND NAMES</strong>
-                <span>Safely fix typos. Existing pegs are locked.</span>
-            </button>
-            <button class="btn-ui" onclick="injectLatecomer(true)">
-                <strong>➕ LATE TEAM</strong>
-                <span>Inject a 4-man team using Alpha pegs.</span>
-            </button>
-            <button class="btn-ui" onclick="injectLatecomer(false)">
-                <strong>➕ LATE SOLO</strong>
-                <span>Inject a solo angler using an Alpha peg.</span>
-            </button>
-            <button class="btn-ui" onclick="toggleSwapMode()">
-                <strong>🔄 SWAP PEGS</strong>
-                <span>Manually trade pegs. No redraw triggered.</span>
-            </button>
-            <button class="btn-ui btn-danger" onclick="showRedrawModal()">
-                <strong>⚠️ FULL RE-DRAW</strong>
-                <span>DANGER: Wipes all current pegs. Generates fresh match.</span>
-            </button>
-        </div>
-
-        <div id="outputMenu" class="master-menu-grid no-print" style="display:none;">
-            <button class="btn-ui" id="copyExcelBtn" onclick="copyExcelData()">
-                <strong>📋 COPY EXCEL DATA</strong>
-                <span>Instantly copies draw to clipboard for Excel.</span>
-            </button>
-            <button class="btn-ui" onclick="generateRegistrationSheet()">
-                <strong>🖨️ PRINT REGISTRATION</strong>
-                <span>Generates master attendance sheet.</span>
-            </button>
-            <button class="btn-ui" onclick="generateDispatchSlips()">
-                <strong>🖨️ TEAM SLIPS</strong>
-                <span>Prints individual peg details.</span>
-            </button>
-            <button class="btn-ui" onclick="printZoneRosters()">
-                <strong>🖨️ ZONE ROSTERS</strong>
-                <span>Prints ordered lists for stewards.</span>
-            </button>
-            <button class="btn-ui" onclick="shareDraw()">
-                <strong>SHARE PDF</strong>
-                <span>Downloads snapshot of draw screen.</span>
-            </button>
-        </div>
-
         <div id="swapPrompt" class="no-print" style="display:none; text-align:center; background:var(--text-dark); color:white; border: 2px solid var(--border); padding:16px; font-weight:800; font-size: 13px; margin-bottom:20px; border-radius:16px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">SWAP MODE ACTIVE (Select a specific day peg to swap)</div>
         
         <div id="anomalyBanner" class="anomaly-banner no-print">
@@ -744,12 +576,65 @@
         </div>
     </div>
 
+    <!-- Modals for Manage/Output replace inline blocks -->
+    <div id="manageMenuModal" class="modal-overlay no-print">
+        <div class="modal-content" style="max-width: 700px; padding: 25px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+                <h2 style="margin:0; font-size: 20px;">⚙️ MANAGE DRAW</h2>
+                <button onclick="closePopups()" class="btn-tool" style="font-size:16px; padding: 4px 10px;">❌</button>
+            </div>
+            <div class="master-menu-grid">
+                <button class="btn-ui" onclick="handleSafeEdit(); closePopups();">
+                    <strong>✏️ AMEND NAMES</strong><span>Safely fix typos. Existing pegs locked.</span>
+                </button>
+                <button class="btn-ui" onclick="injectLatecomer(true); closePopups();">
+                    <strong>➕ LATE TEAM</strong><span>Inject a 4-man team.</span>
+                </button>
+                <button class="btn-ui" onclick="injectLatecomer(false); closePopups();">
+                    <strong>➕ LATE SOLO</strong><span>Inject a solo angler.</span>
+                </button>
+                <button class="btn-ui" onclick="toggleSwapMode(); closePopups();">
+                    <strong>🔄 SWAP PEGS</strong><span>Manually trade pegs.</span>
+                </button>
+                <button class="btn-ui btn-danger" onclick="showRedrawModal(); closePopups();">
+                    <strong>⚠️ FULL RE-DRAW</strong><span>DANGER: Generates fresh match.</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="outputMenuModal" class="modal-overlay no-print">
+        <div class="modal-content" style="max-width: 700px; padding: 25px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+                <h2 style="margin:0; font-size: 20px;">🖨️ OUTPUT MENU</h2>
+                <button onclick="closePopups()" class="btn-tool" style="font-size:16px; padding: 4px 10px;">❌</button>
+            </div>
+            <div class="master-menu-grid">
+                <button class="btn-ui" onclick="copyExcelData(); closePopups();">
+                    <strong>📋 COPY SETUP DATA</strong><span>Copies name/zone matrix to clipboard.</span>
+                </button>
+                <button class="btn-ui" onclick="generateRegistrationSheet(); closePopups();">
+                    <strong>🖨️ PRINT REGISTRATION</strong><span>Master attendance sheet.</span>
+                </button>
+                <button class="btn-ui" onclick="generateDispatchSlips(); closePopups();">
+                    <strong>🖨️ TEAM SLIPS</strong><span>Prints individual peg details.</span>
+                </button>
+                <button class="btn-ui" onclick="printZoneRosters(); closePopups();">
+                    <strong>🖨️ ZONE ROSTERS</strong><span>Prints ordered lists for stewards.</span>
+                </button>
+                <button class="btn-ui" onclick="shareDraw(); closePopups();">
+                    <strong>SHARE PDF</strong><span>Downloads snapshot of draw screen.</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div id="masterActionBar" class="sticky-action-bar no-print" style="display:none;">
-        <button id="btnManageToggle" onclick="toggleMasterMenu('manage')" class="btn-master" style="background:#ffffff; border: 1px solid var(--border);">
+        <button onclick="openManageMenu()" class="btn-master" style="background:#ffffff; border: 1px solid var(--border);">
             <strong style="color:var(--text-dark);">⚙️ MANAGE DRAW</strong>
             <span style="color:var(--text-light);">Add latecomers, swap pegs, fix typos</span>
         </button>
-        <button id="btnOutputToggle" onclick="toggleMasterMenu('output')" class="btn-master" style="background:var(--text-dark); border: 1px solid var(--text-dark);">
+        <button onclick="openOutputMenu()" class="btn-master" style="background:var(--text-dark); border: 1px solid var(--text-dark);">
             <strong style="color:white;">🖨️ OUTPUT MENU</strong>
             <span style="color:#94a3b8;">Print rosters, slips, copy Excel data</span>
         </button>
@@ -791,24 +676,36 @@
     </div>
 </div>
 
+<!-- ========================================== -->
+<!-- TAB 2: SCORECARD DATA ENTRY                -->
+<!-- ========================================== -->
 <div id="scoreTab" class="tab-content" style="display:none;">
     <div style="max-width: 1400px; margin: 0 auto; text-align: center; padding-bottom: 20px;">
         
-        <button onclick="exportMasterData()" class="btn-action" style="background: var(--green-color); font-size: 16px; padding: 18px 40px; margin-bottom: 25px; width: 100%; max-width: 600px;">
-            📋 EXPORT MASTER SCORES FOR EXCEL
-        </button>
-        
-        <div id="dayTabsContainer" class="day-sub-nav">
-            <button id="subBtn-1" class="day-sub-btn active" onclick="switchScoreDay(1)">DAY 1 SCORES</button>
-            <button id="subBtn-2" class="day-sub-btn" onclick="switchScoreDay(2)">DAY 2 SCORES</button>
+        <!-- Tweak 4: Day Tabs look like actual tabs -->
+        <div id="dayTabsContainer" class="day-tab-nav">
+            <button id="subBtn-1" class="day-tab-btn active" onclick="switchScoreDay(1)">DAY 1 SCORES</button>
+            <button id="subBtn-2" class="day-tab-btn" onclick="switchScoreDay(2)">DAY 2 SCORES</button>
         </div>
     </div>
 
+    <!-- Tweak 3: Scroll wrapper ensures grid integrity if screen is tiny -->
     <div class="scorecard-scroll-wrapper">
         <div id="scoreListContainer" class="score-list-container"></div>
     </div>
+
+    <!-- Tweak 4: Export Button moved to bottom of Scorecard Page -->
+    <div style="text-align: center; margin-top: 40px; padding-top: 30px; border-top: 2px dashed var(--border);">
+        <p style="color: var(--text-light); font-weight: 800; font-size: 12px; margin-bottom: 15px;">ONCE ALL SCORES ARE ENTERED, EXPORT FOR EXCEL</p>
+        <button onclick="exportMasterData()" class="btn-action" style="background: var(--green-color); font-size: 16px; padding: 20px 40px; width: 100%; max-width: 600px; box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);">
+            📋 EXPORT MASTER SCORES FOR EXCEL
+        </button>
+    </div>
 </div>
 
+<!-- ========================================== -->
+<!-- PRINT SECTIONS & MODALS                    -->
+<!-- ========================================== -->
 <div id="registrationPrintSection" class="no-print"></div>
 <div id="dispatchSection" class="no-print"></div>
 <div id="rosterSection" class="no-print"></div>
@@ -872,7 +769,7 @@
     
     let isAppReady = false; 
     let appState = []; 
-    let scoreState = {}; // NEW SCORECARD DATA BUCKET
+    let scoreState = {}; // SCORECARD DATA BUCKET
     let matchDays = 2;
     let currentZoneSize = 0; 
     let isSwapMode = false;
@@ -894,15 +791,36 @@
     }
 
     // ====================================================
-    // --- TAB NAVIGATION LOGIC (NEW HUB LOGIC) ---
+    // --- POPUP MENU LOGIC (TWEAK 2) ---
+    // ====================================================
+    function openManageMenu() { document.getElementById('manageMenuModal').style.display = 'flex'; }
+    function openOutputMenu() { document.getElementById('outputMenuModal').style.display = 'flex'; }
+    function closePopups() {
+        document.getElementById('manageMenuModal').style.display = 'none';
+        document.getElementById('outputMenuModal').style.display = 'none';
+    }
+
+    // ====================================================
+    // --- TAB NAVIGATION LOGIC (TWEAK 1) ---
     // ====================================================
     function switchTab(tabId) {
         document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
         document.querySelectorAll('.tab-content').forEach(content => content.style.display = 'none');
-        document.getElementById(`tabBtn-${tabId}`).classList.add('active');
+        
+        let activeTabBtn = document.getElementById(`tabBtn-${tabId}`);
+        activeTabBtn.classList.add('active');
         document.getElementById(`${tabId}Tab`).style.display = 'block';
 
-        if (tabId === 'score') {
+        // Stage Color Switching
+        if (tabId === 'draw') {
+            document.body.style.backgroundColor = 'var(--bg-base)';
+            activeTabBtn.style.backgroundColor = 'var(--bg-base)';
+            document.getElementById('tabBtn-score').style.backgroundColor = '#e2e8f0';
+        } else {
+            document.body.style.backgroundColor = 'var(--bg-score)';
+            activeTabBtn.style.backgroundColor = 'var(--bg-score)';
+            document.getElementById('tabBtn-draw').style.backgroundColor = '#e2e8f0';
+            
             document.getElementById('dayTabsContainer').style.display = matchDays === 2 ? 'flex' : 'none';
             switchScoreDay(1); 
         }
@@ -917,8 +835,17 @@
     }
 
     // ====================================================
-    // --- LINEAR SCORECARD LOGIC (CSS GRID) ---
+    // --- LINEAR SCORECARD LOGIC (TWEAK 3: UX Constraints) ---
     // ====================================================
+    function highlightRow(el) { el.closest('.score-row').classList.add('focused-row'); }
+    function unhighlightRow(el) { el.closest('.score-row').classList.remove('focused-row'); }
+
+    function enforceLimits(el, maxDigits) {
+        if(el.value.length > maxDigits) {
+            el.value = el.value.slice(0, maxDigits);
+        }
+    }
+
     function renderScorecards() {
         const container = document.getElementById('scoreListContainer');
         container.innerHTML = '';
@@ -957,14 +884,27 @@
                 const row = document.createElement('div');
                 row.className = 'score-row';
                 
+                // UX Inputs with Tweak 3 logic applied
                 row.innerHTML = `
                     <div class="s-name">${a.name}</div>
                     <div class="s-team">${tName}</div>
                     <div class="s-peg" style="color: ${zColor};">${targetZ} ${targetP}</div>
-                    <input type="number" placeholder="LEN" value="${s.len}" onchange="saveScore('${key}', 'len', this.value)">
-                    <input type="number" placeholder="CNT" value="${s.count}" onchange="saveScore('${key}', 'count', this.value)">
-                    <input type="number" placeholder="BIG" value="${s.big}" onchange="saveScore('${key}', 'big', this.value)">
-                    <input type="number" placeholder="SPC" value="${s.spec}" onchange="saveScore('${key}', 'spec', this.value)">
+                    <input type="number" placeholder="LEN" value="${s.len}" 
+                        oninput="enforceLimits(this, 4)" 
+                        onchange="saveScore('${key}', 'len', this.value)" 
+                        onfocus="highlightRow(this)" onblur="unhighlightRow(this)">
+                    <input type="number" placeholder="CNT" value="${s.count}" 
+                        oninput="enforceLimits(this, 3)" 
+                        onchange="saveScore('${key}', 'count', this.value)" 
+                        onfocus="highlightRow(this)" onblur="unhighlightRow(this)">
+                    <input type="number" placeholder="BIG" value="${s.big}" 
+                        oninput="enforceLimits(this, 4)" 
+                        onchange="saveScore('${key}', 'big', this.value)" 
+                        onfocus="highlightRow(this)" onblur="unhighlightRow(this)">
+                    <input type="number" placeholder="SPC" value="${s.spec}" 
+                        oninput="enforceLimits(this, 2)" 
+                        onchange="saveScore('${key}', 'spec', this.value)" 
+                        onfocus="highlightRow(this)" onblur="unhighlightRow(this)">
                 `;
                 container.appendChild(row);
             });
@@ -1023,13 +963,6 @@
         const bar = document.getElementById('masterActionBar');
         if (!bar || bar.style.display === 'none') return;
         
-        const mMenu = document.getElementById('manageMenu');
-        const oMenu = document.getElementById('outputMenu');
-        if (mMenu.style.display === 'flex' || oMenu.style.display === 'flex') {
-            bar.style.transform = 'translateY(0)';
-            return;
-        }
-
         const currentScrollY = window.scrollY;
         
         if (currentScrollY > lastScrollY && currentScrollY > 50) {
@@ -1045,73 +978,13 @@
         lastScrollY = currentScrollY;
     }, { passive: true });
 
-    function toggleMasterMenu(menuType) {
-        const mMenu = document.getElementById('manageMenu');
-        const oMenu = document.getElementById('outputMenu');
-        const btnM = document.getElementById('btnManageToggle');
-        const btnO = document.getElementById('btnOutputToggle');
-
-        const resetM = () => {
-            btnM.style.background = 'white';
-            btnM.style.borderColor = 'var(--border)';
-            btnM.innerHTML = `<strong style="color:var(--text-dark);">⚙️ MANAGE DRAW</strong><span style="color:var(--text-light);">Add latecomers, swap pegs, fix typos</span>`;
-        };
-        const resetO = () => {
-            btnO.style.background = 'var(--text-dark)';
-            btnO.style.borderColor = 'var(--text-dark)';
-            btnO.innerHTML = `<strong style="color:white;">🖨️ OUTPUT MENU</strong><span style="color:#94a3b8;">Print rosters, slips, copy Excel data</span>`;
-        };
-        const setClose = (btn) => {
-            btn.style.background = 'var(--accent)';
-            btn.style.borderColor = 'var(--accent)';
-            btn.innerHTML = `<strong style="color:white;">❌ CLOSE MENU</strong><span style="color:#eff6ff;">Return to display</span>`;
-        };
-
-        if (menuType === 'manage') {
-            if (mMenu.style.display === 'none') {
-                mMenu.style.display = 'flex';
-                oMenu.style.display = 'none';
-                setClose(btnM);
-                resetO();
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            } else {
-                mMenu.style.display = 'none';
-                resetM();
-            }
-        } else if (menuType === 'output') {
-            if (oMenu.style.display === 'none') {
-                oMenu.style.display = 'flex';
-                mMenu.style.display = 'none';
-                setClose(btnO);
-                resetM();
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            } else {
-                oMenu.style.display = 'none';
-                resetO();
-            }
-        }
-    }
-
-    function resetMasterToggles() {
-        const btnM = document.getElementById('btnManageToggle');
-        const btnO = document.getElementById('btnOutputToggle');
-        btnM.style.background = 'white';
-        btnM.style.borderColor = 'var(--border)';
-        btnM.innerHTML = `<strong style="color:var(--text-dark);">⚙️ MANAGE DRAW</strong><span style="color:var(--text-light);">Add latecomers, swap pegs, fix typos</span>`;
-        btnO.style.background = 'var(--text-dark)';
-        btnO.style.borderColor = 'var(--text-dark)';
-        btnO.innerHTML = `<strong style="color:white;">🖨️ OUTPUT MENU</strong><span style="color:#94a3b8;">Print rosters, slips, copy Excel data</span>`;
-        document.getElementById('manageMenu').style.display = 'none';
-        document.getElementById('outputMenu').style.display = 'none';
-    }
-
     function persistState() {
         if (!isAppReady) return; 
 
         const stateObj = { 
             title: document.getElementById('matchTitle').value || '',
             data: appState, 
-            scores: scoreState, // V7.4.0 Score Addition
+            scores: scoreState, 
             days: matchDays, 
             zoneSize: currentZoneSize, 
             mobilityMode: mobilityMode,
@@ -1222,7 +1095,7 @@
         });
 
         appState = [];
-        scoreState = {}; // V7.4.0 Score Addition
+        scoreState = {}; 
         trashCan = null;
         document.getElementById('undoBtn').style.display = 'none';
 
@@ -1257,13 +1130,11 @@
     function closeWipeModal() { document.getElementById('wipeModal').style.display = 'none'; }
 
     function handleSafeEdit() {
-        resetMasterToggles();
         handleAmend(true); 
     }
 
     function executePegWipe() {
         closeRedrawModal();
-        resetMasterToggles();
         
         appState.forEach(e => {
             e.anglers.forEach(a => {
@@ -1289,7 +1160,6 @@
                     let d1Str = `D1: ${a.z1} ${a.p1}`;
                     let d2Str = `D2: ${a.z2 || '-'} ${a.p2 || '-'}`;
                     
-                    // V7.4.0 Output Appends
                     let s1 = scoreState[`${e.id}_${i}_1`] || {};
                     let s2 = scoreState[`${e.id}_${i}_2`] || {};
                     let scoreTxt = ` [Scores D1: L:${s1.len||'-'} C:${s1.count||'-'} D2: L:${s2.len||'-'} C:${s2.count||'-'}]`;
@@ -1335,7 +1205,7 @@
         document.getElementById('accPegs2_a').value = '';
         
         appState = []; 
-        scoreState = {}; // V7.4.0 Score Addition
+        scoreState = {}; 
         currentZoneSize = 0;
         setMobilityMode('A'); 
         setDays(2);
@@ -1361,7 +1231,7 @@
 
     function bulkInit() {
         appState = [];
-        scoreState = {}; // V7.4.0 Score Addition
+        scoreState = {}; 
         trashCan = null;
         document.getElementById('undoBtn').style.display = 'none';
         
@@ -1891,7 +1761,6 @@
     }
 
     function toggleSwapMode() { 
-        resetMasterToggles();
         isSwapMode = !isSwapMode;
         swapObj1 = null; 
         document.getElementById('swapPrompt').style.display = isSwapMode ? 'block' : 'none';
@@ -1994,7 +1863,6 @@
     }
 
     function injectLatecomer(isTeam) {
-        resetMasterToggles();
         let used1 = { 'RED':[], 'YELLOW':[], 'GREEN':[], 'BLUE':[] };
         let used2 = { 'RED':[], 'YELLOW':[], 'GREEN':[], 'BLUE':[] };
         
@@ -2071,7 +1939,6 @@
     }
 
     function copyExcelData() {
-        resetMasterToggles();
         let tsv = matchDays === 2 ? "NAME\tTEAM\tDAY 1 ZONE\tDAY 2 ZONE\n" : "NAME\tTEAM\tDAY 1 ZONE\n";
         appState.forEach(g => { 
             g.anglers.forEach(a => { 
@@ -2263,7 +2130,6 @@
     }
 
     function generateRegistrationSheet() {
-        resetMasterToggles();
         const c = document.getElementById('registrationPrintSection'); c.innerHTML = '';
         let matchName = document.getElementById('matchTitle').value;
         let h = `<div class="roster-header"><h1>${matchName}</h1><h2>REGISTRATION SHEET</h2></div>
@@ -2281,7 +2147,6 @@
     }
 
     function printZoneRosters() {
-        resetMasterToggles();
         const c = document.getElementById('rosterSection'); c.innerHTML = '';
         let days = matchDays === 2 ? [1, 2] : [1];
         days.forEach(d => { 
@@ -2313,7 +2178,6 @@
     }
 
     function generateDispatchSlips() {
-        resetMasterToggles();
         const c = document.getElementById('dispatchSection'); c.innerHTML = '';
         let teamsOnly = []; appState.forEach(e => { if (e.isTeam) teamsOnly.push(e); });
         teamsOnly.forEach(e => {
@@ -2347,7 +2211,6 @@
     }
 
     function shareDraw() {
-        resetMasterToggles();
         const el = document.getElementById('resultsSection'); 
         el.classList.add('mobile-pdf-export');
         html2pdf().set({ margin: 0.1, filename: 'DRAW_REPORT.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, scrollY: 0 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } }).from(el).save().then(() => {
@@ -2383,7 +2246,7 @@
             
             setMobilityMode(e.mobilityMode || 'A'); setDays(e.days || 2); 
             appState = e.data || []; 
-            scoreState = e.scores || {}; // Load V7.4.0 Score State
+            scoreState = e.scores || {}; 
             currentZoneSize = e.zoneSize || 0;
             accEnabled = e.accEnabled ? true : false;
             applyAccToggleUI();
