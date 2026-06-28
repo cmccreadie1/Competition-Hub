@@ -593,7 +593,10 @@ body.stage-score-d2 #subBtn-2 { background: var(--card); color: var(--green-colo
 <div id="scoreTab" class="tab-content" style="display:none;">
     <div style="max-width: 1400px; margin: 0 auto; text-align: center; padding-bottom: 10px;">
         
-        <input type="text" id="scoreSearch" placeholder="🔍 SEARCH ANGLER OR TEAM..." oninput="filterScorecards()" class="scorecard-search">
+       <div class="search-wrapper">
+    <input type="text" id="scoreSearch" placeholder="🔍 SEARCH ANGLER OR TEAM..." oninput="filterScorecards()" class="scorecard-search">
+    <button id="clearSearchBtn" onclick="clearSearch()" class="clear-btn">&times;</button>
+</div>
 
         <div id="dayTabsContainer" class="day-tab-nav">
             <button id="subBtn-1" class="day-tab-btn active" onclick="switchScoreDay(1)">DAY 1 SCORES</button>
@@ -2188,6 +2191,12 @@ body.stage-score-d2 #subBtn-2 { background: var(--card); color: var(--green-colo
         } else { startNewDraw(); }
         setTimeout(() => { isAppReady = true; }, 500); 
     };
+    function clearSearch() {
+    const input = document.getElementById('scoreSearch');
+    input.value = '';
+    filterScorecards(); 
+    input.focus();      
+}
 </script>
 </body>
 </html>
