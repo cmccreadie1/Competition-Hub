@@ -12,7 +12,8 @@
         :root {
             /* Stage Backgrounds */
             --bg-base: #f8fafc; /* Draw Setup: Ghost White */
-            --bg-score: #334155; /* Scorecards: Deep Slate Blue for contrast */
+            --bg-score-d1: #334155; /* Day 1: Slate Blue */
+--bg-score-d2: #0f766e; /* Day 2: Forest Teal */
             --card: #ffffff; 
             
             --text-dark: #0f172a; 
@@ -303,9 +304,25 @@
             .roster-page { page-break-after: always; padding: 20px; }
             .roster-header { border-bottom: 3px solid black; margin-bottom: 20px; padding-bottom: 12px; text-align: left; }
         }
+        /* Watermark & Background Stages */
+.day-watermark {
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    font-size: 25vw; color: white; font-weight: 900; opacity: 0.04;
+    pointer-events: none; z-index: 0; white-space: nowrap; display: none;
+}
+body.stage-score-d1 .day-watermark, body.stage-score-d2 .day-watermark { display: block; }
+
+/* Dynamic Backgrounds */
+body.stage-score-d1 { background: var(--bg-score-d1) !important; }
+body.stage-score-d2 { background: var(--bg-score-d2) !important; }
+
+/* Active Day Tab Highlights */
+body.stage-score-d1 #subBtn-1 { background: var(--card); color: var(--accent); }
+body.stage-score-d2 #subBtn-2 { background: var(--card); color: var(--green-color); }
     </style>
 </head>
 <body class="stage-draw">
+    <div id="dayWatermark" class="day-watermark no-print">DAY 1</div>
 
 <div id="toastBanner" class="no-print">ACTION COMPLETED</div>
 
@@ -702,13 +719,23 @@
         }
     }
 
-    function switchScoreDay(day) {
+   function switchScoreDay(day) {
         currentScoreDay = day;
-        document.querySelectorAll('.day-sub-btn').forEach(btn => btn.classList.remove('active'));
+        
+        // This line tells the app which CSS background to use:
+        // If day is 1, it uses 'stage-score-d1' (the blue theme).
+        // If day is 2, it uses 'stage-score-d2' (the teal theme).
+        document.body.className = day === 1 ? 'stage-score-d1' : 'stage-score-d2';
+        
+        // This line updates the floating watermark text:
+        document.getElementById('dayWatermark').innerText = 'DAY ' + day;
+
+        // This keeps your tab-highlighting logic working:
+        document.querySelectorAll('.day-tab-btn').forEach(btn => btn.classList.remove('active'));
         let activeSubBtn = document.getElementById(`subBtn-${day}`);
         if(activeSubBtn) activeSubBtn.classList.add('active');
         
-        document.getElementById('scoreSearch').value = ''; // clear search when switching days
+        document.getElementById('scoreSearch').value = ''; 
         renderScorecards();
     }
 
