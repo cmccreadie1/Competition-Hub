@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Competition Hub - v1.0.0</title>
+    <title>Competition Hub - v1.0.1</title>
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -49,8 +49,7 @@
             margin: 0; padding: 0; 
             text-transform: uppercase; 
             line-height: 1.3; 
-            /* Fixed Sticky Bug by clipping rather than hiding overflow */
-            overflow-x: clip; 
+            overflow-x: clip; /* Fixes sticky header bug */
             padding-bottom: 120px;
             font-variant-numeric: tabular-nums; 
             transition: background-color 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
@@ -107,8 +106,8 @@
         body.stage-score-d1 #tabBtn-score.active { background: var(--bg-score-d1); color: white; border-color: #1e293b; box-shadow: 0 -4px 15px rgba(0,0,0,0.2); }
         body.stage-score-d2 #tabBtn-score.active { background: var(--bg-score-d2); color: white; border-color: #134e4a; box-shadow: 0 -4px 15px rgba(0,0,0,0.2); }
 
-        /* Fixed offset so page clears the header */
-        .tab-content { padding: 130px 20px 40px; position: relative; z-index: 2; }
+        /* Content Offset Fix */
+        .tab-content { padding: 140px 20px 40px; position: relative; z-index: 2; }
         #entrySection, #resultsSection, #dispatchSection, #rosterSection, #registrationPrintSection { max-width: 1400px; margin: 0 auto; position: relative; z-index: 2; }
 
         /* Setup Control Panel */
@@ -145,11 +144,10 @@
         /* SCORECARD: STICKY HEADER & GRID            */
         /* ========================================== */
         .sticky-score-header {
-            position: sticky; top: 110px; /* Docks flawlessly just below the main fixed header */
+            position: sticky; top: 110px; /* Properly aligns below new header height */
             background: var(--bg-score-d1); z-index: 5000; padding: 15px 20px 0;
             transition: background-color 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-            margin: -20px -20px 10px; /* Counteracts parent padding to fill width */
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin: -20px -20px 10px; border-bottom: 1px solid rgba(255,255,255,0.1);
         }
         body.stage-score-d2 .sticky-score-header { background: var(--bg-score-d2); }
 
@@ -170,7 +168,6 @@
 
         .score-list-container { display: flex; flex-direction: column; gap: 8px; max-width: 1400px; margin: 0 auto; }
         
-        /* 7-Column Layout with exact text placeholders */
         .score-list-header, .score-row { display: grid; grid-template-columns: minmax(180px, 2fr) minmax(140px, 1.5fr) 130px 105px 105px 105px 105px; gap: 12px; align-items: center; }
         
         .score-list-header { padding: 12px 20px 8px; font-weight: 900; font-size: 11px; color: #cbd5e1; border-bottom: none; margin-bottom: 0; max-width: 1400px; margin: 0 auto; }
@@ -281,7 +278,6 @@
 </head>
 <body class="stage-draw">
 
-<!-- Giant Floating Watermark (Visible only in Score Stage) -->
 <div id="dayWatermark" class="day-watermark no-print">DAY 1</div>
 
 <div id="toastBanner" class="no-print">ACTION COMPLETED</div>
@@ -294,16 +290,12 @@
         <button id="masterResetBtn" onclick="showWipeModal()" class="btn-action-outline btn-danger-outline" style="padding: 10px 16px; font-size: 11px; font-weight: 900; background: white;">🏁 FINISH AND RESET COMPETITION</button>
     </div>
     
-    <!-- True Folder Tabs -->
     <div class="tab-nav">
         <button id="tabBtn-draw" class="tab-btn active" onclick="switchTab('draw')">1. DRAW SETUP</button>
         <button id="tabBtn-score" class="tab-btn" onclick="switchTab('score')">2. SCORECARDS</button>
     </div>
 </div>
 
-<!-- ========================================== -->
-<!-- TAB 1: DRAW SETUP                          -->
-<!-- ========================================== -->
 <div id="drawTab" class="tab-content active">
 
     <div id="entrySection" class="no-print">
@@ -447,7 +439,6 @@
         </div>
     </div>
 
-    <!-- Modal Menus -->
     <div id="manageMenuModal" class="modal-overlay no-print">
         <div class="modal-content" style="max-width: 700px; padding: 25px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
@@ -547,12 +538,8 @@
     </div>
 </div>
 
-<!-- ========================================== -->
-<!-- TAB 2: SCORECARD DATA ENTRY                -->
-<!-- ========================================== -->
 <div id="scoreTab" class="tab-content" style="display:none;">
     
-    <!-- The Sticky Score Header -->
     <div class="sticky-score-header no-print">
         <div style="max-width: 1400px; margin: 0 auto; text-align: center;">
             <input type="text" id="scoreSearch" placeholder="🔍 SEARCH ANGLER OR TEAM..." oninput="filterScorecards()" class="scorecard-search">
@@ -566,12 +553,10 @@
         <div id="scoreListHeaderContainer"></div>
     </div>
 
-    <!-- The Scrollable Data Entry Area -->
     <div class="scorecard-scroll-wrapper" style="position: relative; z-index: 2;">
         <div id="scoreListContainer" class="score-list-container"></div>
     </div>
 
-    <!-- Export Button at the Bottom -->
     <div style="text-align: center; margin-top: 40px; padding-top: 30px; border-top: 2px dashed rgba(255,255,255,0.1); position: relative; z-index: 2;">
         <p style="color: #cbd5e1; font-weight: 800; font-size: 12px; margin-bottom: 15px;">ONCE ALL SCORES ARE ENTERED, EXPORT FOR EXCEL</p>
         <button onclick="exportMasterData()" class="btn-action" style="background: var(--green-color); font-size: 16px; padding: 20px 40px; width: 100%; max-width: 600px; box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);">
@@ -580,9 +565,6 @@
     </div>
 </div>
 
-<!-- ========================================== -->
-<!-- PRINT SECTIONS & MODALS                    -->
-<!-- ========================================== -->
 <div id="registrationPrintSection" class="no-print"></div>
 <div id="dispatchSection" class="no-print"></div>
 <div id="rosterSection" class="no-print"></div>
@@ -630,9 +612,8 @@
         </div>
     </div>
 </div>
-
 <script>
-    const APP_VERSION = "v1.0.0";
+    const APP_VERSION = "v1.0.1";
     document.getElementById('vTag').innerText = APP_VERSION;
 
     const zones = ['RED', 'YELLOW', 'GREEN', 'BLUE'];
