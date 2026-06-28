@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Competition Hub - v2.2.0</title>
+    <title>Competition Hub - v2.3.0</title>
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -120,8 +120,8 @@
         #tabBtn-draw.active { background: var(--bg-base); color: var(--text-dark); }
         #tabBtn-score.active { background: #1e293b; color: white; border-color: #1e293b; box-shadow: 0 -4px 15px rgba(0,0,0,0.2); }
 
-        /* Reduced padding-top to account for shorter header */
-        .tab-content { padding: 110px 20px 40px; }
+        /* Restored padding to ensure content clears the fixed header completely */
+        .tab-content { padding: 130px 20px 40px; }
         #entrySection, #resultsSection, #dispatchSection, #rosterSection, #registrationPrintSection { max-width: 1400px; margin: 0 auto; }
 
         /* Setup Control Panel */
@@ -173,18 +173,6 @@
         .day-tab-btn { padding: 12px 30px; font-weight: 900; font-size: 14px; border-radius: 12px 12px 0 0; background: #475569; color: #94a3b8; border: 2px solid transparent; border-bottom: none; cursor: pointer; transition: 0.2s; margin-bottom: -2px; }
         .day-tab-btn.active { background: var(--card); color: var(--accent); border-color: var(--border); padding-bottom: 14px; z-index: 10; }
         
-        .sticky-score-header {
-            position: sticky; 
-            top: 95px; /* Adjusted up since the header is slimmer */
-            z-index: 4000; 
-            padding: 15px 20px 0;
-            margin: -20px -20px 10px; 
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        /* Make sure sticky header background dynamically matches the day background */
-        body.stage-score-d1 .sticky-score-header { background: var(--bg-score-d1); }
-        body.stage-score-d2 .sticky-score-header { background: var(--bg-score-d2); }
-
         .scorecard-search {
             width: 100%; max-width: 600px; margin: 0 auto 25px; display: block;
             font-size: 16px; padding: 16px 80px 16px 24px; border-radius: 50px;
@@ -617,19 +605,17 @@
 
 <div id="scoreTab" class="tab-content" style="display:none;">
     
-    <div class="sticky-score-header no-print">
-        <div style="max-width: 1400px; margin: 0 auto; text-align: center;">
-            <div id="scoreProgressText" style="font-size: 13px; font-weight: 900; color: #94a3b8; text-align: center; margin-bottom: 10px;">SCORES LOGGED: 0 / 0</div>
-            
-            <div class="search-wrapper">
-                <input type="text" id="scoreSearch" placeholder="🔍 SEARCH ANGLER OR TEAM..." oninput="filterScorecards()" class="scorecard-search">
-                <button id="clearSearchBtn" onclick="clearSearch()" class="clear-btn">CLEAR</button>
-            </div>
+    <div style="max-width: 1400px; margin: 0 auto; text-align: center; padding-bottom: 10px;">
+        <div id="scoreProgressText" style="font-size: 13px; font-weight: 900; color: #94a3b8; text-align: center; margin-bottom: 15px;">SCORES LOGGED: 0 / 0</div>
+        
+        <div class="search-wrapper">
+            <input type="text" id="scoreSearch" placeholder="🔍 SEARCH ANGLER OR TEAM..." oninput="filterScorecards()" class="scorecard-search">
+            <button id="clearSearchBtn" onclick="clearSearch()" class="clear-btn">CLEAR</button>
+        </div>
 
-            <div id="dayTabsContainer" class="day-tab-nav">
-                <button id="subBtn-1" class="day-tab-btn active" onclick="switchScoreDay(1)">DAY 1 SCORES</button>
-                <button id="subBtn-2" class="day-tab-btn" onclick="switchScoreDay(2)">DAY 2 SCORES</button>
-            </div>
+        <div id="dayTabsContainer" class="day-tab-nav">
+            <button id="subBtn-1" class="day-tab-btn active" onclick="switchScoreDay(1)">DAY 1 SCORES</button>
+            <button id="subBtn-2" class="day-tab-btn" onclick="switchScoreDay(2)">DAY 2 SCORES</button>
         </div>
     </div>
 
@@ -694,7 +680,7 @@
 </div>
 
 <script>
-    const APP_VERSION = "v2.2.0";
+    const APP_VERSION = "v2.3.0";
     document.getElementById('vTag').innerText = APP_VERSION;
 
     const zones = ['RED', 'YELLOW', 'GREEN', 'BLUE'];
