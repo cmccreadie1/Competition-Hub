@@ -12,14 +12,18 @@
         :root {
             /* Stage Backgrounds */
             --bg-base: #f8fafc; /* Draw Setup: Ghost White */
-            --bg-score: #334155; /* Scorecards: Deep Slate Blue for contrast */
+            --bg-score-d1: #334155; /* Day 1 Scorecards: Deep Slate Blue */
+            --bg-score-d2: #0f766e; /* Day 2 Scorecards: Deep Forest Teal */
             --card: #ffffff; 
             
             --text-dark: #0f172a; 
             --text-light: #64748b; 
             
-            --accent: #0ea5e9; 
+            --accent: #0ea5e9; /* Blue highlight */
             --accent-glow: rgba(14, 165, 233, 0.2);
+            --accent-d2: #10b981; /* Green highlight for Day 2 */
+            --accent-d2-glow: rgba(16, 185, 129, 0.2);
+            
             --border: #cbd5e1; 
             
             /* High-Contrast Status Colors */
@@ -51,31 +55,29 @@
             transition: background-color 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
 
+        /* Day Background Logic */
+        body.stage-score-d1 { background: var(--bg-score-d1); }
+        body.stage-score-d2 { background: var(--bg-score-d2); }
+
+        /* Floating Watermark */
+        .day-watermark {
+            position: fixed; top: 55%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 20vw; color: white; font-weight: 900; opacity: 0.03;
+            pointer-events: none; z-index: 0; white-space: nowrap; display: none;
+        }
+        body.stage-score-d1 .day-watermark, body.stage-score-d2 .day-watermark { display: block; }
+
+        /* Base Inputs */
         input, select, textarea { 
-            text-transform: uppercase; 
-            font-weight: 800 !important; 
-            color: var(--text-dark); 
-            background: #ffffff; 
-            border: 2px solid var(--border); 
-            border-radius: 12px; 
-            padding: 12px 16px; 
-            outline: none; 
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); 
-            width: 100%; 
-            box-sizing: border-box; 
-            font-size: 14px; 
+            text-transform: uppercase; font-weight: 800 !important; color: var(--text-dark); 
+            background: #ffffff; border: 2px solid var(--border); border-radius: 12px; 
+            padding: 12px 16px; outline: none; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); 
+            width: 100%; box-sizing: border-box; font-size: 14px; 
         }
 
-        input:focus, select:focus, textarea:focus { 
-            border-color: var(--accent); 
-            box-shadow: 0 0 0 4px var(--accent-glow);
-        }
+        input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-glow); }
 
-        #matchTitle {
-            font-size: 18px; text-align: center; border: 2px dashed var(--border);
-            background: #ffffff; padding: 16px; color: var(--text-dark); border-radius: 16px;
-        }
-
+        #matchTitle { font-size: 18px; text-align: center; border: 2px dashed var(--border); background: #ffffff; padding: 16px; color: var(--text-dark); border-radius: 16px; }
         #matchTitle:focus { border: 2px solid var(--accent); }
         #matchTitle::placeholder { color: #94a3b8; font-weight: 600 !important; text-transform: none; font-style: italic; }
         .input-error { background: var(--red-soft) !important; border-color: var(--red-color) !important; color: var(--red-color) !important; }
@@ -83,75 +85,46 @@
         /* Fixed Header & True Folder Tabs */
         .fixed-header { 
             position: fixed; top: 0; left: 0; right: 0; z-index: 5000; 
-            background: rgba(255, 255, 255, 0.98); 
-            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            border-bottom: 2px solid var(--border); 
-            padding: 14px 20px 0px; 
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            transition: border-bottom-color 0.4s;
+            background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border-bottom: 2px solid var(--border); padding: 14px 20px 0px; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08); transition: border-bottom-color 0.4s;
         }
 
-        body.stage-score .fixed-header { border-bottom-color: #1e293b; }
+        body.stage-score-d1 .fixed-header { border-bottom-color: #1e293b; }
+        body.stage-score-d2 .fixed-header { border-bottom-color: #134e4a; }
 
         .header-content { display: flex; justify-content: space-between; align-items: center; max-width: 1400px; margin: 0 auto 15px; }
         .brand-name { font-size: 20px; font-weight: 900; letter-spacing: -0.5px; color: var(--text-dark); display: flex; align-items: center; }
         .v-tag { font-size: 12px; color: var(--accent); margin-left: 10px; font-weight: 900; background: var(--accent-glow); padding: 4px 8px; border-radius: 20px; }
 
         .tab-nav { display: flex; justify-content: center; gap: 8px; max-width: 1400px; margin: 0 auto; align-items: flex-end; }
-
-        .tab-btn {
-            flex: 1; max-width: 400px; padding: 16px 20px;
-            background: #cbd5e1; border: 2px solid var(--border); border-bottom: none;
-            border-radius: 16px 16px 0 0; font-weight: 900; font-size: 15px;
-            color: #475569; cursor: pointer; transition: all 0.3s;
-            box-shadow: inset 0 -4px 10px rgba(0,0,0,0.05);
-            position: relative;
-        }
-
+        .tab-btn { flex: 1; max-width: 400px; padding: 16px 20px; background: #cbd5e1; border: 2px solid var(--border); border-bottom: none; border-radius: 16px 16px 0 0; font-weight: 900; font-size: 15px; color: #475569; cursor: pointer; transition: all 0.3s; box-shadow: inset 0 -4px 10px rgba(0,0,0,0.05); position: relative; }
         .tab-btn:hover { background: #e2e8f0; color: var(--text-dark); }
-
-        .tab-btn.active {
-            padding-bottom: 20px; margin-bottom: -2px; z-index: 10;
-            box-shadow: 0 -4px 15px rgba(0,0,0,0.05);
-            border-color: var(--border);
-        }
-
+        .tab-btn.active { padding-bottom: 20px; margin-bottom: -2px; z-index: 10; box-shadow: 0 -4px 15px rgba(0,0,0,0.05); border-color: var(--border); }
+        
         #tabBtn-draw.active { background: var(--bg-base); color: var(--text-dark); }
-        #tabBtn-score.active { background: var(--bg-score); color: white; border-color: #1e293b; box-shadow: 0 -4px 15px rgba(0,0,0,0.2); }
+        body.stage-score-d1 #tabBtn-score.active { background: var(--bg-score-d1); color: white; border-color: #1e293b; box-shadow: 0 -4px 15px rgba(0,0,0,0.2); }
+        body.stage-score-d2 #tabBtn-score.active { background: var(--bg-score-d2); color: white; border-color: #134e4a; box-shadow: 0 -4px 15px rgba(0,0,0,0.2); }
 
-        .tab-content { padding: 160px 20px 40px; }
+        .tab-content { padding: 130px 20px 40px; position: relative; z-index: 1; }
         #entrySection, #resultsSection, #dispatchSection, #rosterSection, #registrationPrintSection { max-width: 1400px; margin: 0 auto; }
 
         /* Setup Control Panel */
-        .control-panel { 
-            background: var(--card); border-radius: 20px; padding: 25px; 
-            border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-            text-align: center; margin-bottom: 20px; 
-        }
-
+        .control-panel { background: var(--card); border-radius: 20px; padding: 25px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.05); text-align: center; margin-bottom: 20px; }
         .bucket-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
         .duration-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; background: #f1f5f9; padding: 6px; border-radius: 50px; width: 100%; margin: 0 auto; }
         .dt-opt { padding: 10px; border-radius: 50px; cursor: pointer; font-weight: 800; font-size: 13px; display: flex; align-items: center; justify-content: center; color: var(--text-light); transition: all 0.3s; }
         .dt-opt.active { color: var(--text-dark); background: #ffffff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
 
         /* Setup Zone Cards */
-        .zone-card { 
-            background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 12px 0; 
-            position: relative; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            break-inside: avoid; page-break-inside: avoid; overflow: hidden; 
-        }
+        .zone-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 12px 0; position: relative; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.05); break-inside: avoid; page-break-inside: avoid; overflow: hidden; }
         .zone-card:hover { box-shadow: 0 8px 25px rgba(0,0,0,0.1); transform: translateY(-2px); }
         .zone-card.solo-card { height: fit-content; align-self: start; }
         .zone-header { font-size: 13px; font-weight: 900; color: var(--text-dark); margin: 0 0 10px 0; padding: 0 16px 10px 16px; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; }
         .res-row { display: grid; grid-template-columns: 1fr 95px 95px; gap: 12px; align-items: center; padding: 6px 16px; border-bottom: none; }
         .angler-name { font-size: 13px; font-weight: 800; color: var(--text-dark); pointer-events: none; line-height: 1.3; }
 
-        .draw-pill { 
-            padding: 8px 10px; border-radius: 12px; font-size: 11px; font-weight: 900; text-align: center; 
-            border: 2px solid transparent; color: white; cursor: default; transition: all 0.2s;
-            display: flex; align-items: center; justify-content: center; gap: 4px;
-        }
-
+        .draw-pill { padding: 8px 10px; border-radius: 12px; font-size: 11px; font-weight: 900; text-align: center; border: 2px solid transparent; color: white; cursor: default; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 4px; }
         .draw-pill.swap-active { cursor: pointer; border: 2px dashed var(--text-dark); background: transparent !important; color: var(--text-dark); opacity: 0.7; }
         .draw-pill.swap-selected { border: 2px solid var(--text-dark) !important; background: var(--text-dark) !important; color: white !important; opacity: 1; z-index: 10; position: relative; transform: scale(1.1); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
         .clash-glow { border: 2px solid var(--red-color) !important; background: var(--red-soft) !important; color: var(--red-color) !important; box-shadow: 0 0 12px rgba(239, 68, 68, 0.3) !important; }
@@ -166,64 +139,60 @@
         .anomaly-banner ul { color: var(--text-dark); font-size: 12px; font-weight: 600; margin: 0; padding-left: 20px; text-transform: none; }
         .anomaly-banner li { margin-bottom: 4px; }
 
-        /* SCORECARD: Horizontal Linear Layout */
-        .day-tab-nav { display: flex; justify-content: center; gap: 4px; margin-bottom: 20px; align-items: flex-end; border-bottom: 2px solid rgba(255,255,255,0.1); }
-        .day-tab-btn { padding: 12px 30px; font-weight: 900; font-size: 14px; border-radius: 12px 12px 0 0; background: #475569; color: #94a3b8; border: 2px solid transparent; border-bottom: none; cursor: pointer; transition: 0.2s; margin-bottom: -2px; }
-        .day-tab-btn.active { background: var(--card); color: var(--accent); border-color: var(--border); padding-bottom: 14px; z-index: 10; }
+        /* ========================================== */
+        /* SCORECARD: STICKY HEADER & GRID            */
+        /* ========================================== */
+        .sticky-score-header {
+            position: sticky; top: 72px; /* Docks just below the main fixed header */
+            background: var(--bg-score-d1); z-index: 4000; padding: 25px 20px 0;
+            transition: background-color 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            margin: -20px -20px 10px; /* Counteracts parent padding to fill width */
+        }
+        body.stage-score-d2 .sticky-score-header { background: var(--bg-score-d2); }
 
         .scorecard-search {
-            width: 100%; max-width: 600px; margin: 0 auto 25px; display: block;
+            width: 100%; max-width: 600px; margin: 0 auto 20px; display: block;
             font-size: 16px; padding: 16px 24px; border-radius: 50px;
-            border: 2px solid var(--accent); box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-            background: #ffffff; color: var(--text-dark);
+            border: 2px solid transparent; box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            background: #ffffff; color: var(--text-dark); transition: 0.3s;
         }
+        body.stage-score-d1 .scorecard-search:focus { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-glow); }
+        body.stage-score-d2 .scorecard-search:focus { border-color: var(--accent-d2); box-shadow: 0 0 0 4px var(--accent-d2-glow); }
+
+        .day-tab-nav { display: flex; justify-content: center; gap: 4px; margin-bottom: 0px; align-items: flex-end; border-bottom: 2px solid rgba(255,255,255,0.1); max-width: 1400px; margin: 0 auto; }
+        .day-tab-btn { padding: 12px 30px; font-weight: 900; font-size: 14px; border-radius: 12px 12px 0 0; background: #475569; color: #94a3b8; border: 2px solid transparent; border-bottom: none; cursor: pointer; transition: 0.2s; margin-bottom: -2px; }
+        
+        body.stage-score-d1 .day-tab-btn.active { background: var(--card); color: var(--accent); border-color: var(--border); padding-bottom: 14px; z-index: 10; }
+        body.stage-score-d2 .day-tab-btn.active { background: var(--card); color: var(--accent-d2); border-color: var(--border); padding-bottom: 14px; z-index: 10; }
 
         .score-list-container { display: flex; flex-direction: column; gap: 8px; max-width: 1400px; margin: 0 auto; }
+        .score-list-header, .score-row { display: grid; grid-template-columns: minmax(180px, 2fr) minmax(140px, 1.5fr) 130px 90px 90px 90px 90px; gap: 12px; align-items: center; }
+        
+        .score-list-header { padding: 12px 20px 8px; font-weight: 900; font-size: 11px; color: #cbd5e1; border-bottom: 2px solid rgba(255,255,255,0.1); margin-bottom: 0; max-width: 1400px; margin: 0 auto; }
 
-        .score-list-header, .score-row {
-            display: grid;
-            grid-template-columns: minmax(180px, 2fr) minmax(140px, 1.5fr) 130px 90px 90px 90px 90px;
-            gap: 12px; align-items: center;
-        }
-
-        .score-list-header { padding: 0 20px 8px; font-weight: 900; font-size: 11px; color: #cbd5e1; border-bottom: 2px solid rgba(255,255,255,0.1); margin-bottom: 4px; }
-
-        .score-row {
-            background: var(--card); border: 2px solid transparent;
-            border-radius: 12px; padding: 10px 20px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1); transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
-        }
-
-        .score-row.focused-row {
-            border: 2px solid var(--accent); transform: scale(1.02);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4); z-index: 10; position: relative;
-        }
+        .score-row { background: var(--card); border: 2px solid transparent; border-radius: 12px; padding: 10px 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1); position: relative; z-index: 1; }
+        
+        body.stage-score-d1 .score-row.focused-row { border: 2px solid var(--accent); transform: scale(1.02); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4); z-index: 10; position: relative; }
+        body.stage-score-d2 .score-row.focused-row { border: 2px solid var(--accent-d2); transform: scale(1.02); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4); z-index: 10; position: relative; }
 
         .score-row input { width: 100%; text-align: center; font-size: 15px; padding: 10px 4px; background: #f8fafc; border: 1px solid var(--border); }
-        .score-row.focused-row input:focus { background: #ffffff; border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-glow); }
+        
+        body.stage-score-d1 .score-row.focused-row input:focus { background: #ffffff; border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-glow); }
+        body.stage-score-d2 .score-row.focused-row input:focus { background: #ffffff; border-color: var(--accent-d2); box-shadow: 0 0 0 4px var(--accent-d2-glow); }
+        
         .score-row input::placeholder { font-size: 10px; color: #94a3b8; }
 
         .s-name { font-size: 14px; font-weight: 900; color: var(--text-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .s-team { font-size: 12px; font-weight: 800; color: var(--text-light); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .s-peg { font-size: 13px; font-weight: 900; }
 
-        .scorecard-scroll-wrapper { width: 100%; overflow-x: auto; padding-bottom: 20px; }
+        .scorecard-scroll-wrapper { width: 100%; overflow-x: auto; padding-bottom: 20px; margin-top: 15px; }
 
         /* Buttons */
-        .btn-action { 
-            background: var(--accent); border: none; color: white; font-weight: 800; 
-            padding: 16px 32px; border-radius: 50px; cursor: pointer; font-size: 14px; 
-            letter-spacing: 0.5px; transition: all 0.3s;
-            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
-        }
+        .btn-action { background: var(--accent); border: none; color: white; font-weight: 800; padding: 16px 32px; border-radius: 50px; cursor: pointer; font-size: 14px; letter-spacing: 0.5px; transition: all 0.3s; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3); }
         .btn-action:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(14, 165, 233, 0.4); }
         .btn-action:disabled { background: var(--border); box-shadow: none; color: white; cursor: not-allowed; }
-
-        .btn-action-outline { 
-            background: transparent; border: 2px solid var(--border); color: var(--text-dark); 
-            font-weight: 800; padding: 16px 32px; border-radius: 50px; cursor: pointer; 
-            font-size: 14px; transition: all 0.3s;
-        }
+        .btn-action-outline { background: transparent; border: 2px solid var(--border); color: var(--text-dark); font-weight: 800; padding: 16px 32px; border-radius: 50px; cursor: pointer; font-size: 14px; transition: all 0.3s; }
         .btn-action-outline:hover { border-color: var(--text-dark); color: white; background: var(--text-dark); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
         
         .btn-tool { background: #f8fafc; border: 1px solid var(--border); color: var(--text-dark); font-size: 11px; font-weight: 800; padding: 8px 14px; border-radius: 50px; cursor: pointer; transition: all 0.2s; }
@@ -306,6 +275,8 @@
     </style>
 </head>
 <body class="stage-draw">
+
+<div id="dayWatermark" class="day-watermark no-print">DAY 1</div>
 
 <div id="toastBanner" class="no-print">ACTION COMPLETED</div>
 
@@ -565,22 +536,26 @@
     </div>
 </div>
 
-<div id="scoreTab" class="tab-content" style="display:none;">
-    <div style="max-width: 1400px; margin: 0 auto; text-align: center; padding-bottom: 10px;">
-        
-        <input type="text" id="scoreSearch" placeholder="🔍 SEARCH ANGLER OR TEAM..." oninput="filterScorecards()" class="scorecard-search">
+<div id="scoreTab" class="tab-content" style="display:none; padding-top: 80px;">
+    
+    <div class="sticky-score-header no-print">
+        <div style="max-width: 1400px; margin: 0 auto; text-align: center;">
+            <input type="text" id="scoreSearch" placeholder="🔍 SEARCH ANGLER OR TEAM..." oninput="filterScorecards()" class="scorecard-search">
 
-        <div id="dayTabsContainer" class="day-tab-nav">
-            <button id="subBtn-1" class="day-tab-btn active" onclick="switchScoreDay(1)">DAY 1 SCORES</button>
-            <button id="subBtn-2" class="day-tab-btn" onclick="switchScoreDay(2)">DAY 2 SCORES</button>
+            <div id="dayTabsContainer" class="day-tab-nav">
+                <button id="subBtn-1" class="day-tab-btn active" onclick="switchScoreDay(1)">DAY 1 SCORES</button>
+                <button id="subBtn-2" class="day-tab-btn" onclick="switchScoreDay(2)">DAY 2 SCORES</button>
+            </div>
         </div>
+        
+        <div id="scoreListHeaderContainer"></div>
     </div>
 
-    <div class="scorecard-scroll-wrapper">
+    <div class="scorecard-scroll-wrapper" style="position: relative; z-index: 1;">
         <div id="scoreListContainer" class="score-list-container"></div>
     </div>
 
-    <div style="text-align: center; margin-top: 40px; padding-top: 30px; border-top: 2px dashed rgba(255,255,255,0.1);">
+    <div style="text-align: center; margin-top: 40px; padding-top: 30px; border-top: 2px dashed rgba(255,255,255,0.1); position: relative; z-index: 1;">
         <p style="color: #cbd5e1; font-weight: 800; font-size: 12px; margin-bottom: 15px;">ONCE ALL SCORES ARE ENTERED, EXPORT FOR EXCEL</p>
         <button onclick="exportMasterData()" class="btn-action" style="background: var(--green-color); font-size: 16px; padding: 20px 40px; width: 100%; max-width: 600px; box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);">
             📋 EXPORT MASTER SCORES FOR EXCEL
@@ -696,7 +671,6 @@
         if (tabId === 'draw') {
             document.body.className = 'stage-draw';
         } else {
-            document.body.className = 'stage-score';
             document.getElementById('dayTabsContainer').style.display = matchDays === 2 ? 'flex' : 'none';
             switchScoreDay(1); 
         }
@@ -704,11 +678,14 @@
 
     function switchScoreDay(day) {
         currentScoreDay = day;
+        document.body.className = day === 1 ? 'stage-score-d1' : 'stage-score-d2';
+        document.getElementById('dayWatermark').innerText = 'DAY ' + day;
+
         document.querySelectorAll('.day-sub-btn').forEach(btn => btn.classList.remove('active'));
         let activeSubBtn = document.getElementById(`subBtn-${day}`);
         if(activeSubBtn) activeSubBtn.classList.add('active');
         
-        document.getElementById('scoreSearch').value = ''; // clear search when switching days
+        document.getElementById('scoreSearch').value = ''; 
         renderScorecards();
     }
 
@@ -724,7 +701,7 @@
             let team = row.querySelector('.s-team').innerText.toUpperCase();
             
             if (name.includes(filter) || team.includes(filter)) {
-                row.style.display = 'grid'; // Maintain grid layout
+                row.style.display = 'grid'; 
             } else {
                 row.style.display = 'none';
             }
@@ -744,11 +721,14 @@
     }
 
     function renderScorecards() {
+        const headerContainer = document.getElementById('scoreListHeaderContainer');
         const container = document.getElementById('scoreListContainer');
         container.innerHTML = '';
+        headerContainer.innerHTML = '';
         
         let hasDrawnData = false;
         
+        // Render Column Headers into the Sticky Area
         let headerRow = document.createElement('div');
         headerRow.className = 'score-list-header';
         headerRow.innerHTML = `
@@ -760,7 +740,7 @@
             <div style="text-align:center;">BIGGEST</div>
             <div style="text-align:center;">SPECIES</div>
         `;
-        container.appendChild(headerRow);
+        headerContainer.appendChild(headerRow);
 
         let sortedState = [...appState].sort((a,b) => (a.tName||"").localeCompare(b.tName||""));
 
@@ -1002,9 +982,8 @@
     function showWipeModal() { document.getElementById('wipeModal').style.display = 'flex'; }
     function closeWipeModal() { document.getElementById('wipeModal').style.display = 'none'; }
 
-    // FIXED: Now accurately routes to Setup Edit screen and switches tab automatically.
     function handleSafeEdit() {
-        switchTab('draw'); 
+        switchTab('draw');
         handleAmend(true); 
     }
 
@@ -1982,7 +1961,6 @@
         persistState();
     }
 
-    // FIXED: Correctly routed back to the edit screen
     function handleAmend(isSafe) { 
         switchTab('draw');
 
