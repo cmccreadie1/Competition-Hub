@@ -1,0 +1,2408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Competition Hub - v7.4.0</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+        :root {
+            /* v7.4.0 Light Mode Palette */
+            --bg-base: #f8fafc; 
+            --card: #ffffff; 
+            
+            --text-dark: #0f172a; 
+            --text-light: #64748b; 
+            
+            --accent: #0ea5e9; 
+            --accent-glow: rgba(14, 165, 233, 0.2);
+            --border: #cbd5e1; 
+            
+            /* High-Contrast Status Colors */
+            --red-color: #ef4444;
+            --yellow-color: #f59e0b;
+            --green-color: #10b981;
+            --blue-color: #3b82f6;
+            
+            --red-soft: #fef2f2;
+            --yellow-soft: #fffbeb;
+            --green-soft: #ecfdf5;
+            --blue-soft: #eff6ff;
+            --pending: #f59e0b; 
+            --a-color: #ca8a04; 
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 150px;
+        }
+
+        body { 
+            font-family: 'Inter', system-ui, -apple-system, sans-serif; 
+            background: var(--bg-base); 
+            color: var(--text-dark); 
+            margin: 0; 
+            padding: 0; 
+            text-transform: uppercase; 
+            line-height: 1.3; 
+            overflow-x: hidden; 
+            padding-bottom: 120px;
+            font-variant-numeric: tabular-nums; 
+        }
+
+        /* Pill Inputs globally adapted */
+        input, select, textarea { 
+            text-transform: uppercase; 
+            font-weight: 800 !important; 
+            color: var(--text-dark); 
+            background: #ffffff; 
+            border: 2px solid var(--border); 
+            border-radius: 12px; 
+            padding: 12px 16px; 
+            outline: none; 
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); 
+            width: 100%; 
+            box-sizing: border-box; 
+            font-size: 14px; 
+        }
+
+        input:focus, select:focus, textarea:focus { 
+            border-color: var(--accent); 
+            box-shadow: 0 0 0 4px var(--accent-glow);
+        }
+
+        /* Main title input */
+        #matchTitle {
+            font-size: 18px;
+            text-align: center;
+            border: 2px dashed var(--border);
+            background: #ffffff;
+            padding: 16px;
+            color: var(--text-dark);
+            border-radius: 16px;
+        }
+
+        #matchTitle:focus { border: 2px solid var(--accent); }
+        #matchTitle::placeholder { color: #94a3b8; font-weight: 600 !important; text-transform: none; font-style: italic; }
+
+        .input-error {
+            background: var(--red-soft) !important;
+            border-color: var(--red-color) !important;
+            color: var(--red-color) !important;
+        }
+
+        /* Fixed Header & Tabs */
+        .fixed-header { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            right: 0; 
+            z-index: 5000; 
+            background: rgba(255, 255, 255, 0.98); 
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border); 
+            padding: 14px 20px 20px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+        }
+
+        .header-content { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            max-width: 1400px; 
+            margin: 0 auto 15px; 
+        }
+
+        .brand-name { 
+            font-size: 20px; 
+            font-weight: 900; 
+            letter-spacing: -0.5px; 
+            color: var(--text-dark); 
+            display: flex; 
+            align-items: center; 
+        }
+
+        .v-tag { 
+            font-size: 12px; 
+            color: var(--accent); 
+            margin-left: 10px; 
+            font-weight: 900; 
+            background: var(--accent-glow);
+            padding: 4px 8px;
+            border-radius: 20px;
+        }
+
+        /* Tab Navigation */
+        .tab-nav {
+            display: flex; justify-content: center; gap: 16px; max-width: 1400px; margin: 0 auto;
+        }
+
+        .tab-btn {
+            flex: 1; max-width: 400px; padding: 16px 20px;
+            background: #f1f5f9; border: 2px solid var(--border);
+            border-radius: 16px; font-weight: 900; font-size: 15px;
+            color: var(--text-light); cursor: pointer; transition: all 0.2s;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .tab-btn.active {
+            background: var(--text-dark); color: white; border-color: var(--text-dark);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.15); transform: translateY(-2px);
+        }
+
+        /* Container Padding */
+        .tab-content { padding: 160px 20px 40px; }
+        
+        #entrySection, #resultsSection, #dispatchSection, #rosterSection, #registrationPrintSection { 
+            max-width: 1400px; 
+            margin: 0 auto; 
+        }
+
+        /* Draw Setup Control Panel */
+        .control-panel { 
+            background: var(--card); 
+            border-radius: 20px; 
+            padding: 25px; 
+            border: 1px solid var(--border); 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            text-align: center; 
+            margin-bottom: 20px; 
+        }
+
+        .bucket-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); 
+            gap: 20px; 
+        }
+
+        .duration-toggle { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 8px; 
+            background: #f1f5f9; 
+            padding: 6px; 
+            border-radius: 50px; 
+            width: 100%; 
+            margin: 0 auto; 
+        }
+
+        .dt-opt { 
+            padding: 10px; 
+            border-radius: 50px; 
+            cursor: pointer; 
+            font-weight: 800; 
+            font-size: 13px; 
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            color: var(--text-light); 
+            background: transparent; 
+        }
+
+        .dt-opt.active { 
+            color: var(--text-dark); 
+            background: #ffffff; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        /* Setup Zone Cards */
+        .zone-card { 
+            background: var(--card); 
+            border: 1px solid var(--border); 
+            border-radius: 20px; 
+            padding: 12px 0; 
+            position: relative; 
+            transition: transform 0.2s, box-shadow 0.2s; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            break-inside: avoid; 
+            page-break-inside: avoid; 
+            overflow: hidden; 
+        }
+
+        .zone-card:hover {
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .zone-card.solo-card { height: fit-content; align-self: start; }
+
+        .zone-header { 
+            font-size: 13px; 
+            font-weight: 900; 
+            color: var(--text-dark); 
+            margin: 0 0 10px 0; 
+            padding: 0 16px 10px 16px; 
+            border-bottom: 1px solid #f1f5f9; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+        }
+
+        .res-row { 
+            display: grid; 
+            grid-template-columns: 1fr 95px 95px; 
+            gap: 12px; 
+            align-items: center; 
+            padding: 6px 16px; 
+            border-bottom: none; 
+        }
+
+        .angler-name { 
+            font-size: 13px; 
+            font-weight: 800; 
+            color: var(--text-dark);
+            pointer-events: none; 
+            line-height: 1.3;
+        }
+
+        .draw-pill { 
+            padding: 8px 10px; 
+            border-radius: 12px; 
+            font-size: 11px; 
+            font-weight: 900; 
+            text-align: center; 
+            border: 2px solid transparent; 
+            color: white; 
+            cursor: default;
+            transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .draw-pill.swap-active { 
+            cursor: pointer; 
+            border: 2px dashed var(--text-dark); 
+            background: transparent !important;
+            color: var(--text-dark);
+            opacity: 0.7;
+        }
+
+        .draw-pill.swap-selected { 
+            border: 2px solid var(--text-dark) !important; 
+            background: var(--text-dark) !important;
+            color: white !important;
+            opacity: 1;
+            z-index: 10;
+            position: relative;
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .clash-glow { 
+            border: 2px solid var(--red-color) !important; 
+            background: var(--red-soft) !important; 
+            color: var(--red-color) !important; 
+            box-shadow: 0 0 12px rgba(239, 68, 68, 0.3) !important;
+        }
+
+        .peg-num { font-size: 15px; font-weight: 900; }
+        .a-tag { color: var(--a-color); font-weight: 900; margin-left: 6px; font-size: 12px; }
+
+        .anomaly-banner {
+            background: var(--red-soft);
+            border: 1px solid var(--red-color);
+            border-left: 4px solid var(--red-color);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            display: none;
+        }
+
+        .anomaly-banner.warning {
+            background: var(--yellow-soft);
+            border-color: var(--yellow-color);
+            border-left-color: var(--yellow-color);
+        }
+
+        .anomaly-banner h3 { color: var(--red-color); margin: 0 0 8px 0; font-size: 14px; text-align: left; }
+        .anomaly-banner.warning h3 { color: var(--yellow-color); }
+        .anomaly-banner ul { color: var(--text-dark); font-size: 12px; font-weight: 600; margin: 0; padding-left: 20px; text-transform: none; }
+        .anomaly-banner li { margin-bottom: 4px; }
+
+        /* SCORECARD: Horizontal Linear Layout */
+        .day-sub-nav { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+        
+        .day-sub-btn {
+            padding: 10px 30px; font-weight: 900; font-size: 14px; border-radius: 50px;
+            background: #f1f5f9; color: var(--text-light); border: 1px solid var(--border);
+            cursor: pointer; transition: 0.2s;
+        }
+
+        .day-sub-btn.active {
+            background: var(--accent); color: white; border-color: var(--accent);
+            box-shadow: 0 4px 10px var(--accent-glow);
+        }
+
+        .score-list-container {
+            display: flex; flex-direction: column; gap: 8px; max-width: 1400px; margin: 0 auto;
+        }
+
+        /* 7 Columns: Name, Team, Peg, Len, Cnt, Big, Spec */
+        .score-list-header, .score-row {
+            display: grid;
+            grid-template-columns: minmax(180px, 2fr) minmax(140px, 1.5fr) 130px 90px 90px 90px 90px;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .score-list-header {
+            padding: 0 20px 8px; font-weight: 900; font-size: 11px; color: var(--text-light);
+            border-bottom: 2px solid var(--border); margin-bottom: 4px;
+        }
+
+        .score-row {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 12px; padding: 10px 20px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02); transition: 0.2s;
+        }
+        
+        .score-row:hover { border-color: var(--accent); box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+
+        .s-name { font-size: 14px; font-weight: 900; color: var(--text-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .s-team { font-size: 12px; font-weight: 800; color: var(--text-light); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .s-peg { font-size: 13px; font-weight: 900; }
+
+        .score-row input {
+            width: 100%; text-align: center; font-size: 15px; padding: 10px 4px;
+            background: #f8fafc;
+        }
+        .score-row input:focus { background: white; }
+        .score-row input::placeholder { font-size: 10px; color: #94a3b8; }
+
+        .scorecard-scroll-wrapper { width: 100%; overflow-x: auto; padding-bottom: 20px; }
+
+        /* Buttons */
+        .btn-action { 
+            background: var(--accent); border: none; color: white; font-weight: 800; 
+            padding: 16px 32px; border-radius: 50px; cursor: pointer; font-size: 14px; 
+            letter-spacing: 0.5px; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+        }
+
+        .btn-action:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(14, 165, 233, 0.4); }
+        .btn-action:disabled { background: var(--border); box-shadow: none; color: white; cursor: not-allowed; }
+
+        .btn-action-outline { 
+            background: transparent; border: 2px solid var(--border); color: var(--text-dark); 
+            font-weight: 800; padding: 16px 32px; border-radius: 50px; cursor: pointer; 
+            font-size: 14px; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .btn-action-outline:hover {
+            border-color: var(--text-dark); color: white; background: var(--text-dark);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .btn-tool { 
+            background: #f8fafc; border: 1px solid var(--border); color: var(--text-dark); 
+            font-size: 11px; font-weight: 800; padding: 8px 14px; border-radius: 50px; 
+            cursor: pointer; transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .btn-tool:hover { border-color: var(--accent); color: var(--accent); background: white; }
+
+        /* Master Menus */
+        .master-menu-grid { 
+            display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; 
+            max-width: 1400px; margin: 0 auto 30px; padding: 0 10px;
+        }
+
+        .btn-ui { 
+            flex: 1 1 200px; background: var(--card); border: 1px solid var(--border); 
+            border-radius: 16px; padding: 16px 20px; text-align: left; cursor: pointer; 
+            display: flex; flex-direction: column; justify-content: center;
+            min-width: 150px; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); color: var(--text-dark);
+        }
+
+        .btn-ui:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 8px 25px rgba(14, 165, 233, 0.15); }
+        .btn-ui strong { font-size: 14px; font-weight: 900; margin-bottom: 6px; color: var(--text-dark); }
+        .btn-ui span { font-size: 11px; font-weight: 600; text-transform: none; line-height: 1.4; color: var(--text-light); }
+
+        .btn-danger { background: var(--red-soft); border-color: rgba(239, 68, 68, 0.2); }
+        .btn-danger:hover { border-color: var(--red-color); box-shadow: 0 8px 20px rgba(239, 68, 68, 0.2); }
+        .btn-danger strong { color: var(--red-color); }
+        .btn-danger span { color: #fca5a5; }
+
+        /* Sticky Action Bars */
+        .command-bar { 
+            position: fixed; bottom: 0; left: 0; right: 0; z-index: 5000; 
+            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px);
+            border-top: 1px solid var(--border); padding: 16px 30px; 
+            display: none; justify-content: space-between; align-items: center; 
+        }
+
+        .sticky-action-bar {
+            position: fixed; bottom: 20px; left: 0; right: 0; background: transparent; 
+            border-top: none; padding: 0 20px; display: flex; gap: 16px; justify-content: center;
+            z-index: 8000; transform: translateY(0); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: none; 
+        }
+
+        .sticky-action-bar .btn-master {
+            pointer-events: auto; flex: 1; max-width: 320px; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; padding: 12px 16px; border-radius: 50px;
+            border: 1px solid var(--border); cursor: pointer; text-align: center;
+            background: var(--card); box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); color: var(--text-dark);
+        }
+
+        .sticky-action-bar .btn-master:hover { transform: translateY(-2px); box-shadow: 0 12px 35px rgba(0,0,0,0.15); border-color: #94a3b8; }
+        .sticky-action-bar .btn-master strong { font-size: 14px; font-weight: 900; }
+        .sticky-action-bar .btn-master span { font-size: 10px; font-weight: 600; opacity: 0.8; margin-top: 4px; text-transform: none; color: var(--text-light); }
+
+        #toastBanner {
+            position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
+            background: var(--text-dark); color: white; font-weight: 800; padding: 14px 28px;
+            border-radius: 50px; z-index: 10000; transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-size: 14px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        @keyframes livePulse {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.3; transform: scale(0.9); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        .live-dot { display: inline-block; animation: livePulse 1.5s infinite; vertical-align: baseline; margin-right: 6px; font-size: 14px; color: var(--red-color); }
+
+        .group-label { grid-column: 1 / -1; font-size: 18px; font-weight: 900; color: var(--text-dark); border-bottom: 2px solid var(--border); padding-bottom: 8px; margin: 20px 0 15px; }
+        .entry-group-label { font-size: 14px; font-weight: 900; color: var(--text-light); margin: 10px 0 15px; text-align: left; padding-left: 5px; }
+        
+        #resTitle { color: var(--text-dark); }
+
+        .modal-overlay { 
+            position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); 
+            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+            z-index: 9999; display: none; align-items: center; justify-content: center; 
+        }
+
+        .modal-content { 
+            background: var(--card); border-radius: 24px; padding: 35px; width: 90%; 
+            max-width: 500px; text-align: left; box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+            color: var(--text-dark); border: 1px solid var(--border);
+        }
+
+        /* Print CSS for Zonedraw Reports */
+        .mobile-pdf-export .no-print { display: none !important; }
+        .mobile-pdf-export .bucket-grid { display: flex !important; flex-direction: column !important; gap: 15px !important; }
+        .mobile-pdf-export .zone-card { width: 100% !important; box-sizing: border-box !important; page-break-inside: avoid !important; }
+        .mobile-pdf-export #resultsSection { padding: 10px !important; width: 100% !important; max-width: 420px !important; margin: 0 !important; background: white !important; }
+        .mobile-pdf-export .group-label { color: black !important; border-bottom-color: black !important; }
+        .mobile-pdf-export #resTitle { color: black !important; }
+        .mobile-pdf-export .res-row { grid-template-columns: 1fr 95px 95px !important; gap: 10px !important; padding: 10px 5px !important; }
+        .mobile-pdf-export .res-row:nth-child(2) span { font-size: 12px !important; }
+        .mobile-pdf-export .angler-name { font-size: 14px !important; }
+        .mobile-pdf-export .draw-pill { font-size: 12px !important; padding: 8px 10px !important; border-radius: 8px !important;}
+        .mobile-pdf-export .peg-num { font-size: 16px !important; }
+        .mobile-pdf-export .zone-header { font-size: 14px !important; }
+        
+        @media print { 
+            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; font-variant-numeric: tabular-nums; }
+            .no-print { display: none !important; } 
+            body.printing-rosters > :not(#rosterSection) { display: none !important; }
+            #rosterSection { display: block !important; }
+            body.printing-registration > :not(#registrationPrintSection) { display: none !important; }
+            #registrationPrintSection { display: block !important; }
+            body.printing-dispatch #dispatchSection { display: block !important; }
+            body.printing-dispatch > :not(#dispatchSection) { display: none !important; }
+            
+            body { background: white !important; margin: 0; color: black !important; }
+            .zone-card { border: 2px solid black !important; background: white !important; color: black !important; box-shadow: none !important; break-inside: avoid; page-break-inside: avoid; padding: 0 !important; border-radius: 12px !important; margin-bottom: 15px !important; }
+            .zone-header { border-bottom: 2px solid black !important; color: black !important; margin: 0 0 10px 0 !important; padding: 8px 12px !important; background: #f8fafc !important; }
+            .res-row { grid-template-columns: 1fr 95px 95px !important; }
+            .draw-pill { border: 2px solid black !important; color: black !important; background: white !important; border-radius: 8px !important; }
+            .peg-num { color: black !important; }
+            .a-name { color: black !important; font-weight: 900 !important; }
+            .a-tag { color: black !important; border: 1px solid black !important; padding: 2px 4px !important; border-radius: 4px !important; }
+            
+            .print-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+            .print-table th { border: 2px solid black; padding: 12px; font-size: 14px; font-weight: 900; text-align: left; background: #f8fafc; }
+            .print-table td { border: 1px solid black; padding: 10px 12px; font-size: 13px; font-weight: 800; height: 25px; }
+            .print-checkbox { display: inline-block; width: 18px; height: 18px; border: 2px solid black; margin: 0 auto; border-radius: 4px; }
+            
+            .dispatch-slip { padding: 25px; border: 3px solid black; margin-bottom: 25px; page-break-inside: avoid; border-radius: 16px; }
+            .dispatch-header { border-bottom: 3px solid black; padding-bottom: 12px; margin-bottom: 20px; }
+            .dispatch-header h1 { font-size: 20px; margin: 0; }
+            .dispatch-header h2 { font-size: 16px; margin: 6px 0 0 0; }
+            .roster-page { page-break-after: always; padding: 20px; }
+            .roster-header { border-bottom: 3px solid black; margin-bottom: 20px; padding-bottom: 12px; text-align: left; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="toastBanner" class="no-print">ACTION COMPLETED</div>
+
+<div class="fixed-header no-print">
+    <div class="header-content">
+        <div class="brand-name">COMPETITION HUB <span id="vTag" class="v-tag"></span></div>
+        <div id="saveIndicator" style="position: fixed; top: 18px; right: 20px; background: var(--green-color); color: white; padding: 4px 10px; border-radius: 50px; font-weight: 800; font-size: 11px; opacity: 0; transition: opacity 0.3s; z-index: 9999; pointer-events: none; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);">✓ SAVED</div>
+        <button id="masterResetBtn" onclick="showWipeModal()" class="btn-action-outline btn-danger-outline" style="padding: 8px 16px; font-size: 11px;">🏁 FINISH & RESET</button>
+    </div>
+    
+    <div class="tab-nav">
+        <button id="tabBtn-draw" class="tab-btn active" onclick="switchTab('draw')">1. DRAW SETUP</button>
+        <button id="tabBtn-score" class="tab-btn" onclick="switchTab('score')">2. SCORECARDS</button>
+    </div>
+</div>
+
+<div id="drawTab" class="tab-content active">
+
+    <div id="entrySection" class="no-print">
+        <div id="editDrawBanner" style="display:none; background:var(--green-soft); border: 1px solid var(--green-color); border-radius:16px; padding: 16px; margin-bottom: 20px; text-align: left; display: flex; align-items: center; gap: 15px;">
+            <span style="font-size: 24px;">✏️</span>
+            <div>
+                <h3 style="color:var(--green-color); margin:0 0 4px 0; font-size: 14px;">EDITING CURRENT DRAW</h3>
+                <p style="color:var(--text-dark); margin:0; font-size: 12px; text-transform: none; font-weight: 600;">You can safely change names, update mobility [A] tags, and link/unlink teams. Your existing peg numbers are locked.</p>
+            </div>
+        </div>
+
+        <div class="control-panel" id="setupPanel">
+            <input type="text" id="matchTitle" placeholder="[ TYPE COMPETITION NAME HERE ]">
+            
+            <div style="display:flex; justify-content:center; gap:20px; margin-top:20px; flex-wrap:wrap;">
+                <div style="width: 100%; max-width: 300px;">
+                    <label style="display:block; margin-bottom:8px; font-size: 11px; font-weight: 900; color: var(--text-light);">DURATION</label>
+                    <div class="duration-toggle" style="margin:0;">
+                        <div id="dayOpt1" class="dt-opt" onclick="setDays(1)">1 DAY</div>
+                        <div id="dayOpt2" class="dt-opt active" onclick="setDays(2)">2 DAYS</div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 20px; display:flex; flex-direction:column; align-items:center;">
+                <button id="accToggleBtn" class="btn-action-outline" onclick="toggleAccPanel()" style="width: 100%; max-width: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 16px;" type="button">
+                    <strong id="accToggleTitle" style="font-size: 14px; font-weight: 900;">ACCESSIBLE PEGS: OFF</strong>
+                    <span id="accToggleSub" style="font-size: 11px; font-weight: 600; text-transform: none; margin-top: 6px; color: var(--text-light);">Tap to enable safe zone and peg assignments.</span>
+                </button>
+            </div>
+
+            <div id="accPanelWrapper" style="display:none; flex-direction:column; align-items:center; gap:16px; width:100%; max-width:700px; padding: 24px; background: #f8fafc; border: 1px solid var(--border); border-radius: 20px; margin: 20px auto 0;">
+                <div style="display:flex; justify-content:center; gap:12px; width:100%;">
+                    <div id="mobModeA" class="dt-opt active" style="flex:1; flex-direction:column; border: 1px solid var(--border); padding: 12px;" onclick="setMobilityMode('A')">
+                        <span>DISTRIBUTED PEGS</span>
+                        <span style="font-size:10px; color:var(--text-light); margin-top:6px; text-transform:none; text-align: center;">A-Anglers rotate zones on Day 2.</span>
+                    </div>
+                    <div id="mobModeB" class="dt-opt" style="flex:1; flex-direction:column; border: 1px solid var(--border); padding: 12px;" onclick="setMobilityMode('B')">
+                        <span>STATIC ZONE ANCHOR</span>
+                        <span style="font-size:10px; color:var(--text-light); margin-top:6px; text-transform:none; text-align: center;">A-Anglers pinned to full specific zones.</span>
+                    </div>
+                </div>
+
+                <div id="modeASetup" style="display:flex; flex-direction:column; gap:12px; width:100%; margin-top:8px;">
+                    <input type="text" id="accPegs1_a" placeholder="DAY 1 SAFE PEGS" onblur="formatPegs(this)">
+                    <div id="day2PegsContainer" style="display:flex; width:100%;">
+                        <input type="text" id="accPegs2_a" placeholder="DAY 2 SAFE PEGS" onblur="formatPegs(this)">
+                    </div>
+                </div>
+
+                <div id="modeBSetup" style="display:none; flex-direction:column; gap:12px; width:100%; margin-top:8px;">
+                    <label style="font-size:11px; font-weight:900; color:var(--text-dark); text-align:left; margin-bottom:-6px;">DAY 1 FULL ZONE ANCHOR</label>
+                    <div style="display:flex; gap:10px;">
+                        <select id="anchorZoneSelect" style="flex: 1; background: #ffffff; color: var(--text-dark); border: 1px solid var(--border);">
+                            <option value="RED">RED</option>
+                            <option value="YELLOW">YELLOW</option>
+                            <option value="GREEN">GREEN</option>
+                            <option value="BLUE">BLUE</option>
+                        </select>
+                    </div>
+                    
+                    <div id="day2AnchorContainer" style="display:flex; flex-direction:column; gap:12px; width:100%;">
+                        <label style="font-size:11px; font-weight:900; color:var(--text-dark); text-align:left; margin-bottom:-6px; margin-top:8px;">DAY 2 FULL ZONE ANCHOR</label>
+                        <div style="display:flex; gap:10px;">
+                            <select id="anchorZoneSelect2" style="flex: 1; background: #ffffff; color: var(--text-dark); border: 1px solid var(--border);">
+                                <option value="RED">RED</option>
+                                <option value="YELLOW">YELLOW</option>
+                                <option value="GREEN">GREEN</option>
+                                <option value="BLUE">BLUE</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="rosterEntryZone">
+                <div style="margin: 25px 0; border-bottom: 2px dashed var(--border);"></div>
+                <div class="entry-group-label" style="text-align: center; margin-bottom: 20px; color: var(--text-dark);">COMPETITOR ENTRY</div>
+
+                <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; text-align: left;">
+                    <div style="flex: 1; min-width: 280px; max-width: 400px; background: #ffffff; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.05); border-radius: 20px; padding: 24px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
+                        <h4 style="margin: 0 0 6px 0; color: var(--text-dark); font-weight: 900; font-size: 15px;">OPTION 1: QUICK IMPORT</h4>
+                        <p style="margin: 0 0 20px 0; font-size: 12px; font-weight: 600; color: var(--text-light); text-transform: none;">Auto-calculates teams and solos from Excel data.</p>
+                        <button id="importExcelBtn" class="btn-action" style="width: 100%; padding: 14px 20px;" onclick="showImportModal()">📋 QUICK IMPORT EXCEL LIST</button>
+                    </div>
+
+                    <div style="flex: 1; min-width: 280px; max-width: 400px; background: #ffffff; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.05); border-radius: 20px; padding: 24px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
+                        <h4 style="margin: 0 0 6px 0; color: var(--text-dark); font-weight: 900; font-size: 15px;">OPTION 2: MANUAL SETUP</h4>
+                        <p style="margin: 0 0 20px 0; font-size: 12px; font-weight: 600; color: var(--text-light); text-transform: none;">Generate empty boxes to fill by hand.</p>
+                        <div style="display:flex; align-items:center; justify-content:center; gap:12px; width:100%;">
+                            <div style="display:flex; gap:8px;">
+                                <div style="display:flex; flex-direction:column; align-items:center;">
+                                    <label style="font-size: 10px; font-weight: 900; color: var(--text-light); margin-bottom: 4px;">TEAMS</label>
+                                    <input type="number" id="initTeams" value="0" style="width:60px; text-align:center; font-size: 14px; padding: 10px; background: #f8fafc; border: 1px solid var(--border);">
+                                </div>
+                                <div style="display:flex; flex-direction:column; align-items:center;">
+                                    <label style="font-size: 10px; font-weight: 900; color: var(--text-light); margin-bottom: 4px;">SOLOS</label>
+                                    <input type="number" id="initIndivs" value="0" style="width:60px; text-align:center; font-size: 14px; padding: 10px; background: #f8fafc; border: 1px solid var(--border);">
+                                </div>
+                            </div>
+                            <button id="initMatchBtn" class="btn-action-outline" style="padding: 10px 16px; height: 100%; flex: 1;" onclick="bulkInit()">CREATE</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="entryList">
+            <div id="entryTeamsContainer" style="display:none;">
+                <div class="entry-group-label">TEAMS</div>
+                <div id="entryTeamsBucket" class="bucket-grid"></div>
+            </div>
+            <div id="entrySolosContainer" style="display:none;">
+                <div class="entry-group-label" style="margin-top: 30px;">SOLO ANGLERS</div>
+                <div id="entrySolosBucket" class="bucket-grid"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="resultsSection">
+        
+        <div id="manageMenu" class="master-menu-grid no-print" style="display:none;">
+            <button class="btn-ui" onclick="handleSafeEdit()">
+                <strong>✏️ AMEND NAMES</strong>
+                <span>Safely fix typos. Existing pegs are locked.</span>
+            </button>
+            <button class="btn-ui" onclick="injectLatecomer(true)">
+                <strong>➕ LATE TEAM</strong>
+                <span>Inject a 4-man team using Alpha pegs.</span>
+            </button>
+            <button class="btn-ui" onclick="injectLatecomer(false)">
+                <strong>➕ LATE SOLO</strong>
+                <span>Inject a solo angler using an Alpha peg.</span>
+            </button>
+            <button class="btn-ui" onclick="toggleSwapMode()">
+                <strong>🔄 SWAP PEGS</strong>
+                <span>Manually trade pegs. No redraw triggered.</span>
+            </button>
+            <button class="btn-ui btn-danger" onclick="showRedrawModal()">
+                <strong>⚠️ FULL RE-DRAW</strong>
+                <span>DANGER: Wipes all current pegs. Generates fresh match.</span>
+            </button>
+        </div>
+
+        <div id="outputMenu" class="master-menu-grid no-print" style="display:none;">
+            <button class="btn-ui" id="copyExcelBtn" onclick="copyExcelData()">
+                <strong>📋 COPY EXCEL DATA</strong>
+                <span>Instantly copies draw to clipboard for Excel.</span>
+            </button>
+            <button class="btn-ui" onclick="generateRegistrationSheet()">
+                <strong>🖨️ PRINT REGISTRATION</strong>
+                <span>Generates master attendance sheet.</span>
+            </button>
+            <button class="btn-ui" onclick="generateDispatchSlips()">
+                <strong>🖨️ TEAM SLIPS</strong>
+                <span>Prints individual peg details.</span>
+            </button>
+            <button class="btn-ui" onclick="printZoneRosters()">
+                <strong>🖨️ ZONE ROSTERS</strong>
+                <span>Prints ordered lists for stewards.</span>
+            </button>
+            <button class="btn-ui" onclick="shareDraw()">
+                <strong>SHARE PDF</strong>
+                <span>Downloads snapshot of draw screen.</span>
+            </button>
+        </div>
+
+        <div id="swapPrompt" class="no-print" style="display:none; text-align:center; background:var(--text-dark); color:white; border: 2px solid var(--border); padding:16px; font-weight:800; font-size: 13px; margin-bottom:20px; border-radius:16px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">SWAP MODE ACTIVE (Select a specific day peg to swap)</div>
+        
+        <div id="anomalyBanner" class="anomaly-banner no-print">
+            <h3>⚠️ DRAW ANOMALIES DETECTED</h3>
+            <ul id="anomalyList"></ul>
+        </div>
+
+        <h1 id="resTitle" style="text-align:center; font-size:22px; font-weight:900; margin: 0 0 20px;"></h1>
+        
+        <div id="beachMapContainer" class="no-print" style="margin-bottom: 20px; width: 100%;"></div>
+
+        <div id="resultsArea">
+            <div id="teamsBucketContainer" style="display:none;">
+                <div class="group-label">TEAMS</div>
+                <div id="teamsBucket" class="bucket-grid"></div>
+            </div>
+            <div id="solosBucketContainer" style="display:none; margin-top:40px;">
+                <div class="group-label">SOLOS</div>
+                <div id="solosBucket" class="bucket-grid"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="masterActionBar" class="sticky-action-bar no-print" style="display:none;">
+        <button id="btnManageToggle" onclick="toggleMasterMenu('manage')" class="btn-master" style="background:#ffffff; border: 1px solid var(--border);">
+            <strong style="color:var(--text-dark);">⚙️ MANAGE DRAW</strong>
+            <span style="color:var(--text-light);">Add latecomers, swap pegs, fix typos</span>
+        </button>
+        <button id="btnOutputToggle" onclick="toggleMasterMenu('output')" class="btn-master" style="background:var(--text-dark); border: 1px solid var(--text-dark);">
+            <strong style="color:white;">🖨️ OUTPUT MENU</strong>
+            <span style="color:#94a3b8;">Print rosters, slips, copy Excel data</span>
+        </button>
+    </div>
+
+    <div id="commandBar" class="command-bar no-print">
+        <div style="display:flex; gap:30px; align-items:center;">
+            <div style="display:flex; flex-direction:column;">
+                <span style="font-size:11px; font-weight:900; color:var(--text-light);">ANGLERS</span>
+                <span id="tkAnglers" style="font-size:26px; font-weight:900; color:var(--text-dark);">0</span>
+            </div>
+            <div id="amendTools" style="display:none; gap:10px;">
+                <button id="addAmendTeamBtn" class="btn-action-outline" style="padding: 10px 20px; font-size: 12px; background: transparent;" onclick="addNewStateItem(true)">+ TEAM</button>
+                <button id="addAmendSoloBtn" class="btn-action-outline" style="padding: 10px 20px; font-size: 12px; background: transparent;" onclick="addNewStateItem(false)">+ SOLO</button>
+                <button id="undoBtn" class="btn-action-outline" style="border-color:var(--text-dark); color:var(--text-dark); background: white; padding: 10px 20px; font-size: 12px; display:none;" onclick="undoLastAction()">↩️ UNDO</button>
+            </div>
+        </div>
+        
+        <div id="actionBtnArea" style="display:flex; flex-direction:column; align-items:flex-end;">
+            <div id="teamClashWarning" style="display:none; color:var(--red-color); font-size:12px; font-weight:800; margin-bottom:10px;">⚠️ STATIC MODE CLASH: MAX 1 [A] PER TEAM</div>
+            
+            <div id="entryAnomalyBanner" class="anomaly-banner warning no-print" style="display:none; margin-bottom:15px; width: 100%; max-width: 450px;">
+                <h3 style="color:var(--yellow-color);">⚠️ PRE-DRAW WARNINGS</h3>
+                <ul id="entryAnomalyList"></ul>
+            </div>
+
+            <div style="display:flex; gap:12px; align-items:flex-start;">
+                <button class="btn-action-outline" id="mergeBtn" style="display:none; border-color:var(--text-dark); color:var(--text-dark); background: white; padding: 16px 32px; height: fit-content;" onclick="mergeSelected()">LINK TEAM (4)</button>
+                
+                <div id="viewDrawContainer" style="display:none; flex-direction:column; align-items:center; max-width: 280px;">
+                    <button class="btn-action" id="viewDrawBtn" onclick="displayDraw()" style="background:var(--green-color); width: 100%;">✅ SAVE EDITS & RETURN</button>
+                </div>
+
+                <div id="processDrawContainer" style="display:flex; flex-direction:column; align-items:center;">
+                    <button class="btn-action" id="mainActionBtn" onclick="initiateShuffle()" style="width: 100%;">PROCESS DRAW</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="scoreTab" class="tab-content" style="display:none;">
+    <div style="max-width: 1400px; margin: 0 auto; text-align: center; padding-bottom: 20px;">
+        
+        <button onclick="exportMasterData()" class="btn-action" style="background: var(--green-color); font-size: 16px; padding: 18px 40px; margin-bottom: 25px; width: 100%; max-width: 600px;">
+            📋 EXPORT MASTER SCORES FOR EXCEL
+        </button>
+        
+        <div id="dayTabsContainer" class="day-sub-nav">
+            <button id="subBtn-1" class="day-sub-btn active" onclick="switchScoreDay(1)">DAY 1 SCORES</button>
+            <button id="subBtn-2" class="day-sub-btn" onclick="switchScoreDay(2)">DAY 2 SCORES</button>
+        </div>
+    </div>
+
+    <div class="scorecard-scroll-wrapper">
+        <div id="scoreListContainer" class="score-list-container"></div>
+    </div>
+</div>
+
+<div id="registrationPrintSection" class="no-print"></div>
+<div id="dispatchSection" class="no-print"></div>
+<div id="rosterSection" class="no-print"></div>
+
+<div id="shuffleOverlay" class="modal-overlay" style="z-index:9000; flex-direction:column;">
+    <h2 style="font-size:28px; font-weight:900; color:white;">CALCULATING...</h2>
+    <div style="width:350px; height:6px; background:rgba(255,255,255,0.2); border-radius:10px; overflow:hidden; margin-top:25px;">
+        <div id="pBar" style="height:100%; width:0%; background:var(--accent); transition:0.1s;"></div>
+    </div>
+</div>
+
+<div id="redrawModal" class="modal-overlay no-print">
+    <div class="modal-content">
+        <h2 style="color: var(--red-color); font-size: 24px; margin-top: 0;">⚠️ REDRAW CONFIRMATION</h2>
+        <p style="font-size: 14px; font-weight: 600; margin-bottom: 30px; text-transform: none; color: var(--text-dark); line-height: 1.5;">This permanently wipes all current pegs so you can add latecomers or change rules. Proceed?</p>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+            <button onclick="closeRedrawModal()" class="btn-action-outline" style="width: 100%;">CANCEL</button>
+            <button onclick="executePegWipe()" class="btn-action btn-danger" style="color: white; width: 100%; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);">YES, WIPE PEGS & REDRAW</button>
+        </div>
+    </div>
+</div>
+
+<div id="wipeModal" class="modal-overlay no-print">
+    <div class="modal-content">
+        <h2 style="color: var(--text-dark); font-size: 24px; margin-top: 0;">🏁 COMPLETE & RESET</h2>
+        <p style="font-size: 14px; font-weight: 600; margin-bottom: 30px; text-transform: none; color: var(--text-light); line-height: 1.5;">The app will now download a full report of the draw details and reset itself for a new competition. Proceed?</p>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+            <button onclick="closeWipeModal()" class="btn-action-outline" style="width: 100%;">CANCEL</button>
+            <button onclick="executeNuclearWipe()" class="btn-action" style="width: 100%;">YES, DOWNLOAD BACKUP & RESET</button>
+        </div>
+    </div>
+</div>
+
+<div id="importModal" class="modal-overlay no-print">
+    <div class="modal-content" style="max-width: 650px;">
+        <h2 style="color: var(--text-dark); font-size: 24px; margin-top: 0;">📋 PASTE EXCEL LIST</h2>
+        <p style="font-size: 13px; font-weight: 600; margin-bottom: 20px; text-transform: none; color: var(--text-light); line-height: 1.5;">
+            Copy the <strong>Angler Name</strong> and <strong>Team Name</strong> columns from Excel and paste them below.<br>
+            Leave the Team column blank for solo anglers. Add <b>[A]</b> to a name for a mobility tag.
+        </p>
+        <textarea id="importRawData" rows="10" placeholder="John Smith [A]&#9;SCOTLAND&#10;David Bruce&#9;SCOTLAND&#10;Liam Ness&#9;&#10;Tom Jones&#9;ENGLAND" style="font-size:13px; margin-bottom: 25px; resize: none; font-weight: normal !important; text-transform: none; font-family: monospace; border: 2px solid var(--border);"></textarea>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+            <button onclick="closeImportModal()" class="btn-action-outline" style="width: 100%;">CANCEL</button>
+            <button onclick="processExcelImport()" class="btn-action" style="width: 100%;">IMPORT COMPETITORS</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const APP_VERSION = "v7.4.0";
+    document.getElementById('vTag').innerText = APP_VERSION;
+
+    const zones = ['RED', 'YELLOW', 'GREEN', 'BLUE'];
+    
+    const zColors = { 
+        'RED': 'var(--red-color)', 
+        'YELLOW': 'var(--yellow-color)', 
+        'GREEN': 'var(--green-color)', 
+        'BLUE': 'var(--blue-color)' 
+    };
+    
+    let isAppReady = false; 
+    let appState = []; 
+    let scoreState = {}; // NEW SCORECARD DATA BUCKET
+    let matchDays = 2;
+    let currentZoneSize = 0; 
+    let isSwapMode = false;
+    let swapObj1 = null; 
+    let mobilityMode = 'A'; 
+    let accEnabled = false; 
+    let trashCan = null;
+    let currentScoreDay = 1;
+
+    const genId = () => {
+        return 'id_' + Math.random().toString(36).substr(2, 9);
+    };
+
+    function showToast(msg) {
+        const t = document.getElementById('toastBanner');
+        t.innerHTML = msg;
+        t.style.top = '25px';
+        setTimeout(() => { t.style.top = '-100px'; }, 3000);
+    }
+
+    // ====================================================
+    // --- TAB NAVIGATION LOGIC (NEW HUB LOGIC) ---
+    // ====================================================
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(content => content.style.display = 'none');
+        document.getElementById(`tabBtn-${tabId}`).classList.add('active');
+        document.getElementById(`${tabId}Tab`).style.display = 'block';
+
+        if (tabId === 'score') {
+            document.getElementById('dayTabsContainer').style.display = matchDays === 2 ? 'flex' : 'none';
+            switchScoreDay(1); 
+        }
+    }
+
+    function switchScoreDay(day) {
+        currentScoreDay = day;
+        document.querySelectorAll('.day-sub-btn').forEach(btn => btn.classList.remove('active'));
+        let activeSubBtn = document.getElementById(`subBtn-${day}`);
+        if(activeSubBtn) activeSubBtn.classList.add('active');
+        renderScorecards();
+    }
+
+    // ====================================================
+    // --- LINEAR SCORECARD LOGIC (CSS GRID) ---
+    // ====================================================
+    function renderScorecards() {
+        const container = document.getElementById('scoreListContainer');
+        container.innerHTML = '';
+        
+        let hasDrawnData = false;
+        
+        // Render Column Headers
+        let headerRow = document.createElement('div');
+        headerRow.className = 'score-list-header';
+        headerRow.innerHTML = `
+            <div>ANGLER</div>
+            <div>TEAM</div>
+            <div>PEG</div>
+            <div style="text-align:center;">LENGTH</div>
+            <div style="text-align:center;">FISH CT</div>
+            <div style="text-align:center;">BIGGEST</div>
+            <div style="text-align:center;">SPECIES</div>
+        `;
+        container.appendChild(headerRow);
+
+        let sortedState = [...appState].sort((a,b) => (a.tName||"").localeCompare(b.tName||""));
+
+        sortedState.forEach(e => {
+            e.anglers.forEach((a, aIdx) => {
+                let targetZ = currentScoreDay === 1 ? a.z1 : a.z2;
+                let targetP = currentScoreDay === 1 ? a.p1 : a.p2;
+
+                if (!a.name || !targetZ) return;
+                hasDrawnData = true;
+
+                let tName = e.isTeam ? (e.tName || 'SOLO') : 'SOLO';
+                let key = `${e.id}_${aIdx}_${currentScoreDay}`;
+                let s = scoreState[key] || {len:'', count:'', big:'', spec:''};
+                let zColor = zColors[targetZ] || 'gray';
+
+                const row = document.createElement('div');
+                row.className = 'score-row';
+                
+                row.innerHTML = `
+                    <div class="s-name">${a.name}</div>
+                    <div class="s-team">${tName}</div>
+                    <div class="s-peg" style="color: ${zColor};">${targetZ} ${targetP}</div>
+                    <input type="number" placeholder="LEN" value="${s.len}" onchange="saveScore('${key}', 'len', this.value)">
+                    <input type="number" placeholder="CNT" value="${s.count}" onchange="saveScore('${key}', 'count', this.value)">
+                    <input type="number" placeholder="BIG" value="${s.big}" onchange="saveScore('${key}', 'big', this.value)">
+                    <input type="number" placeholder="SPC" value="${s.spec}" onchange="saveScore('${key}', 'spec', this.value)">
+                `;
+                container.appendChild(row);
+            });
+        });
+
+        if (!hasDrawnData) {
+            container.innerHTML = `<div style="text-align:center; padding: 40px; color: var(--text-light); font-weight: 800;">YOU MUST COMPLETE THE DRAW SETUP FIRST.</div>`;
+        }
+    }
+
+    function saveScore(key, field, value) {
+        if (!scoreState[key]) scoreState[key] = { len:'', count:'', big:'', spec:'' };
+        scoreState[key][field] = value;
+        persistState();
+    }
+
+    function exportMasterData() {
+        let tsv = "NAME\tTEAM\tDAY\tZONE\tPEG\tLENGTH\tFISH COUNT\tBIGGEST FISH\tSPECIES\n";
+        let dataCount = 0;
+
+        appState.forEach(e => {
+            e.anglers.forEach((a, i) => {
+                if (!a.name || !a.z1) return;
+                let tName = e.isTeam ? (e.tName || 'SOLO') : 'SOLO';
+                
+                let k1 = `${e.id}_${i}_1`;
+                let s1 = scoreState[k1] || {len:'', count:'', big:'', spec:''};
+                tsv += `${a.name}\t${tName}\t1\t${a.z1}\t${a.p1}\t${s1.len}\t${s1.count}\t${s1.big}\t${s1.spec}\n`;
+                dataCount++;
+
+                if (matchDays === 2 && a.z2) {
+                    let k2 = `${e.id}_${i}_2`;
+                    let s2 = scoreState[k2] || {len:'', count:'', big:'', spec:''};
+                    tsv += `${a.name}\t${tName}\t2\t${a.z2}\t${a.p2}\t${s2.len}\t${s2.count}\t${s2.big}\t${s2.spec}\n`;
+                }
+            });
+        });
+
+        if (dataCount === 0) {
+            alert("No draw data exists to export.");
+            return;
+        }
+
+        navigator.clipboard.writeText(tsv).then(() => {
+            showToast("✅ MASTER SCORES COPIED TO CLIPBOARD");
+        });
+    }
+
+    // ====================================================
+    // --- ORIGINAL ZONEDRAW APP ENGINE (UNEDITED) ---
+    // ====================================================
+
+    // --- Smart Scroll Listener for Action Bar ---
+    let lastScrollY = window.scrollY;
+    window.addEventListener('scroll', () => {
+        const bar = document.getElementById('masterActionBar');
+        if (!bar || bar.style.display === 'none') return;
+        
+        const mMenu = document.getElementById('manageMenu');
+        const oMenu = document.getElementById('outputMenu');
+        if (mMenu.style.display === 'flex' || oMenu.style.display === 'flex') {
+            bar.style.transform = 'translateY(0)';
+            return;
+        }
+
+        const currentScrollY = window.scrollY;
+        
+        if (currentScrollY > lastScrollY && currentScrollY > 50) {
+            bar.style.transform = 'translateY(150%)'; 
+        } else {
+            bar.style.transform = 'translateY(0)';
+        }
+        
+        if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 10) {
+            bar.style.transform = 'translateY(0)';
+        }
+        
+        lastScrollY = currentScrollY;
+    }, { passive: true });
+
+    function toggleMasterMenu(menuType) {
+        const mMenu = document.getElementById('manageMenu');
+        const oMenu = document.getElementById('outputMenu');
+        const btnM = document.getElementById('btnManageToggle');
+        const btnO = document.getElementById('btnOutputToggle');
+
+        const resetM = () => {
+            btnM.style.background = 'white';
+            btnM.style.borderColor = 'var(--border)';
+            btnM.innerHTML = `<strong style="color:var(--text-dark);">⚙️ MANAGE DRAW</strong><span style="color:var(--text-light);">Add latecomers, swap pegs, fix typos</span>`;
+        };
+        const resetO = () => {
+            btnO.style.background = 'var(--text-dark)';
+            btnO.style.borderColor = 'var(--text-dark)';
+            btnO.innerHTML = `<strong style="color:white;">🖨️ OUTPUT MENU</strong><span style="color:#94a3b8;">Print rosters, slips, copy Excel data</span>`;
+        };
+        const setClose = (btn) => {
+            btn.style.background = 'var(--accent)';
+            btn.style.borderColor = 'var(--accent)';
+            btn.innerHTML = `<strong style="color:white;">❌ CLOSE MENU</strong><span style="color:#eff6ff;">Return to display</span>`;
+        };
+
+        if (menuType === 'manage') {
+            if (mMenu.style.display === 'none') {
+                mMenu.style.display = 'flex';
+                oMenu.style.display = 'none';
+                setClose(btnM);
+                resetO();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                mMenu.style.display = 'none';
+                resetM();
+            }
+        } else if (menuType === 'output') {
+            if (oMenu.style.display === 'none') {
+                oMenu.style.display = 'flex';
+                mMenu.style.display = 'none';
+                setClose(btnO);
+                resetM();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                oMenu.style.display = 'none';
+                resetO();
+            }
+        }
+    }
+
+    function resetMasterToggles() {
+        const btnM = document.getElementById('btnManageToggle');
+        const btnO = document.getElementById('btnOutputToggle');
+        btnM.style.background = 'white';
+        btnM.style.borderColor = 'var(--border)';
+        btnM.innerHTML = `<strong style="color:var(--text-dark);">⚙️ MANAGE DRAW</strong><span style="color:var(--text-light);">Add latecomers, swap pegs, fix typos</span>`;
+        btnO.style.background = 'var(--text-dark)';
+        btnO.style.borderColor = 'var(--text-dark)';
+        btnO.innerHTML = `<strong style="color:white;">🖨️ OUTPUT MENU</strong><span style="color:#94a3b8;">Print rosters, slips, copy Excel data</span>`;
+        document.getElementById('manageMenu').style.display = 'none';
+        document.getElementById('outputMenu').style.display = 'none';
+    }
+
+    function persistState() {
+        if (!isAppReady) return; 
+
+        const stateObj = { 
+            title: document.getElementById('matchTitle').value || '',
+            data: appState, 
+            scores: scoreState, // V7.4.0 Score Addition
+            days: matchDays, 
+            zoneSize: currentZoneSize, 
+            mobilityMode: mobilityMode,
+            accEnabled: accEnabled,
+            safePegs1_a: document.getElementById('accPegs1_a').value,
+            safePegs2_a: document.getElementById('accPegs2_a').value,
+            anchorZone: document.getElementById('anchorZoneSelect').value,
+            anchorZone2: document.getElementById('anchorZoneSelect2').value
+        };
+        
+        localStorage.setItem('zonedraw_current_state_v1', JSON.stringify(stateObj));
+    }
+
+    function formatPegs(el) {
+        let val = el.value;
+        let nums = val.match(/\d+/g);
+        if (nums) el.value = nums.join(', ');
+        else el.value = '';
+    }
+
+    function toggleAccPanel() {
+        accEnabled = !accEnabled;
+        applyAccToggleUI();
+    }
+
+    function applyAccToggleUI() {
+        const panel = document.getElementById('accPanelWrapper');
+        const btn = document.getElementById('accToggleBtn');
+        const title = document.getElementById('accToggleTitle');
+        const sub = document.getElementById('accToggleSub');
+        
+        if (accEnabled) {
+            panel.style.display = 'flex';
+            title.innerText = 'ACCESSIBLE PEGS: ON';
+            sub.innerText = 'Routing enabled. Configure safe nodes below.';
+            btn.style.background = 'var(--text-dark)';
+            btn.style.color = 'white';
+            btn.style.borderColor = 'var(--text-dark)';
+        } else {
+            panel.style.display = 'none';
+            title.innerText = 'ACCESSIBLE PEGS: OFF';
+            sub.innerText = 'Tap to enable safe zone and peg assignments.';
+            btn.style.background = 'transparent';
+            btn.style.color = 'var(--text-dark)';
+            btn.style.borderColor = 'var(--border)';
+        }
+    }
+
+    function setMobilityMode(m) {
+        mobilityMode = m;
+        document.getElementById('mobModeA').classList.toggle('active', m === 'A');
+        document.getElementById('mobModeB').classList.toggle('active', m === 'B');
+        
+        if (m === 'A') {
+            document.getElementById('modeASetup').style.display = 'flex';
+            document.getElementById('modeBSetup').style.display = 'none';
+        } else {
+            document.getElementById('modeASetup').style.display = 'none';
+            document.getElementById('modeBSetup').style.display = 'flex';
+        }
+        checkTeamClash();
+    }
+
+    // --- Import Modal Logic ---
+    function showImportModal() {
+        document.getElementById('importRawData').value = '';
+        document.getElementById('importModal').style.display = 'flex';
+    }
+
+    function closeImportModal() {
+        document.getElementById('importModal').style.display = 'none';
+    }
+
+    function processExcelImport() {
+        let rawData = document.getElementById('importRawData').value;
+        if (!rawData.trim()) {
+            closeImportModal();
+            return;
+        }
+
+        let rows = rawData.split('\n');
+        let tempTeams = {};
+        let tempSolos = [];
+
+        rows.forEach(row => {
+            if (!row.trim()) return;
+            let cols = row.split('\t'); 
+            let rawName = (cols[0] || '').trim().toUpperCase();
+            let rawTeam = (cols[1] || '').trim().toUpperCase();
+            
+            if (!rawName && !rawTeam) return;
+
+            let isMobility = false;
+
+            if (rawName.match(/[\(\[\{]A[\)\]\}]/i)) {
+                isMobility = true;
+                rawName = rawName.replace(/[\(\[\{]A[\)\]\}]/i, '').trim();
+            }
+
+            let anglerObj = { name: rawName, mobility: isMobility ? 1 : 0 };
+
+            if (rawTeam) {
+                if (!tempTeams[rawTeam]) tempTeams[rawTeam] = [];
+                tempTeams[rawTeam].push(anglerObj);
+            } else {
+                tempSolos.push(anglerObj);
+            }
+        });
+
+        appState = [];
+        scoreState = {}; // V7.4.0 Score Addition
+        trashCan = null;
+        document.getElementById('undoBtn').style.display = 'none';
+
+        Object.keys(tempTeams).forEach(tName => {
+            let members = tempTeams[tName];
+            for (let i = 0; i < members.length; i += 4) {
+                let chunk = members.slice(i, i + 4);
+                while (chunk.length < 4) { chunk.push({}); }
+                appState.push({ id: genId(), isTeam: true, tName: tName, anglers: chunk });
+            }
+        });
+
+        tempSolos.forEach(solo => {
+            appState.push({ id: genId(), isTeam: false, tName: '', anglers: [solo] });
+        });
+
+        closeImportModal();
+        
+        document.getElementById('rosterEntryZone').style.display = 'none';
+        document.getElementById('commandBar').style.display = 'flex';
+        document.getElementById('masterActionBar').style.display = 'none';
+        document.getElementById('amendTools').style.display = 'flex'; 
+        document.getElementById('actionBtnArea').style.display = 'flex';
+        
+        renderStateToScreen();
+        showToast("✅ COMPETITORS IMPORTED SUCCESSFULLY");
+    }
+
+    function showRedrawModal() { document.getElementById('redrawModal').style.display = 'flex'; }
+    function closeRedrawModal() { document.getElementById('redrawModal').style.display = 'none'; }
+    function showWipeModal() { document.getElementById('wipeModal').style.display = 'flex'; }
+    function closeWipeModal() { document.getElementById('wipeModal').style.display = 'none'; }
+
+    function handleSafeEdit() {
+        resetMasterToggles();
+        handleAmend(true); 
+    }
+
+    function executePegWipe() {
+        closeRedrawModal();
+        resetMasterToggles();
+        
+        appState.forEach(e => {
+            e.anglers.forEach(a => {
+                a.z1 = undefined; a.p1 = undefined;
+                a.z2 = undefined; a.p2 = undefined;
+            });
+        });
+        currentZoneSize = 0; 
+        handleAmend(false);
+    }
+
+    function executeNuclearWipe() {
+        let title = document.getElementById('matchTitle').value || 'HUB_BACKUP';
+        let txt = `REPORT: ${title}\nDATE: ${new Date().toLocaleString()}\n------------------------------\n\n`;
+        
+        appState.forEach(e => {
+            if (e.isTeam) txt += `TEAM: ${e.tName || "UNNAMED"}\n`;
+            else txt += `SOLO: ${e.tName || "UNNAMED"}\n`;
+            
+            e.anglers.forEach((a, i) => { 
+                if (a.name) {
+                    let accStr = (accEnabled && a.mobility) ? ' [A]' : '';
+                    let d1Str = `D1: ${a.z1} ${a.p1}`;
+                    let d2Str = `D2: ${a.z2 || '-'} ${a.p2 || '-'}`;
+                    
+                    // V7.4.0 Output Appends
+                    let s1 = scoreState[`${e.id}_${i}_1`] || {};
+                    let s2 = scoreState[`${e.id}_${i}_2`] || {};
+                    let scoreTxt = ` [Scores D1: L:${s1.len||'-'} C:${s1.count||'-'} D2: L:${s2.len||'-'} C:${s2.count||'-'}]`;
+
+                    txt += `  - ${a.name}${accStr} | ${d1Str} | ${d2Str}${scoreTxt}\n`; 
+                }
+            });
+            txt += "\n";
+        });
+
+        const blob = new Blob([txt], {type: 'text/plain'});
+        const lnk = document.createElement('a'); 
+        lnk.href = URL.createObjectURL(blob); 
+        lnk.download = `${title.replace(/\s+/g, '_')}_FINAL_REPORT.txt`; 
+        lnk.click();
+        
+        isAppReady = false; 
+        localStorage.removeItem('zonedraw_current_state_v1');
+        closeWipeModal();
+        startNewDraw();
+        isAppReady = true; 
+    }
+
+    function setDays(d) {
+        matchDays = d;
+        document.getElementById('dayOpt1').classList.toggle('active', d === 1);
+        document.getElementById('dayOpt2').classList.toggle('active', d === 2);
+        
+        if (d === 2) {
+            document.getElementById('day2PegsContainer').style.display = 'flex';
+            if (document.getElementById('day2AnchorContainer')) document.getElementById('day2AnchorContainer').style.display = 'flex';
+        } else {
+            document.getElementById('day2PegsContainer').style.display = 'none';
+            if (document.getElementById('day2AnchorContainer')) document.getElementById('day2AnchorContainer').style.display = 'none';
+        }
+    }
+
+    function startNewDraw() {
+        document.getElementById('matchTitle').value = '';
+        document.getElementById('initTeams').value = 0;
+        document.getElementById('initIndivs').value = 0;
+        document.getElementById('accPegs1_a').value = '';
+        document.getElementById('accPegs2_a').value = '';
+        
+        appState = []; 
+        scoreState = {}; // V7.4.0 Score Addition
+        currentZoneSize = 0;
+        setMobilityMode('A'); 
+        setDays(2);
+        accEnabled = false;
+        trashCan = null;
+        applyAccToggleUI();
+        
+        document.querySelectorAll('body > div[id$="Section"]').forEach(s => s.style.display = 'none');
+        document.getElementById('entrySection').style.display = 'block';
+        document.getElementById('setupPanel').style.display = 'block';
+        document.getElementById('editDrawBanner').style.display = 'none';
+        
+        document.getElementById('rosterEntryZone').style.display = 'block';
+        document.getElementById('commandBar').style.display = 'none';
+        document.getElementById('masterActionBar').style.display = 'none';
+        document.getElementById('undoBtn').style.display = 'none';
+        
+        document.getElementById('accToggleBtn').style.display = 'flex';
+        
+        updateTicker();
+        renderStateToScreen(); 
+    }
+
+    function bulkInit() {
+        appState = [];
+        scoreState = {}; // V7.4.0 Score Addition
+        trashCan = null;
+        document.getElementById('undoBtn').style.display = 'none';
+        
+        let tVal = document.getElementById('initTeams').value;
+        let iVal = document.getElementById('initIndivs').value;
+        const t = parseInt(tVal) || 0; const i = parseInt(iVal) || 0;
+        
+        for(let x = 0; x < t; x++) appState.push({ id: genId(), isTeam: true, tName: '', anglers: [{},{},{},{}] });
+        for(let y = 0; y < i; y++) appState.push({ id: genId(), isTeam: false, tName: '', anglers: [{}] });
+        
+        document.getElementById('rosterEntryZone').style.display = 'none';
+        document.getElementById('commandBar').style.display = 'flex';
+        document.getElementById('masterActionBar').style.display = 'none';
+        document.getElementById('amendTools').style.display = 'flex'; 
+        document.getElementById('actionBtnArea').style.display = 'flex';
+        
+        renderStateToScreen();
+        setTimeout(() => {
+            const firstInput = document.querySelector('#entryList input[type="text"]');
+            if (firstInput) firstInput.focus(); 
+        }, 50);
+    }
+
+    function addNewStateItem(isTeam) {
+        if (isTeam) appState.push({ id: genId(), isTeam: true, tName: '', anglers: [{},{},{},{}] });
+        else appState.push({ id: genId(), isTeam: false, tName: '', anglers: [{}] });
+        renderStateToScreen();
+    }
+
+    function toggleMobility(eId, aIdx) {
+        const entry = appState.find(e => e.id === eId);
+        if (entry) { 
+            entry.anglers[aIdx].mobility = entry.anglers[aIdx].mobility ? 0 : 1;
+            renderStateToScreen(); 
+        }
+    }
+
+    function updateTeamName(id, val) {
+        let entry = appState.find(e => e.id === id);
+        if (entry) entry.tName = val.trim().toUpperCase(); 
+    }
+
+    function updateAnglerName(id, aIdx, val) {
+        let entry = appState.find(e => e.id === id);
+        if (entry && entry.anglers[aIdx]) {
+            entry.anglers[aIdx].name = val.trim().toUpperCase();
+            updateTicker();
+        }
+    }
+
+    function updateDrawButtons() {
+        const hasDraw = appState.some(e => e.anglers.some(a => a.z1));
+        const viewCont = document.getElementById('viewDrawContainer');
+        const processCont = document.getElementById('processDrawContainer');
+        
+        if (hasDraw) {
+            viewCont.style.display = 'flex';
+            processCont.style.display = 'none';
+        } else {
+            viewCont.style.display = 'none';
+            processCont.style.display = 'flex';
+        }
+    }
+
+    function runEntryValidation() {
+        if (document.getElementById('entrySection').style.display !== 'block') return;
+
+        let errors = [];
+        let severeErrors = false;
+        let anglerNames = {};
+        let teamNames = {};
+
+        document.querySelectorAll('.a-name-input, .t-name').forEach(el => el.classList.remove('input-error'));
+
+        appState.forEach((entry) => {
+            if (entry.isTeam) {
+                let tName = (entry.tName || '').trim();
+                let filledAnglers = entry.anglers.filter(a => (a.name || '').trim() !== '').length;
+
+                if (filledAnglers > 0 && tName === '') {
+                    errors.push(`MISSING TEAM NAME: A team with anglers has no team name.`);
+                    severeErrors = true;
+                    let tInputs = document.querySelectorAll(`.zone-card[data-id="${entry.id}"] .t-name`);
+                    tInputs.forEach(el => el.classList.add('input-error'));
+                }
+
+                if (tName !== '') {
+                    if (teamNames[tName]) {
+                        errors.push(`DUPLICATE TEAM: '${tName}' is used more than once.`);
+                        severeErrors = true;
+                        document.querySelectorAll('.t-name').forEach(el => {
+                            if(el.value.trim().toUpperCase() === tName) el.classList.add('input-error');
+                        });
+                    } else {
+                        teamNames[tName] = true;
+                    }
+                }
+
+                if (filledAnglers > 0 && filledAnglers < 4) {
+                    let tDisp = tName !== '' ? `'${tName}'` : 'An unnamed team';
+                    errors.push(`INCOMPLETE TEAM: ${tDisp} only has ${filledAnglers} out of 4 anglers.`);
+                }
+            }
+
+            entry.anglers.forEach((a) => {
+                let aName = (a.name || '').trim();
+                if (aName !== '') {
+                    if (anglerNames[aName]) {
+                        if (!errors.includes(`DUPLICATE ANGLER: '${aName}' is listed multiple times.`)) {
+                            errors.push(`DUPLICATE ANGLER: '${aName}' is listed multiple times.`);
+                        }
+                        severeErrors = true;
+                        document.querySelectorAll('.a-name-input').forEach(el => {
+                            if(el.value.trim().toUpperCase() === aName) el.classList.add('input-error');
+                        });
+                    } else {
+                        anglerNames[aName] = true;
+                    }
+                }
+            });
+        });
+
+        const banner = document.getElementById('entryAnomalyBanner');
+        const list = document.getElementById('entryAnomalyList');
+        
+        if (errors.length > 0) {
+            banner.style.display = 'block';
+            list.innerHTML = errors.map(err => `<li>${err}</li>`).join('');
+        } else {
+            banner.style.display = 'none';
+        }
+
+        window.currentSevereErrors = severeErrors;
+        checkTeamClash(); 
+    }
+
+    function renderStateToScreen() {
+        const tb = document.getElementById('entryTeamsBucket'); tb.innerHTML = '';
+        const sb = document.getElementById('entrySolosBucket'); sb.innerHTML = '';
+        
+        appState.forEach(entry => {
+            const div = document.createElement('div');
+            div.className = !entry.isTeam ? 'zone-card solo-card' : 'zone-card';
+            div.dataset.id = entry.id;
+            
+            let typeStr = entry.isTeam ? 'TEAM' : 'SOLO';
+            let h = `<div class="zone-header"><span>${typeStr}</span><div style="display:flex; align-items:center;">`;
+            
+            if (!entry.isTeam) h += `<input type="checkbox" class="merge-cb" onchange="checkMerge()" tabindex="-1" style="width:18px; height:18px;">`; 
+            if (entry.isTeam) h += `<button class="btn-tool" onclick="breakStateTeam('${entry.id}')" tabindex="-1" style="margin-left:12px;">🔗 UNLINK</button>`; 
+            else h += `<button onclick="deleteStateEntry('${entry.id}')" tabindex="-1" style="background:none; border:none; color:var(--red-color); font-weight:900; font-size:22px; cursor:pointer; margin-left:12px; transition: 0.2s;">×</button>`; 
+            
+            h += `</div></div>`;
+            
+            if (entry.isTeam) {
+                h += `<div style="padding: 0 16px;"><label style="font-size:10px; font-weight:800; color:var(--text-light); letter-spacing:0.5px;">TEAM NAME</label>
+                      <input type="text" class="t-name" value="${entry.tName}" oninput="updateTeamName('${entry.id}', this.value)" style="margin-bottom:12px; margin-top:4px;">`;
+                      
+                for (let i = 0; i < 4; i++) {
+                    let mBg = entry.anglers[i].mobility ? 'var(--text-dark)' : '#f1f5f9';
+                    let mColor = entry.anglers[i].mobility ? 'white' : 'var(--text-dark)';
+                    let aName = entry.anglers[i].name || '';
+                    
+                    h += `<div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+                            <input type="text" class="a-name-input" value="${aName}" placeholder="ANGLER ${i+1}" oninput="updateAnglerName('${entry.id}', ${i}, this.value)">
+                            <button class="btn-tool" onclick="toggleMobility('${entry.id}', ${i})" tabindex="-1" style="padding:10px 14px; background:${mBg}; color:${mColor};">[A]</button>
+                          </div>`;
+                }
+                h += `</div>`;
+            } else {
+                h += `<div style="padding: 0 16px;"><label style="font-size:10px; font-weight:800; color:var(--text-light); letter-spacing:0.5px;">SOLO NAME</label>`;
+                let mBg = entry.anglers[0].mobility ? 'var(--text-dark)' : '#f1f5f9';
+                let mColor = entry.anglers[0].mobility ? 'white' : 'var(--text-dark)';
+                let aName = entry.anglers[0].name || '';
+                
+                h += `<div style="display:flex; align-items:center; gap:8px; margin-top:4px; margin-bottom:6px;">
+                        <input type="text" class="a-name-input" value="${aName}" oninput="updateAnglerName('${entry.id}', 0, this.value)">
+                        <button class="btn-tool" onclick="toggleMobility('${entry.id}', 0)" tabindex="-1" style="padding:10px 14px; background:${mBg}; color:${mColor};">[A]</button>
+                      </div></div>`;
+            }
+            
+            div.innerHTML = h; 
+            if (entry.isTeam) tb.appendChild(div); else sb.appendChild(div);
+        });
+        
+        document.getElementById('entryTeamsContainer').style.display = tb.innerHTML !== '' ? 'block' : 'none';
+        document.getElementById('entrySolosContainer').style.display = sb.innerHTML !== '' ? 'block' : 'none';
+        
+        updateTicker(); checkMerge(); updateDrawButtons(); runEntryValidation(); persistState();
+    }
+
+    function deleteStateEntry(id) { 
+        const idx = appState.findIndex(e => e.id === id); 
+        if (idx > -1) { 
+            trashCan = { action: 'delete', data: appState[idx], index: idx };
+            document.getElementById('undoBtn').style.display = 'inline-block';
+            appState.splice(idx, 1); 
+            renderStateToScreen(); 
+        } 
+    }
+    
+    function breakStateTeam(id) { 
+        const idx = appState.findIndex(e => e.id === id); 
+        if (idx > -1) { 
+            const t = appState.splice(idx, 1)[0]; 
+            let nIds = [];
+            t.anglers.forEach(a => { 
+                let nId = genId(); nIds.push(nId);
+                appState.push({ id: nId, isTeam: false, tName: '', anglers: [{...a}] }); 
+            }); 
+            trashCan = { action: 'break', originalTeam: t, index: idx, newIds: nIds };
+            document.getElementById('undoBtn').style.display = 'inline-block';
+            renderStateToScreen(); 
+        } 
+    }
+
+    function undoLastAction() {
+        if (!trashCan) return;
+        if (trashCan.action === 'delete') {
+            appState.splice(trashCan.index, 0, trashCan.data);
+        } else if (trashCan.action === 'break') {
+            appState = appState.filter(e => !trashCan.newIds.includes(e.id));
+            appState.splice(trashCan.index, 0, trashCan.originalTeam);
+        }
+        trashCan = null;
+        document.getElementById('undoBtn').style.display = 'none';
+        renderStateToScreen();
+    }
+    
+    function mergeSelected() { 
+        const sel = document.querySelectorAll('.merge-cb:checked'); 
+        if (sel.length !== 4) return; 
+        const ids = Array.from(sel).map(cb => cb.closest('.zone-card').dataset.id); 
+        const angs = []; 
+        ids.forEach(id => { 
+            const idx = appState.findIndex(e => e.id === id); 
+            if (idx > -1) {
+                let removed = appState.splice(idx, 1)[0];
+                angs.push(removed.anglers[0]); 
+            }
+        }); 
+        appState.push({ id: genId(), isTeam: true, tName: '', anglers: angs }); 
+        renderStateToScreen(); 
+    }
+    
+    function checkMerge() { 
+        let checkedBoxes = document.querySelectorAll('.merge-cb:checked');
+        document.getElementById('mergeBtn').style.display = checkedBoxes.length === 4 ? 'inline-block' : 'none';
+    }
+    
+    function checkTeamClash() {
+        let clash = false; 
+        if (mobilityMode === 'B') {
+            appState.forEach(e => { 
+                if (e.isTeam) {
+                    let mobCount = e.anglers.filter(a => a.mobility).length;
+                    if (mobCount > 1) clash = true;
+                } 
+            }); 
+        }
+        document.getElementById('teamClashWarning').style.display = clash ? 'block' : 'none';
+        
+        let severeErrs = window.currentSevereErrors || false;
+        let processBtn = document.getElementById('mainActionBtn');
+        
+        if (clash || severeErrs) {
+            processBtn.disabled = true;
+            processBtn.style.opacity = '0.5';
+            processBtn.innerText = 'FIX ERRORS';
+        } else {
+            processBtn.disabled = false;
+            processBtn.style.opacity = '1';
+            processBtn.innerText = 'PROCESS DRAW';
+        }
+    }
+    
+    function updateTicker() { 
+        let ent = 0; 
+        appState.forEach(e => { e.anglers.forEach(a => { if (a.name && a.name.trim() !== '') ent++; }); });
+        document.getElementById('tkAnglers').innerText = ent; 
+    }
+
+    function initiateShuffle() {
+        let filteredState = [];
+        appState.forEach(e => {
+            if (e.isTeam) {
+                let hasNames = e.anglers.some(a => (a.name || '').trim() !== '');
+                let hasTeamName = (e.tName || '').trim() !== '';
+                if (hasNames || hasTeamName) filteredState.push(e);
+            } else {
+                if ((e.anglers[0].name || '').trim() !== '') filteredState.push(e);
+            }
+        });
+        
+        appState = filteredState;
+        appState.forEach(e => { e.anglers.forEach(a => { a.z1 = undefined; a.p1 = undefined; a.z2 = undefined; a.p2 = undefined; }); });
+        
+        renderStateToScreen();
+        
+        const over = document.getElementById('shuffleOverlay'); 
+        const pBar = document.getElementById('pBar');
+        over.style.display = 'flex'; 
+        let p = 0;
+        
+        const inv = setInterval(() => { 
+            p += 5; pBar.style.width = p + '%'; 
+            if (p >= 100) { clearInterval(inv); over.style.display = 'none'; runDraw(); } 
+        }, 30);
+    }
+
+    function getAlphaPeg(z, day, usedObj) {
+        let zIdx = zones.indexOf(z);
+        let maxBase = (zIdx + 1) * currentZoneSize;
+        let letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        for (let i = 0; i < letters.length; i++) {
+            let testPeg = maxBase + letters[i];
+            if (!usedObj[z].includes(String(testPeg))) {
+                usedObj[z].push(String(testPeg));
+                return testPeg;
+            }
+        }
+        return maxBase + 'Z'; 
+    }
+
+    function runDraw() {
+        appState.sort((a, b) => {
+            let getPriority = (entry) => { 
+                let hasA = accEnabled && entry.anglers.some(ang => ang.mobility); 
+                if (entry.isTeam && hasA) return 4;
+                if (!entry.isTeam && hasA) return 3;
+                if (entry.isTeam) return 2;
+                return 1; 
+            };
+            return getPriority(b) - getPriority(a);
+        });
+
+        let s1A_str = document.getElementById('accPegs1_a').value || '';
+        let s2A_str = document.getElementById('accPegs2_a').value || '';
+        let s1A = s1A_str.match(/\d+/g) ? s1A_str.match(/\d+/g).map(Number) : [];
+        let s2A = s2A_str.match(/\d+/g) ? s2A_str.match(/\d+/g).map(Number) : [];
+        const ancZ1 = document.getElementById('anchorZoneSelect').value;
+        const ancZ2 = document.getElementById('anchorZoneSelect2').value;
+        
+        if (currentZoneSize === 0) {
+            let tot = 0; 
+            appState.forEach(e => { if (e.isTeam) tot += 4; else tot += 1; });
+            currentZoneSize = Math.max(Math.ceil(tot / 4), 1); 
+        }
+        let zSize = currentZoneSize;
+        
+        let p1 = zones.map((z, idx) => { 
+            let p = []; for (let i = 1; i <= zSize; i++) p.push((idx * zSize) + i);
+            p.sort(() => Math.random() - 0.5); return {z, p}; 
+        });
+        let p2 = zones.map((z, idx) => { 
+            let p = []; for (let i = 1; i <= zSize; i++) p.push((idx * zSize) + i);
+            p.sort(() => Math.random() - 0.5); return {z, p}; 
+        });
+
+        let aEntries = [];
+        if (accEnabled) {
+            appState.forEach(e => { if (e.anglers.some(a => a.mobility)) aEntries.push(e); });
+        }
+
+        if (accEnabled && mobilityMode === 'A' && aEntries.length > 0) {
+            let availableD1Safe = []; let availableD2Safe = [];
+            zones.forEach(z => {
+                let zI = zones.indexOf(z); let safeCount = 0;
+                p1[zI].p.forEach(pegNum => { if (s1A.includes(pegNum)) safeCount++; });
+                for (let i = 0; i < safeCount; i++) availableD1Safe.push(z);
+            });
+            zones.forEach(z => {
+                let zI = zones.indexOf(z); let safeCount = 0;
+                p2[zI].p.forEach(pegNum => { if (s2A.includes(pegNum)) safeCount++; });
+                for (let i = 0; i < safeCount; i++) availableD2Safe.push(z);
+            });
+
+            let bestPairing = []; let leastClashes = 999;
+            for (let attempt = 0; attempt < 100; attempt++) {
+                let tempD1 = [...availableD1Safe].sort(() => Math.random() - 0.5);
+                let tempD2 = [...availableD2Safe].sort(() => Math.random() - 0.5);
+                let clashes = 0; let currentPairs = [];
+                for (let i = 0; i < aEntries.length; i++) {
+                    let z1 = null, z2 = null;
+                    if (i < tempD1.length) z1 = tempD1[i];
+                    if (i < tempD2.length) z2 = tempD2[i];
+                    if (z1 !== null && z2 !== null && z1 === z2) clashes++;
+                    currentPairs.push({z1: z1, z2: z2});
+                }
+                if (clashes < leastClashes) {
+                    leastClashes = clashes; bestPairing = currentPairs;
+                    if (leastClashes === 0) break; 
+                }
+            }
+            aEntries.forEach((e, idx) => {
+                let a = e.anglers.find(ang => ang.mobility);
+                a.preZ1 = bestPairing[idx].z1; a.preZ2 = bestPairing[idx].z2;
+            });
+        }
+        
+        const pull = (z, d2, mob) => {
+            const pools = d2 ? p2 : p1; const zI = zones.indexOf(z);
+            if (accEnabled && mobilityMode === 'A') {
+                const sL = d2 ? s2A : s1A;
+                if (mob) { 
+                    let sI = pools[zI].p.findIndex(p => sL.includes(p)); 
+                    if (sI > -1) return pools[zI].p.splice(sI, 1)[0]; 
+                } else if (sL.length > 0) { 
+                    let nI = pools[zI].p.findIndex(p => !sL.includes(p)); 
+                    if (nI > -1) return pools[zI].p.splice(nI, 1)[0]; 
+                }
+            }
+            let popVal = pools[zI].p.pop();
+            return popVal !== undefined ? popVal : 9999;
+        };
+        
+        appState.forEach(e => {
+            if (e.isTeam) {
+                let hasA = false;
+                if (accEnabled) { e.anglers.forEach(a => { if (a.mobility) hasA = true; }); }
+                
+                if (accEnabled && mobilityMode === 'B' && hasA) {
+                    let d1Z = [null, null, null, null]; let d2Z = [null, null, null, null]; 
+                    e.anglers.forEach((a, i) => { if (a.mobility) { d1Z[i] = ancZ1; d2Z[i] = ancZ2; } });
+                    
+                    let av1 = []; zones.forEach(z => { if (z !== ancZ1) av1.push(z); });
+                    av1.sort(() => Math.random() - 0.5);
+                    let sI = []; e.anglers.forEach((a, i) => { if (!a.mobility) sI.push(i); });
+                    d1Z[sI[0]] = av1[0]; d1Z[sI[1]] = av1[1]; d1Z[sI[2]] = av1[2];
+                    
+                    let av2 = []; zones.forEach(z => { if (z !== ancZ2) av2.push(z); });
+                    let bestD2Perm = [...av2];
+                    for (let attempt = 0; attempt < 20; attempt++) {
+                        av2.sort(() => Math.random() - 0.5);
+                        let isValid = true;
+                        for (let k = 0; k < 3; k++) { if (d1Z[sI[k]] === av2[k]) isValid = false; }
+                        if (isValid) { bestD2Perm = [...av2]; break; }
+                    }
+                    d2Z[sI[0]] = bestD2Perm[0]; d2Z[sI[1]] = bestD2Perm[1]; d2Z[sI[2]] = bestD2Perm[2];
+                    
+                    e.anglers.forEach((a, i) => { 
+                        a.z1 = d1Z[i]; a.p1 = pull(a.z1, 0, a.mobility); 
+                        a.z2 = d2Z[i]; a.p2 = pull(a.z2, 1, a.mobility); 
+                    });
+                } else if (accEnabled && mobilityMode === 'A' && hasA) {
+                    let mI = e.anglers.findIndex(a => a.mobility); let a = e.anglers[mI];
+                    let targetZ1 = a.preZ1; let targetZ2 = a.preZ2;
+                    if (!targetZ1) targetZ1 = [...zones].sort(() => Math.random() - 0.5)[0];
+                    if (!targetZ2) {
+                        let randZones = []; zones.forEach(z => { if (z !== targetZ1) randZones.push(z); });
+                        randZones.sort(() => Math.random() - 0.5);
+                        targetZ2 = randZones.length > 0 ? randZones[0] : targetZ1;
+                    }
+                    let d1Z = [null, null, null, null]; let d2Z = [null, null, null, null];
+                    d1Z[mI] = targetZ1; d2Z[mI] = targetZ2;
+                    
+                    let remainingD1 = []; zones.forEach(z => { if (z !== targetZ1) remainingD1.push(z); });
+                    let remainingD2 = []; zones.forEach(z => { if (z !== targetZ2) remainingD2.push(z); });
+                    remainingD1.sort(() => Math.random() - 0.5);
+                    
+                    let bestD2Perm = [...remainingD2];
+                    for (let attempt = 0; attempt < 20; attempt++) {
+                        remainingD2.sort(() => Math.random() - 0.5);
+                        let isValid = true;
+                        for (let i = 0; i < 3; i++) { if (remainingD1[i] === remainingD2[i]) isValid = false; }
+                        if (isValid) { bestD2Perm = [...remainingD2]; break; }
+                    }
+                    remainingD2 = bestD2Perm;
+                    
+                    let rIdx = 0;
+                    for (let i = 0; i < 4; i++) {
+                        if (i !== mI) { d1Z[i] = remainingD1[rIdx]; d2Z[i] = remainingD2[rIdx]; rIdx++; }
+                    }
+                    e.anglers.forEach((ang, i) => { 
+                        ang.z1 = d1Z[i]; ang.p1 = pull(ang.z1, 0, ang.mobility); 
+                        ang.z2 = d2Z[i]; ang.p2 = pull(ang.z2, 1, ang.mobility); 
+                    });
+                } else {
+                    let d1Z = [...zones].sort(() => Math.random() - 0.5); 
+                    let d2Z = [d1Z[1], d1Z[2], d1Z[3], d1Z[0]];
+                    e.anglers.forEach((a, i) => { 
+                        a.z1 = d1Z[i]; a.p1 = pull(a.z1, 0, 0); 
+                        a.z2 = d2Z[i]; a.p2 = pull(a.z2, 1, 0); 
+                    });
+                }
+            } else {
+                let a = e.anglers[0]; let hasMobility = accEnabled && a.mobility;
+                if (accEnabled && mobilityMode === 'B' && hasMobility) { 
+                    a.z1 = ancZ1; a.z2 = ancZ2; 
+                } else if (accEnabled && mobilityMode === 'A' && hasMobility) {
+                    if (a.preZ1) a.z1 = a.preZ1; else a.z1 = zones[Math.floor(Math.random() * zones.length)];
+                    if (a.preZ2) a.z2 = a.preZ2;
+                    else {
+                        let av2 = []; zones.forEach(z => { if (z !== a.z1) av2.push(z); });
+                        a.z2 = av2.length > 0 ? av2[0] : a.z1;
+                    }
+                } else { 
+                    let av = []; 
+                    zones.forEach(z => { 
+                        if (p1[zones.indexOf(z)].p.length > 0) av.push({z: z, left: p1[zones.indexOf(z)].p.length}); 
+                    });
+                    if (av.length > 0) {
+                        av.sort((val1, val2) => val2.left - val1.left);
+                        let maxLeft = av[0].left;
+                        let candidates = av.filter(item => item.left === maxLeft).map(item => item.z);
+                        a.z1 = candidates[Math.floor(Math.random() * candidates.length)];
+                    } 
+                    
+                    let av2 = []; 
+                    zones.forEach(z => { 
+                        if (z !== a.z1 && p2[zones.indexOf(z)].p.length > 0) av2.push({z: z, left: p2[zones.indexOf(z)].p.length}); 
+                    });
+                    if (av2.length === 0) {
+                        zones.forEach(z => { if (p2[zones.indexOf(z)].p.length > 0) av2.push({z: z, left: p2[zones.indexOf(z)].p.length}); });
+                    }
+                    if (av2.length > 0) {
+                        av2.sort((val1, val2) => val2.left - val1.left);
+                        let maxLeft2 = av2[0].left;
+                        let candidates2 = av2.filter(item => item.left === maxLeft2).map(item => item.z);
+                        a.z2 = candidates2[Math.floor(Math.random() * candidates2.length)];
+                    }
+                }
+                a.p1 = pull(a.z1, 0, hasMobility); a.p2 = pull(a.z2, 1, hasMobility);
+            }
+        });
+        displayDraw();
+    }
+
+    function toggleSwapMode() { 
+        resetMasterToggles();
+        isSwapMode = !isSwapMode;
+        swapObj1 = null; 
+        document.getElementById('swapPrompt').style.display = isSwapMode ? 'block' : 'none';
+        displayDraw(); 
+    }
+
+    function handleSwapClick(eId, aI, day) { 
+        if (!isSwapMode) return; 
+        if (!swapObj1) { 
+            swapObj1 = { eId: eId, aI: aI, day: day }; 
+            displayDraw(); 
+        } else { 
+            if (swapObj1.day !== day) { 
+                alert("Please select another Day " + swapObj1.day + " peg to complete the swap."); 
+                return; 
+            }
+            let e1 = null, e2 = null;
+            appState.forEach(e => {
+                if (e.id === swapObj1.eId) e1 = e;
+                if (e.id === eId) e2 = e;
+            });
+            const a1 = e1.anglers[swapObj1.aI]; const a2 = e2.anglers[aI]; 
+            if (day === 1) { 
+                let tempZ = a1.z1; a1.z1 = a2.z1; a2.z1 = tempZ;
+                let tempP = a1.p1; a1.p1 = a2.p1; a2.p1 = tempP;
+            } else { 
+                let tempZ = a1.z2; a1.z2 = a2.z2; a2.z2 = tempZ;
+                let tempP = a1.p2; a1.p2 = a2.p2; a2.p2 = tempP;
+            }
+            toggleSwapMode(); 
+        } 
+    }
+
+    function runValidator() {
+        let errors = []; let clashMap = [];
+        let pM1 = { RED:[], YELLOW:[], GREEN:[], BLUE:[] }; let pM2 = { RED:[], YELLOW:[], GREEN:[], BLUE:[] };
+
+        appState.forEach(team => {
+            let tN = team.tName || 'SOLO';
+            if (team.isTeam) {
+                let d1Z = {}, d2Z = {};
+                team.anglers.forEach((a, aI) => {
+                    if (a.z1) { if (!d1Z[a.z1]) d1Z[a.z1] = []; d1Z[a.z1].push(aI); }
+                    if (matchDays === 2 && a.z2) { if (!d2Z[a.z2]) d2Z[a.z2] = []; d2Z[a.z2].push(aI); }
+                });
+                Object.keys(d1Z).forEach(z => {
+                    if (d1Z[z].length > 1) {
+                        errors.push(`Team Clash: '${tN}' has multiple anglers in ${z} Zone [DAY 1].`);
+                        d1Z[z].forEach(idx => clashMap.push({eId: team.id, aI: idx, day: 1}));
+                    }
+                });
+                Object.keys(d2Z).forEach(z => {
+                    if (d2Z[z].length > 1) {
+                        errors.push(`Team Clash: '${tN}' has multiple anglers in ${z} Zone [DAY 2].`);
+                        d2Z[z].forEach(idx => clashMap.push({eId: team.id, aI: idx, day: 2}));
+                    }
+                });
+            }
+            
+            team.anglers.forEach((a, aI) => {
+                let aN = a.name || 'UNNAMED';
+               if (!a.z1 || a.p1 === undefined || a.p1 === 9999) {
+                    errors.push(`Missing Peg: '${aN}' invalid allocation [DAY 1].`);
+                    clashMap.push({eId: team.id, aI: aI, day: 1});
+                }
+                if (matchDays === 2 && (!a.z2 || a.p2 === undefined || a.p2 === 9999)) {
+                    errors.push(`Missing Peg: '${aN}' invalid allocation [DAY 2].`);
+                    clashMap.push({eId: team.id, aI: aI, day: 2});
+                }
+                
+                let allowedDouble = (accEnabled && a.mobility) ? true : false;
+                if (matchDays === 2 && a.z1 && a.z2 && a.z1 === a.z2 && !allowedDouble) {
+                    errors.push(`Static Zone Clash: '${aN}' stuck in same zone.`);
+                    clashMap.push({eId: team.id, aI: aI, day: 1});
+                    clashMap.push({eId: team.id, aI: aI, day: 2});
+                }
+                
+                if (a.z1 && a.p1 !== undefined && a.p1 !== 9999) {
+                    let dup = pM1[a.z1].find(p => String(p.val) === String(a.p1));
+                    if (dup) {
+                        errors.push(`Peg Collision: '${a.z1} ${a.p1}' duplicated [DAY 1].`);
+                        clashMap.push({eId: team.id, aI: aI, day: 1});
+                        clashMap.push({eId: dup.eId, aI: dup.aI, day: 1});
+                    } else { pM1[a.z1].push({val: a.p1, eId: team.id, aI: aI}); }
+                }
+                
+                if (matchDays === 2 && a.z2 && a.p2 !== undefined && a.p2 !== 9999) {
+                    let dup = pM2[a.z2].find(p => String(p.val) === String(a.p2));
+                    if (dup) {
+                        errors.push(`Peg Collision: '${a.z2} ${a.p2}' duplicated [DAY 2].`);
+                        clashMap.push({eId: team.id, aI: aI, day: 2});
+                        clashMap.push({eId: dup.eId, aI: dup.aI, day: 2});
+                    } else { pM2[a.z2].push({val: a.p2, eId: team.id, aI: aI}); }
+                }
+            });
+        });
+        
+        let uniqueErrors = []; errors.forEach(e => { if (!uniqueErrors.includes(e)) uniqueErrors.push(e); });
+        return { list: uniqueErrors, markers: clashMap };
+    }
+
+    function injectLatecomer(isTeam) {
+        resetMasterToggles();
+        let used1 = { 'RED':[], 'YELLOW':[], 'GREEN':[], 'BLUE':[] };
+        let used2 = { 'RED':[], 'YELLOW':[], 'GREEN':[], 'BLUE':[] };
+        
+        appState.forEach(e => {
+            e.anglers.forEach(a => {
+                if(a.z1 && a.p1 !== undefined && a.p1 !== 9999) used1[a.z1].push(String(a.p1));
+                if(matchDays === 2 && a.z2 && a.p2 !== undefined && a.p2 !== 9999) used2[a.z2].push(String(a.p2));
+            });
+        });
+
+        let avail1 = { 'RED':[], 'YELLOW':[], 'GREEN':[], 'BLUE':[] };
+        let avail2 = { 'RED':[], 'YELLOW':[], 'GREEN':[], 'BLUE':[] };
+        
+        zones.forEach((z, idx) => {
+            for(let i=1; i<=currentZoneSize; i++) {
+                let pN = String((idx * currentZoneSize) + i);
+                if(!used1[z].includes(pN)) avail1[z].push(pN);
+                if(matchDays === 2 && !used2[z].includes(pN)) avail2[z].push(pN);
+            }
+        });
+
+        let newEntry = { id: genId(), isTeam: isTeam, tName: '', anglers: [] };
+
+        if(isTeam) {
+            let d1Z = [...zones].sort(() => Math.random() - 0.5); 
+            let d2Z = [d1Z[1], d1Z[2], d1Z[3], d1Z[0]];
+            
+            for(let i=0; i<4; i++) {
+                let p1_val;
+                if(avail1[d1Z[i]].length > 0) p1_val = avail1[d1Z[i]].splice(Math.floor(Math.random() * avail1[d1Z[i]].length), 1)[0];
+                else p1_val = getAlphaPeg(d1Z[i], 1, used1);
+                
+                let p2_val = undefined;
+                if(matchDays === 2) {
+                    if(avail2[d2Z[i]].length > 0) p2_val = avail2[d2Z[i]].splice(Math.floor(Math.random() * avail2[d2Z[i]].length), 1)[0];
+                    else p2_val = getAlphaPeg(d2Z[i], 2, used2);
+                }
+                newEntry.anglers.push({ name: '', z1: d1Z[i], p1: p1_val, z2: matchDays === 2 ? d2Z[i] : undefined, p2: p2_val });
+            }
+        } else {
+            let flat1 = []; zones.forEach(z => { if(avail1[z].length > 0) flat1.push(z); });
+            let picked1Z = flat1.length > 0 ? flat1[Math.floor(Math.random() * flat1.length)] : zones[Math.floor(Math.random() * zones.length)];
+            
+            let p1_val;
+            if(avail1[picked1Z].length > 0) p1_val = avail1[picked1Z].splice(Math.floor(Math.random() * avail1[picked1Z].length), 1)[0];
+            else p1_val = getAlphaPeg(picked1Z, 1, used1);
+            
+            let picked2Z = undefined, p2_val = undefined;
+            if(matchDays === 2) {
+                let flat2 = []; zones.forEach(z => { if(z !== picked1Z && avail2[z].length > 0) flat2.push(z); });
+                if(flat2.length === 0) zones.forEach(z => { if(z !== picked1Z) flat2.push(z); });
+                picked2Z = flat2.length > 0 ? flat2[Math.floor(Math.random() * flat2.length)] : zones[Math.floor(Math.random() * zones.length)];
+                
+                if(avail2[picked2Z] && avail2[picked2Z].length > 0) p2_val = avail2[picked2Z].splice(Math.floor(Math.random() * avail2[picked2Z].length), 1)[0];
+                else p2_val = getAlphaPeg(picked2Z, 2, used2);
+            }
+            newEntry.anglers.push({ name: '', z1: picked1Z, p1: p1_val, z2: matchDays === 2 ? picked2Z : undefined, p2: p2_val });
+        }
+        
+        appState.push(newEntry);
+        displayDraw();
+        showToast("✅ LATECOMER ADDED SUCCESSFULLY");
+        setTimeout(() => { handleAmend(true); }, 800); 
+    }
+
+    function isPegSafe(p, d) { 
+        if (!accEnabled) return false;
+        if (mobilityMode === 'A') {
+            let safeStr = d === 1 ? document.getElementById('accPegs1_a').value : document.getElementById('accPegs2_a').value;
+            let safeArr = safeStr.match(/\d+/g) || [];
+            return safeArr.includes(String(p).replace(/[a-zA-Z]/g, ''));
+        }
+        return false;
+    }
+
+    function copyExcelData() {
+        resetMasterToggles();
+        let tsv = matchDays === 2 ? "NAME\tTEAM\tDAY 1 ZONE\tDAY 2 ZONE\n" : "NAME\tTEAM\tDAY 1 ZONE\n";
+        appState.forEach(g => { 
+            g.anglers.forEach(a => { 
+                let tName = g.isTeam ? (g.tName || '') : '';
+                if (matchDays === 2) tsv += `${a.name || ''}\t${tName}\t${a.z1}\t${a.z2}\n`; 
+                else tsv += `${a.name || ''}\t${tName}\t${a.z1}\n`;
+            }); 
+        });
+
+        navigator.clipboard.writeText(tsv).then(() => {
+            showToast("📋 SETUP DATA COPIED TO CLIPBOARD");
+        });
+    }
+
+    function buildBeachMap(day, s) {
+        let html = `<div style="display:flex; width:100%; gap:8px; margin-bottom: 6px;">`;
+        zones.forEach((z, idx) => {
+            let baseMax = (idx + 1) * s;
+            let baseMin = (idx * s) + 1;
+            let highestAlpha = '';
+            
+            let assignedPegs = [];
+            let aPegs = [];
+            
+            appState.forEach(e => e.anglers.forEach(a => {
+                let zp = day === 1 ? {z: a.z1, p: a.p1} : {z: a.z2, p: a.p2};
+                if (zp.z === z && zp.p !== undefined && zp.p !== 9999) {
+                    let pStr = String(zp.p);
+                    assignedPegs.push(pStr);
+                    if (a.mobility) aPegs.push(pStr);
+                    
+                    if (pStr.startsWith(String(baseMax))) {
+                        let alpha = pStr.replace(/[0-9]/g, '');
+                        if (alpha > highestAlpha) highestAlpha = alpha;
+                    }
+                }
+            }));
+            
+            let emptyPegs = [];
+            for (let i = baseMin; i <= baseMax; i++) {
+                if (!assignedPegs.includes(String(i))) {
+                    emptyPegs.push(i);
+                }
+            }
+            
+            let bg = zColors[z];
+            let label = highestAlpha ? `${baseMin}-${baseMax} + ${baseMax}${highestAlpha}` : `${baseMin}-${baseMax}`;
+            
+            let extraInfo = '';
+            let hasEmpty = emptyPegs.length > 0;
+            let hasA = accEnabled && aPegs.length > 0;
+
+            if (hasEmpty) {
+                extraInfo += `<span style="font-size:10px; font-weight:900; background:white; color:var(--text-dark); padding:4px 8px; border-radius:50px; white-space:nowrap; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">E: ${emptyPegs.join(', ')}</span>`;
+            }
+            if (hasA) {
+                extraInfo += `<span style="font-size:10px; font-weight:900; background:white; color:var(--text-dark); padding:4px 8px; border-radius:50px; white-space:nowrap; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">[A]: ${aPegs.join(', ')}</span>`;
+            }
+
+            html += `<div style="flex:1; background:${bg}; border-radius:12px; padding:6px 12px; color:white; font-weight:900; display:flex; flex-direction:row; flex-wrap:wrap; justify-content:center; align-items:center; gap:8px; min-height:26px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                        <span style="font-size:14px; letter-spacing:0.5px;">${label}</span>
+                        ${extraInfo}
+                     </div>`;
+        });
+        html += `</div>`;
+        return html;
+    }
+
+    function displayDraw() {
+        document.querySelectorAll('body > div[id$="Section"]').forEach(s => s.style.display = 'none');
+        document.getElementById('resultsSection').style.display = 'block';
+        
+        let titleVal = document.getElementById('matchTitle').value;
+        let titleStr = titleVal ? `LIVE: ${titleVal}` : "LIVE DRAW";
+        document.getElementById('resTitle').innerHTML = `<span class="live-dot">🔴</span> ${titleStr}`;
+        
+        document.getElementById('commandBar').style.display = 'none';
+        document.getElementById('masterActionBar').style.display = 'flex';
+
+        if (currentZoneSize === 0) {
+            let totAnglers = 0;
+            appState.forEach(e => { if (e.isTeam) totAnglers += 4; else totAnglers += 1; });
+            currentZoneSize = Math.max(Math.ceil(totAnglers / 4), 1);
+        }
+        const s = currentZoneSize;
+
+        let mapHtml = '';
+        
+        let masterLegend = `E = Empty Peg`;
+        if (accEnabled) masterLegend += ` <span style="margin: 0 8px; opacity:0.5;">|</span> [A] = Accesable Pegs`;
+        mapHtml += `<div style="font-size:12px; font-weight:900; color:var(--text-light); text-align:center; margin-bottom:15px; letter-spacing: 0.5px;">${masterLegend}</div>`;
+
+        if (matchDays >= 1) {
+            mapHtml += `<div style="font-size:14px; font-weight:900; color:var(--text-dark); margin-bottom:6px; letter-spacing: 0.5px; margin-left:5px;">DAY 1</div>`;
+            mapHtml += buildBeachMap(1, s);
+        }
+        if (matchDays === 2) {
+            mapHtml += `<div style="font-size:14px; font-weight:900; color:var(--text-dark); margin-bottom:6px; margin-top:10px; letter-spacing: 0.5px; margin-left:5px;">DAY 2</div>`;
+            mapHtml += buildBeachMap(2, s);
+        }
+        
+        const beachContainer = document.getElementById('beachMapContainer');
+        beachContainer.innerHTML = mapHtml;
+
+        const validation = runValidator(); 
+        const banner = document.getElementById('anomalyBanner'); 
+        const list = document.getElementById('anomalyList');
+        
+        if (validation.list.length > 0) { 
+            banner.style.display = 'block'; 
+            list.innerHTML = validation.list.map(err => `<li>${err}</li>`).join('');
+        } else { banner.style.display = 'none'; }
+
+        const tb = document.getElementById('teamsBucket'); tb.innerHTML = ''; 
+        const sb = document.getElementById('solosBucket'); sb.innerHTML = '';
+        
+        appState.forEach(g => {
+            const div = document.createElement('div'); div.className = 'zone-card';
+            
+            let nameStr = g.tName ? g.tName : 'SOLO';
+            let h = `<div class="zone-header"><span>${nameStr}</span></div>`;
+            h += `<div class="res-row" style="font-size:11px; color:var(--text-light); padding-bottom: 2px;"><span></span><span style="text-align:center;">DAY 1</span><span style="text-align:center;">DAY 2</span></div>`;
+            
+            g.anglers.forEach((a, aI) => {
+                let p1C = isSwapMode ? ' swap-active' : '';
+                if (swapObj1 && swapObj1.eId === g.id && swapObj1.aI === aI && swapObj1.day === 1) p1C += ' swap-selected';
+                if (validation.markers.find(m => m.eId === g.id && m.aI === aI && m.day === 1)) p1C += ' clash-glow';
+                
+                let p2C = isSwapMode ? ' swap-active' : '';
+                if (swapObj1 && swapObj1.eId === g.id && swapObj1.aI === aI && swapObj1.day === 2) p2C += ' swap-selected';
+                if (validation.markers.find(m => m.eId === g.id && m.aI === aI && m.day === 2)) p2C += ' clash-glow';
+                
+                let aName = a.name || '';
+                let aTag = (accEnabled && a.mobility) ? ' <span class="a-tag">[A]</span>' : '';
+                
+                let d1Bg = zColors[a.z1] || 'gray'; let d2Bg = zColors[a.z2] || 'gray';
+                let d1SafeTag = isPegSafe(a.p1, 1) ? '<br><small style="font-size:9px;">[A]</small>' : '';
+                let d2SafeTag = isPegSafe(a.p2, 2) ? '<br><small style="font-size:9px;">[A]</small>' : '';
+                
+                h += `<div class="res-row">
+                        <span class="angler-name">${aName}${aTag}</span>
+                        <div class="draw-pill${p1C}" style="background:${d1Bg}" onclick="handleSwapClick('${g.id}',${aI},1)">
+                            <span>${a.z1 || 'UNDEFINED'}</span> <span class="peg-num">${a.p1 !== undefined ? a.p1 : '-'}</span>${d1SafeTag}
+                        </div>
+                        <div class="draw-pill${p2C}" style="background:${d2Bg}" onclick="handleSwapClick('${g.id}',${aI},2)">
+                            <span>${a.z2 || '-'}</span> <span class="peg-num">${a.p2 !== undefined ? a.p2 : '-'}</span>${d2SafeTag}
+                        </div>
+                      </div>`;
+            });
+            div.innerHTML = h; 
+            if (g.isTeam) tb.appendChild(div); else sb.appendChild(div);
+        });
+        
+        document.getElementById('teamsBucketContainer').style.display = tb.innerHTML !== '' ? 'block' : 'none';
+        document.getElementById('solosBucketContainer').style.display = sb.innerHTML !== '' ? 'block' : 'none';
+        
+        persistState();
+    }
+
+    function handleAmend(isSafe) { 
+        document.querySelectorAll('body > div[id$="Section"]').forEach(s => s.style.display = 'none');
+        document.getElementById('entrySection').style.display = 'block'; 
+        document.getElementById('commandBar').style.display = 'flex'; 
+        document.getElementById('masterActionBar').style.display = 'none';
+        
+        if (appState.length > 0) { 
+            document.getElementById('rosterEntryZone').style.display = 'none'; 
+            document.getElementById('commandBar').style.display = 'flex'; 
+            document.getElementById('amendTools').style.display = 'flex'; 
+            document.getElementById('actionBtnArea').style.display = 'flex'; 
+        }
+        
+        if (isSafe) {
+            document.getElementById('setupPanel').style.display = 'none';
+            document.getElementById('editDrawBanner').style.display = 'flex';
+            document.getElementById('accToggleBtn').style.display = 'none';
+            document.getElementById('accPanelWrapper').style.display = 'none';
+            document.getElementById('addAmendTeamBtn').style.display = 'none';
+            document.getElementById('addAmendSoloBtn').style.display = 'none';
+        } else {
+            document.getElementById('setupPanel').style.display = 'block';
+            document.getElementById('editDrawBanner').style.display = 'none';
+            document.getElementById('accToggleBtn').style.display = 'flex';
+            document.getElementById('accPanelWrapper').style.display = accEnabled ? 'flex' : 'none';
+            document.getElementById('addAmendTeamBtn').style.display = 'inline-block';
+            document.getElementById('addAmendSoloBtn').style.display = 'inline-block';
+        }
+        renderStateToScreen(); 
+    }
+
+    function generateRegistrationSheet() {
+        resetMasterToggles();
+        const c = document.getElementById('registrationPrintSection'); c.innerHTML = '';
+        let matchName = document.getElementById('matchTitle').value;
+        let h = `<div class="roster-header"><h1>${matchName}</h1><h2>REGISTRATION SHEET</h2></div>
+                 <table class="print-table"><thead><tr><th>ANGLER</th><th>TEAM</th><th>PRESENT</th><th>POT (£)</th><th>PAIRS (£)</th></tr></thead><tbody>`;
+        let sortedState = [...appState].sort((a,b) => (a.tName || "SOLO").localeCompare(b.tName || "SOLO"));
+        sortedState.forEach(e => { 
+            e.anglers.forEach(a => { 
+                let aName = a.name || ''; let mobStr = (accEnabled && a.mobility) ? ' [A]' : '';
+                let tName = e.tName || 'SOLO';
+                h += `<tr><td>${aName}${mobStr}</td><td>${tName}</td><td><div class="print-checkbox"></div></td><td><div class="print-checkbox"></div></td><td><div class="print-checkbox"></div></td></tr>`; 
+            }); 
+        });
+        h += `</tbody></table>`; c.innerHTML = h;
+        document.body.classList.add('printing-registration'); window.print(); document.body.classList.remove('printing-registration');
+    }
+
+    function printZoneRosters() {
+        resetMasterToggles();
+        const c = document.getElementById('rosterSection'); c.innerHTML = '';
+        let days = matchDays === 2 ? [1, 2] : [1];
+        days.forEach(d => { 
+            zones.forEach(z => {
+                let list = []; 
+                appState.forEach(e => { 
+                    e.anglers.forEach(a => { 
+                        let targetZ = d === 1 ? a.z1 : a.z2;
+                        if (targetZ === z) {
+                            let targetP = d === 1 ? a.p1 : a.p2;
+                            list.push({ n: (a.name || ''), t: e.tName, p: targetP }); 
+                        }
+                    }); 
+                });
+                if (list.length === 0) return; 
+                list.sort((a, b) => {
+                    let numA = parseInt(a.p) || 0; let numB = parseInt(b.p) || 0;
+                    if (numA !== numB) return numA - numB;
+                    let strA = String(a.p).replace(/[0-9]/g, ''); let strB = String(b.p).replace(/[0-9]/g, '');
+                    return strA.localeCompare(strB);
+                });
+                let h = `<div class="roster-page"><div class="roster-header"><h1>DAY ${d} - ${z} ZONE</h1></div>
+                            <table class="print-table"><thead><tr><th>PEG</th><th>ANGLER</th><th>TEAM</th></tr></thead><tbody>`;
+                list.forEach(i => { h += `<tr><td>${i.p}</td><td>${i.n}</td><td>${i.t || 'SOLO'}</td></tr>`; });
+                h += `</tbody></table></div>`; c.innerHTML += h;
+            }); 
+        });
+        document.body.classList.add('printing-rosters'); window.print(); document.body.classList.remove('printing-rosters');
+    }
+
+    function generateDispatchSlips() {
+        resetMasterToggles();
+        const c = document.getElementById('dispatchSection'); c.innerHTML = '';
+        let teamsOnly = []; appState.forEach(e => { if (e.isTeam) teamsOnly.push(e); });
+        teamsOnly.forEach(e => {
+            let h = `<div class="dispatch-slip" style="page-break-after: always;"><div class="dispatch-header"><h1>TEAM: ${e.tName || 'UNNAMED TEAM'}</h1></div>
+                        <table class="print-table"><thead><tr><th>ANGLER</th><th>DAY 1</th>${matchDays === 2 ? '<th>DAY 2</th>' : ''}
+                        <th style="width:100px;">POT (£)</th><th style="width:120px;">PAIRS (£)</th><th style="width:120px;">TOTAL</th></tr></thead><tbody>`;
+            e.anglers.forEach(a => { 
+                h += `<tr><td>${a.name || ''} ${(accEnabled && a.mobility) ? '[A]' : ''}</td>
+                        <td>${a.z1} ${a.p1}</td>${matchDays === 2 ? `<td>${a.z2} ${a.p2}</td>` : ''}<td></td><td></td><td></td></tr>`; 
+            });
+            h += `<tr><td colspan="${matchDays === 2 ? 5 : 4}" style="text-align: right; font-weight: 900; font-size: 14px; padding: 10px;">TEAM HANDOVER TOTAL:</td>
+                    <td style="font-weight: 900; font-size: 14px; background: #f8fafc;">£</td></tr></tbody></table></div>`;
+            c.innerHTML += h;
+        });
+        
+        let solosOnly = []; appState.forEach(e => { if (!e.isTeam) solosOnly.push(e); });
+        for (let i = 0; i < solosOnly.length; i += 4) {
+            let batch = []; for (let j = 0; j < 4; j++) { if (i + j < solosOnly.length) batch.push(solosOnly[i + j]); }
+            const page = document.createElement('div'); page.style.pageBreakAfter = 'always';
+            batch.forEach(e => { 
+                const a = e.anglers[0]; 
+                let h = `<div class="dispatch-slip"><div class="dispatch-header"><h1>SOLO: ${a.name || 'UNNAMED'} ${(accEnabled && a.mobility) ? '[A]' : ''}</h1></div>
+                            <table class="print-table"><thead><tr><th>DAY 1</th>${matchDays === 2 ? '<th>DAY 2</th>' : ''}
+                            <th style="width:100px;">POT (£)</th><th style="width:120px;">PAIRS (£)</th><th style="width:120px;">TOTAL</th></tr></thead><tbody>
+                            <tr><td>${a.z1} ${a.p1}</td>${matchDays === 2 ? `<td>${a.z2} ${a.p2}</td>` : ''}<td></td><td></td><td></td></tr></tbody></table></div>`; 
+                page.innerHTML += h; 
+            });
+            c.appendChild(page);
+        }
+        document.body.classList.add('printing-dispatch'); window.print(); document.body.classList.remove('printing-dispatch');
+    }
+
+    function shareDraw() {
+        resetMasterToggles();
+        const el = document.getElementById('resultsSection'); 
+        el.classList.add('mobile-pdf-export');
+        html2pdf().set({ margin: 0.1, filename: 'DRAW_REPORT.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, scrollY: 0 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } }).from(el).save().then(() => {
+            el.classList.remove('mobile-pdf-export');
+        });
+    }
+
+    let saveTimeout;
+    document.addEventListener('input', function(e) {
+        if (isAppReady && (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA')) {
+            persistState();
+            if (e.target.id !== 'importRawData' && e.target.closest('#entrySection')) {
+                runEntryValidation();
+            }
+            const ind = document.getElementById('saveIndicator');
+            if (ind) {
+                ind.style.opacity = '1'; clearTimeout(saveTimeout);
+                saveTimeout = setTimeout(() => { ind.style.opacity = '0'; }, 1000);
+            }
+        }
+    });
+
+    window.onload = () => {
+        isAppReady = false; 
+        let saved = localStorage.getItem('zonedraw_current_state_v1');
+        if (saved) {
+            let e = JSON.parse(saved); 
+            document.getElementById('matchTitle').value = e.title || '';
+            document.getElementById('accPegs1_a').value = e.safePegs1_a || ''; 
+            document.getElementById('accPegs2_a').value = e.safePegs2_a || '';
+            if (e.anchorZone) document.getElementById('anchorZoneSelect').value = e.anchorZone;
+            if (e.anchorZone2) document.getElementById('anchorZoneSelect2').value = e.anchorZone2;
+            
+            setMobilityMode(e.mobilityMode || 'A'); setDays(e.days || 2); 
+            appState = e.data || []; 
+            scoreState = e.scores || {}; // Load V7.4.0 Score State
+            currentZoneSize = e.zoneSize || 0;
+            accEnabled = e.accEnabled ? true : false;
+            applyAccToggleUI();
+
+            if (appState.length > 0) { 
+                document.getElementById('rosterEntryZone').style.display = 'none'; 
+                document.getElementById('commandBar').style.display = 'flex'; 
+                document.getElementById('amendTools').style.display = 'flex';
+                let tCount = 0, iCount = 0;
+                appState.forEach(item => { if (item.isTeam) tCount++; else iCount++; });
+                document.getElementById('initTeams').value = tCount; document.getElementById('initIndivs').value = iCount;
+            }
+            
+            let hasDraw = false;
+            appState.forEach(x => { x.anglers.forEach(a => { if (a.z1) hasDraw = true; }); });
+            if (hasDraw) displayDraw(); else handleAmend(false);
+        } else { startNewDraw(); }
+        setTimeout(() => { isAppReady = true; }, 500); 
+    };
+</script>
+</body>
+</html>
