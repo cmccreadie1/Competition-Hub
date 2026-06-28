@@ -10,9 +10,9 @@
 
     <style>
         :root {
-            /* v7.4.0 Light Mode Palette */
-            --bg-base: #f8fafc; /* Draw Stage Background */
-            --bg-score: #f0f9ff; /* Score Stage Background (Ice Blue) */
+            /* Stage Backgrounds */
+            --bg-base: #f8fafc; /* Draw Setup: Ghost White */
+            --bg-score: #334155; /* Scorecards: Deep Slate Blue for contrast */
             --card: #ffffff; 
             
             --text-dark: #0f172a; 
@@ -36,26 +36,21 @@
             --a-color: #ca8a04; 
         }
 
-        html {
-            scroll-behavior: smooth;
-            scroll-padding-top: 150px;
-        }
+        html { scroll-behavior: smooth; scroll-padding-top: 150px; }
 
         body { 
             font-family: 'Inter', system-ui, -apple-system, sans-serif; 
             background: var(--bg-base); 
             color: var(--text-dark); 
-            margin: 0; 
-            padding: 0; 
+            margin: 0; padding: 0; 
             text-transform: uppercase; 
             line-height: 1.3; 
             overflow-x: hidden; 
             padding-bottom: 120px;
             font-variant-numeric: tabular-nums; 
-            transition: background-color 0.4s ease; /* Smooth stage transition */
+            transition: background-color 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
 
-        /* Base Inputs */
         input, select, textarea { 
             text-transform: uppercase; 
             font-weight: 800 !important; 
@@ -76,70 +71,58 @@
             box-shadow: 0 0 0 4px var(--accent-glow);
         }
 
-        /* Main title input */
         #matchTitle {
-            font-size: 18px;
-            text-align: center;
-            border: 2px dashed var(--border);
-            background: #ffffff;
-            padding: 16px;
-            color: var(--text-dark);
-            border-radius: 16px;
+            font-size: 18px; text-align: center; border: 2px dashed var(--border);
+            background: #ffffff; padding: 16px; color: var(--text-dark); border-radius: 16px;
         }
 
         #matchTitle:focus { border: 2px solid var(--accent); }
         #matchTitle::placeholder { color: #94a3b8; font-weight: 600 !important; text-transform: none; font-style: italic; }
+        .input-error { background: var(--red-soft) !important; border-color: var(--red-color) !important; color: var(--red-color) !important; }
 
-        .input-error {
-            background: var(--red-soft) !important;
-            border-color: var(--red-color) !important;
-            color: var(--red-color) !important;
-        }
-
-        /* Fixed Header */
+        /* Fixed Header & True Folder Tabs */
         .fixed-header { 
             position: fixed; top: 0; left: 0; right: 0; z-index: 5000; 
             background: rgba(255, 255, 255, 0.98); 
             backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border); 
-            padding: 14px 20px 0px; /* Tabs connect to bottom */
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            border-bottom: 2px solid var(--border); 
+            padding: 14px 20px 0px; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transition: border-bottom-color 0.4s;
         }
 
-        .header-content { 
-            display: flex; justify-content: space-between; align-items: center; 
-            max-width: 1400px; margin: 0 auto 15px; 
-        }
+        body.stage-score .fixed-header { border-bottom-color: #1e293b; }
 
+        .header-content { display: flex; justify-content: space-between; align-items: center; max-width: 1400px; margin: 0 auto 15px; }
         .brand-name { font-size: 20px; font-weight: 900; letter-spacing: -0.5px; color: var(--text-dark); display: flex; align-items: center; }
         .v-tag { font-size: 12px; color: var(--accent); margin-left: 10px; font-weight: 900; background: var(--accent-glow); padding: 4px 8px; border-radius: 20px; }
 
-        /* Tweak 1: True Tab Navigation */
-        .tab-nav {
-            display: flex; justify-content: center; gap: 8px; max-width: 1400px; margin: 0 auto; align-items: flex-end;
-        }
+        .tab-nav { display: flex; justify-content: center; gap: 8px; max-width: 1400px; margin: 0 auto; align-items: flex-end; }
 
         .tab-btn {
-            flex: 1; max-width: 400px; padding: 14px 20px;
-            background: #e2e8f0; border: 2px solid var(--border); border-bottom: none;
+            flex: 1; max-width: 400px; padding: 16px 20px;
+            background: #cbd5e1; border: 2px solid var(--border); border-bottom: none;
             border-radius: 16px 16px 0 0; font-weight: 900; font-size: 15px;
-            color: var(--text-light); cursor: pointer; transition: all 0.2s;
+            color: #475569; cursor: pointer; transition: all 0.3s;
+            box-shadow: inset 0 -4px 10px rgba(0,0,0,0.05);
+            position: relative;
         }
+
+        .tab-btn:hover { background: #e2e8f0; color: var(--text-dark); }
 
         .tab-btn.active {
-            color: var(--text-dark);
-            padding-bottom: 20px; /* Overlaps bottom border */
-            margin-bottom: -1px;
-            z-index: 10;
+            padding-bottom: 20px; margin-bottom: -2px; z-index: 10;
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.05);
+            border-color: var(--border);
         }
+
+        #tabBtn-draw.active { background: var(--bg-base); color: var(--text-dark); }
+        #tabBtn-score.active { background: var(--bg-score); color: white; border-color: #1e293b; box-shadow: 0 -4px 15px rgba(0,0,0,0.2); }
 
         .tab-content { padding: 160px 20px 40px; }
-        
-        #entrySection, #resultsSection, #dispatchSection, #rosterSection, #registrationPrintSection { 
-            max-width: 1400px; margin: 0 auto; 
-        }
+        #entrySection, #resultsSection, #dispatchSection, #rosterSection, #registrationPrintSection { max-width: 1400px; margin: 0 auto; }
 
-        /* Draw Setup Control Panel */
+        /* Setup Control Panel */
         .control-panel { 
             background: var(--card); border-radius: 20px; padding: 25px; 
             border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.05);
@@ -147,9 +130,8 @@
         }
 
         .bucket-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
-
         .duration-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; background: #f1f5f9; padding: 6px; border-radius: 50px; width: 100%; margin: 0 auto; }
-        .dt-opt { padding: 10px; border-radius: 50px; cursor: pointer; font-weight: 800; font-size: 13px; display: flex; align-items: center; justify-content: center; color: var(--text-light); }
+        .dt-opt { padding: 10px; border-radius: 50px; cursor: pointer; font-weight: 800; font-size: 13px; display: flex; align-items: center; justify-content: center; color: var(--text-light); transition: all 0.3s; }
         .dt-opt.active { color: var(--text-dark); background: #ffffff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
 
         /* Setup Zone Cards */
@@ -158,10 +140,8 @@
             position: relative; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             break-inside: avoid; page-break-inside: avoid; overflow: hidden; 
         }
-
         .zone-card:hover { box-shadow: 0 8px 25px rgba(0,0,0,0.1); transform: translateY(-2px); }
         .zone-card.solo-card { height: fit-content; align-self: start; }
-
         .zone-header { font-size: 13px; font-weight: 900; color: var(--text-dark); margin: 0 0 10px 0; padding: 0 16px 10px 16px; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; }
         .res-row { display: grid; grid-template-columns: 1fr 95px 95px; gap: 12px; align-items: center; padding: 6px 16px; border-bottom: none; }
         .angler-name { font-size: 13px; font-weight: 800; color: var(--text-dark); pointer-events: none; line-height: 1.3; }
@@ -186,68 +166,41 @@
         .anomaly-banner ul { color: var(--text-dark); font-size: 12px; font-weight: 600; margin: 0; padding-left: 20px; text-transform: none; }
         .anomaly-banner li { margin-bottom: 4px; }
 
-        /* ========================================== */
-        /* TWEAK 3 & 4: SCORECARD GRID & TABS         */
-        /* ========================================== */
-        
-        .day-tab-nav {
-            display: flex; justify-content: center; gap: 4px; margin-bottom: 20px; align-items: flex-end;
-            border-bottom: 2px solid var(--border);
-        }
-        
-        .day-tab-btn {
-            padding: 12px 30px; font-weight: 900; font-size: 14px;
-            border-radius: 12px 12px 0 0; background: #e2e8f0; color: var(--text-light);
-            border: 2px solid var(--border); border-bottom: none;
-            cursor: pointer; transition: 0.2s; margin-bottom: -2px;
-        }
+        /* SCORECARD: Horizontal Linear Layout */
+        .day-tab-nav { display: flex; justify-content: center; gap: 4px; margin-bottom: 20px; align-items: flex-end; border-bottom: 2px solid rgba(255,255,255,0.1); }
+        .day-tab-btn { padding: 12px 30px; font-weight: 900; font-size: 14px; border-radius: 12px 12px 0 0; background: #475569; color: #94a3b8; border: 2px solid transparent; border-bottom: none; cursor: pointer; transition: 0.2s; margin-bottom: -2px; }
+        .day-tab-btn.active { background: var(--card); color: var(--accent); border-color: var(--border); padding-bottom: 14px; z-index: 10; }
 
-        .day-tab-btn.active {
-            background: var(--card); color: var(--accent); border-color: var(--border);
-            padding-bottom: 14px; z-index: 10;
+        .scorecard-search {
+            width: 100%; max-width: 600px; margin: 0 auto 25px; display: block;
+            font-size: 16px; padding: 16px 24px; border-radius: 50px;
+            border: 2px solid var(--accent); box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            background: #ffffff; color: var(--text-dark);
         }
 
         .score-list-container { display: flex; flex-direction: column; gap: 8px; max-width: 1400px; margin: 0 auto; }
 
-        /* 7 Columns: Name, Team, Peg, Len, Cnt, Big, Spec */
         .score-list-header, .score-row {
             display: grid;
             grid-template-columns: minmax(180px, 2fr) minmax(140px, 1.5fr) 130px 90px 90px 90px 90px;
             gap: 12px; align-items: center;
         }
 
-        .score-list-header {
-            padding: 0 20px 8px; font-weight: 900; font-size: 11px; color: var(--text-light);
-            border-bottom: 2px solid var(--border); margin-bottom: 4px;
-        }
+        .score-list-header { padding: 0 20px 8px; font-weight: 900; font-size: 11px; color: #cbd5e1; border-bottom: 2px solid rgba(255,255,255,0.1); margin-bottom: 4px; }
 
         .score-row {
-            background: var(--card); border: 1px solid var(--border);
+            background: var(--card); border: 2px solid transparent;
             border-radius: 12px; padding: 10px 20px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.02); transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1); transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
 
-        /* Active Focus Highlight (Foolproof UX) */
         .score-row.focused-row {
-            border: 2px solid var(--accent);
-            background: #ffffff;
-            transform: scale(1.02);
-            box-shadow: 0 8px 25px rgba(14, 165, 233, 0.2);
-            z-index: 10;
-            position: relative;
+            border: 2px solid var(--accent); transform: scale(1.02);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4); z-index: 10; position: relative;
         }
 
-        .score-row input {
-            width: 100%; text-align: center; font-size: 15px; padding: 10px 4px;
-            background: #f8fafc; border: 1px solid var(--border);
-        }
-        
-        .score-row.focused-row input:focus {
-            background: #ffffff;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 4px var(--accent-glow);
-        }
-        
+        .score-row input { width: 100%; text-align: center; font-size: 15px; padding: 10px 4px; background: #f8fafc; border: 1px solid var(--border); }
+        .score-row.focused-row input:focus { background: #ffffff; border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-glow); }
         .score-row input::placeholder { font-size: 10px; color: #94a3b8; }
 
         .s-name { font-size: 14px; font-weight: 900; color: var(--text-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -260,42 +213,25 @@
         .btn-action { 
             background: var(--accent); border: none; color: white; font-weight: 800; 
             padding: 16px 32px; border-radius: 50px; cursor: pointer; font-size: 14px; 
-            letter-spacing: 0.5px; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            letter-spacing: 0.5px; transition: all 0.3s;
             box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
         }
-
         .btn-action:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(14, 165, 233, 0.4); }
         .btn-action:disabled { background: var(--border); box-shadow: none; color: white; cursor: not-allowed; }
 
         .btn-action-outline { 
             background: transparent; border: 2px solid var(--border); color: var(--text-dark); 
             font-weight: 800; padding: 16px 32px; border-radius: 50px; cursor: pointer; 
-            font-size: 14px; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            font-size: 14px; transition: all 0.3s;
         }
-
         .btn-action-outline:hover { border-color: var(--text-dark); color: white; background: var(--text-dark); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
         
-        .btn-tool { 
-            background: #f8fafc; border: 1px solid var(--border); color: var(--text-dark); 
-            font-size: 11px; font-weight: 800; padding: 8px 14px; border-radius: 50px; 
-            cursor: pointer; transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
-        }
-
+        .btn-tool { background: #f8fafc; border: 1px solid var(--border); color: var(--text-dark); font-size: 11px; font-weight: 800; padding: 8px 14px; border-radius: 50px; cursor: pointer; transition: all 0.2s; }
         .btn-tool:hover { border-color: var(--accent); color: var(--accent); background: white; }
 
-        /* TWEAK 2: POPUP MENU MODALS */
-        .master-menu-grid { 
-            display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; width: 100%;
-        }
-
-        .btn-ui { 
-            flex: 1 1 200px; background: #f8fafc; border: 1px solid var(--border); 
-            border-radius: 16px; padding: 16px 20px; text-align: left; cursor: pointer; 
-            display: flex; flex-direction: column; justify-content: center;
-            min-width: 150px; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            color: var(--text-dark);
-        }
-
+        /* Menus */
+        .master-menu-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; width: 100%; }
+        .btn-ui { flex: 1 1 200px; background: #f8fafc; border: 1px solid var(--border); border-radius: 16px; padding: 16px 20px; text-align: left; cursor: pointer; display: flex; flex-direction: column; justify-content: center; min-width: 150px; transition: all 0.3s; color: var(--text-dark); }
         .btn-ui:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 8px 25px rgba(14, 165, 233, 0.15); background: white; }
         .btn-ui strong { font-size: 14px; font-weight: 900; margin-bottom: 6px; color: var(--text-dark); }
         .btn-ui span { font-size: 11px; font-weight: 600; text-transform: none; line-height: 1.4; color: var(--text-light); }
@@ -306,64 +242,26 @@
         .btn-danger span { color: #fca5a5; }
 
         /* Sticky Action Bars */
-        .command-bar { 
-            position: fixed; bottom: 0; left: 0; right: 0; z-index: 5000; 
-            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px);
-            border-top: 1px solid var(--border); padding: 16px 30px; 
-            display: none; justify-content: space-between; align-items: center; 
-        }
-
-        .sticky-action-bar {
-            position: fixed; bottom: 20px; left: 0; right: 0; background: transparent; 
-            border-top: none; padding: 0 20px; display: flex; gap: 16px; justify-content: center;
-            z-index: 8000; transform: translateY(0); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            pointer-events: none; 
-        }
-
-        .sticky-action-bar .btn-master {
-            pointer-events: auto; flex: 1; max-width: 320px; display: flex; flex-direction: column;
-            align-items: center; justify-content: center; padding: 12px 16px; border-radius: 50px;
-            border: 1px solid var(--border); cursor: pointer; text-align: center;
-            background: var(--card); box-shadow: 0 8px 30px rgba(0,0,0,0.1);
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); color: var(--text-dark);
-        }
-
+        .command-bar { position: fixed; bottom: 0; left: 0; right: 0; z-index: 5000; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px); border-top: 1px solid var(--border); padding: 16px 30px; display: none; justify-content: space-between; align-items: center; }
+        .sticky-action-bar { position: fixed; bottom: 20px; left: 0; right: 0; background: transparent; border-top: none; padding: 0 20px; display: flex; gap: 16px; justify-content: center; z-index: 8000; transition: transform 0.4s; pointer-events: none; }
+        .sticky-action-bar .btn-master { pointer-events: auto; flex: 1; max-width: 320px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12px 16px; border-radius: 50px; border: 1px solid var(--border); cursor: pointer; text-align: center; background: var(--card); box-shadow: 0 8px 30px rgba(0,0,0,0.1); transition: all 0.3s; color: var(--text-dark); }
         .sticky-action-bar .btn-master:hover { transform: translateY(-2px); box-shadow: 0 12px 35px rgba(0,0,0,0.15); border-color: #94a3b8; }
         .sticky-action-bar .btn-master strong { font-size: 14px; font-weight: 900; }
         .sticky-action-bar .btn-master span { font-size: 10px; font-weight: 600; opacity: 0.8; margin-top: 4px; text-transform: none; color: var(--text-light); }
 
-        #toastBanner {
-            position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
-            background: var(--text-dark); color: white; font-weight: 800; padding: 14px 28px;
-            border-radius: 50px; z-index: 10000; transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            font-size: 14px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
+        #toastBanner { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); background: var(--text-dark); color: white; font-weight: 800; padding: 14px 28px; border-radius: 50px; z-index: 10000; transition: top 0.4s; font-size: 14px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
 
-        @keyframes livePulse {
-            0% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.3; transform: scale(0.9); }
-            100% { opacity: 1; transform: scale(1); }
-        }
+        @keyframes livePulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.3; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
         .live-dot { display: inline-block; animation: livePulse 1.5s infinite; vertical-align: baseline; margin-right: 6px; font-size: 14px; color: var(--red-color); }
-
         .group-label { grid-column: 1 / -1; font-size: 18px; font-weight: 900; color: var(--text-dark); border-bottom: 2px solid var(--border); padding-bottom: 8px; margin: 20px 0 15px; }
         .entry-group-label { font-size: 14px; font-weight: 900; color: var(--text-light); margin: 10px 0 15px; text-align: left; padding-left: 5px; }
-        
         #resTitle { color: var(--text-dark); }
 
-        .modal-overlay { 
-            position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); 
-            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-            z-index: 9999; display: none; align-items: center; justify-content: center; 
-        }
+        /* Modals */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(8px); z-index: 9999; display: none; align-items: center; justify-content: center; }
+        .modal-content { background: var(--card); border-radius: 24px; padding: 35px; width: 90%; max-width: 500px; text-align: left; box-shadow: 0 25px 50px rgba(0,0,0,0.3); color: var(--text-dark); border: 1px solid var(--border); }
 
-        .modal-content { 
-            background: var(--card); border-radius: 24px; padding: 35px; width: 90%; 
-            max-width: 500px; text-align: left; box-shadow: 0 25px 50px rgba(0,0,0,0.2);
-            color: var(--text-dark); border: 1px solid var(--border);
-        }
-
-        /* Print CSS for Zonedraw Reports */
+        /* Print Overrides */
         .mobile-pdf-export .no-print { display: none !important; }
         .mobile-pdf-export .bucket-grid { display: flex !important; flex-direction: column !important; gap: 15px !important; }
         .mobile-pdf-export .zone-card { width: 100% !important; box-sizing: border-box !important; page-break-inside: avoid !important; }
@@ -386,7 +284,6 @@
             #registrationPrintSection { display: block !important; }
             body.printing-dispatch #dispatchSection { display: block !important; }
             body.printing-dispatch > :not(#dispatchSection) { display: none !important; }
-            
             body { background: white !important; margin: 0; color: black !important; }
             .zone-card { border: 2px solid black !important; background: white !important; color: black !important; box-shadow: none !important; break-inside: avoid; page-break-inside: avoid; padding: 0 !important; border-radius: 12px !important; margin-bottom: 15px !important; }
             .zone-header { border-bottom: 2px solid black !important; color: black !important; margin: 0 0 10px 0 !important; padding: 8px 12px !important; background: #f8fafc !important; }
@@ -395,12 +292,10 @@
             .peg-num { color: black !important; }
             .a-name { color: black !important; font-weight: 900 !important; }
             .a-tag { color: black !important; border: 1px solid black !important; padding: 2px 4px !important; border-radius: 4px !important; }
-            
             .print-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
             .print-table th { border: 2px solid black; padding: 12px; font-size: 14px; font-weight: 900; text-align: left; background: #f8fafc; }
             .print-table td { border: 1px solid black; padding: 10px 12px; font-size: 13px; font-weight: 800; height: 25px; }
             .print-checkbox { display: inline-block; width: 18px; height: 18px; border: 2px solid black; margin: 0 auto; border-radius: 4px; }
-            
             .dispatch-slip { padding: 25px; border: 3px solid black; margin-bottom: 25px; page-break-inside: avoid; border-radius: 16px; }
             .dispatch-header { border-bottom: 3px solid black; padding-bottom: 12px; margin-bottom: 20px; }
             .dispatch-header h1 { font-size: 20px; margin: 0; }
@@ -419,20 +314,15 @@
         <div class="brand-name">COMPETITION HUB <span id="vTag" class="v-tag"></span></div>
         <div id="saveIndicator" style="position: fixed; top: 18px; right: 20px; background: var(--green-color); color: white; padding: 4px 10px; border-radius: 50px; font-weight: 800; font-size: 11px; opacity: 0; transition: opacity 0.3s; z-index: 9999; pointer-events: none; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);">✓ SAVED</div>
         
-        <!-- Tweak 5: Renamed Reset Button -->
-        <button id="masterResetBtn" onclick="showWipeModal()" class="btn-action-outline btn-danger-outline" style="padding: 10px 16px; font-size: 11px; font-weight: 900;">🏁 FINISH AND RESET COMPETITION</button>
+        <button id="masterResetBtn" onclick="showWipeModal()" class="btn-action-outline btn-danger-outline" style="padding: 10px 16px; font-size: 11px; font-weight: 900; background: white;">🏁 FINISH AND RESET COMPETITION</button>
     </div>
     
-    <!-- Tweak 1: True Tab Navigation -->
     <div class="tab-nav">
         <button id="tabBtn-draw" class="tab-btn active" onclick="switchTab('draw')">1. DRAW SETUP</button>
         <button id="tabBtn-score" class="tab-btn" onclick="switchTab('score')">2. SCORECARDS</button>
     </div>
 </div>
 
-<!-- ========================================== -->
-<!-- TAB 1: DRAW SETUP (ORIGINAL ZONEDRAW)      -->
-<!-- ========================================== -->
 <div id="drawTab" class="tab-content active">
 
     <div id="entrySection" class="no-print">
@@ -576,7 +466,6 @@
         </div>
     </div>
 
-    <!-- Modals for Manage/Output replace inline blocks -->
     <div id="manageMenuModal" class="modal-overlay no-print">
         <div class="modal-content" style="max-width: 700px; padding: 25px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
@@ -676,36 +565,29 @@
     </div>
 </div>
 
-<!-- ========================================== -->
-<!-- TAB 2: SCORECARD DATA ENTRY                -->
-<!-- ========================================== -->
 <div id="scoreTab" class="tab-content" style="display:none;">
-    <div style="max-width: 1400px; margin: 0 auto; text-align: center; padding-bottom: 20px;">
+    <div style="max-width: 1400px; margin: 0 auto; text-align: center; padding-bottom: 10px;">
         
-        <!-- Tweak 4: Day Tabs look like actual tabs -->
+        <input type="text" id="scoreSearch" placeholder="🔍 SEARCH ANGLER OR TEAM..." oninput="filterScorecards()" class="scorecard-search">
+
         <div id="dayTabsContainer" class="day-tab-nav">
             <button id="subBtn-1" class="day-tab-btn active" onclick="switchScoreDay(1)">DAY 1 SCORES</button>
             <button id="subBtn-2" class="day-tab-btn" onclick="switchScoreDay(2)">DAY 2 SCORES</button>
         </div>
     </div>
 
-    <!-- Tweak 3: Scroll wrapper ensures grid integrity if screen is tiny -->
     <div class="scorecard-scroll-wrapper">
         <div id="scoreListContainer" class="score-list-container"></div>
     </div>
 
-    <!-- Tweak 4: Export Button moved to bottom of Scorecard Page -->
-    <div style="text-align: center; margin-top: 40px; padding-top: 30px; border-top: 2px dashed var(--border);">
-        <p style="color: var(--text-light); font-weight: 800; font-size: 12px; margin-bottom: 15px;">ONCE ALL SCORES ARE ENTERED, EXPORT FOR EXCEL</p>
+    <div style="text-align: center; margin-top: 40px; padding-top: 30px; border-top: 2px dashed rgba(255,255,255,0.1);">
+        <p style="color: #cbd5e1; font-weight: 800; font-size: 12px; margin-bottom: 15px;">ONCE ALL SCORES ARE ENTERED, EXPORT FOR EXCEL</p>
         <button onclick="exportMasterData()" class="btn-action" style="background: var(--green-color); font-size: 16px; padding: 20px 40px; width: 100%; max-width: 600px; box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);">
             📋 EXPORT MASTER SCORES FOR EXCEL
         </button>
     </div>
 </div>
 
-<!-- ========================================== -->
-<!-- PRINT SECTIONS & MODALS                    -->
-<!-- ========================================== -->
 <div id="registrationPrintSection" class="no-print"></div>
 <div id="dispatchSection" class="no-print"></div>
 <div id="rosterSection" class="no-print"></div>
@@ -791,7 +673,7 @@
     }
 
     // ====================================================
-    // --- POPUP MENU LOGIC (TWEAK 2) ---
+    // --- POPUP MENU LOGIC ---
     // ====================================================
     function openManageMenu() { document.getElementById('manageMenuModal').style.display = 'flex'; }
     function openOutputMenu() { document.getElementById('outputMenuModal').style.display = 'flex'; }
@@ -801,7 +683,7 @@
     }
 
     // ====================================================
-    // --- TAB NAVIGATION LOGIC (TWEAK 1) ---
+    // --- TAB NAVIGATION LOGIC ---
     // ====================================================
     function switchTab(tabId) {
         document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -811,16 +693,10 @@
         activeTabBtn.classList.add('active');
         document.getElementById(`${tabId}Tab`).style.display = 'block';
 
-        // Stage Color Switching
         if (tabId === 'draw') {
-            document.body.style.backgroundColor = 'var(--bg-base)';
-            activeTabBtn.style.backgroundColor = 'var(--bg-base)';
-            document.getElementById('tabBtn-score').style.backgroundColor = '#e2e8f0';
+            document.body.className = 'stage-draw';
         } else {
-            document.body.style.backgroundColor = 'var(--bg-score)';
-            activeTabBtn.style.backgroundColor = 'var(--bg-score)';
-            document.getElementById('tabBtn-draw').style.backgroundColor = '#e2e8f0';
-            
+            document.body.className = 'stage-score';
             document.getElementById('dayTabsContainer').style.display = matchDays === 2 ? 'flex' : 'none';
             switchScoreDay(1); 
         }
@@ -831,11 +707,32 @@
         document.querySelectorAll('.day-sub-btn').forEach(btn => btn.classList.remove('active'));
         let activeSubBtn = document.getElementById(`subBtn-${day}`);
         if(activeSubBtn) activeSubBtn.classList.add('active');
+        
+        document.getElementById('scoreSearch').value = ''; // clear search when switching days
         renderScorecards();
     }
 
     // ====================================================
-    // --- LINEAR SCORECARD LOGIC (TWEAK 3: UX Constraints) ---
+    // --- LIVE SEARCH FILTER LOGIC ---
+    // ====================================================
+    function filterScorecards() {
+        let filter = document.getElementById('scoreSearch').value.toUpperCase();
+        let rows = document.querySelectorAll('.score-row');
+        
+        rows.forEach(row => {
+            let name = row.querySelector('.s-name').innerText.toUpperCase();
+            let team = row.querySelector('.s-team').innerText.toUpperCase();
+            
+            if (name.includes(filter) || team.includes(filter)) {
+                row.style.display = 'grid'; // Maintain grid layout
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+
+    // ====================================================
+    // --- LINEAR SCORECARD LOGIC ---
     // ====================================================
     function highlightRow(el) { el.closest('.score-row').classList.add('focused-row'); }
     function unhighlightRow(el) { el.closest('.score-row').classList.remove('focused-row'); }
@@ -852,7 +749,6 @@
         
         let hasDrawnData = false;
         
-        // Render Column Headers
         let headerRow = document.createElement('div');
         headerRow.className = 'score-list-header';
         headerRow.innerHTML = `
@@ -884,7 +780,6 @@
                 const row = document.createElement('div');
                 row.className = 'score-row';
                 
-                // UX Inputs with Tweak 3 logic applied
                 row.innerHTML = `
                     <div class="s-name">${a.name}</div>
                     <div class="s-team">${tName}</div>
@@ -911,7 +806,7 @@
         });
 
         if (!hasDrawnData) {
-            container.innerHTML = `<div style="text-align:center; padding: 40px; color: var(--text-light); font-weight: 800;">YOU MUST COMPLETE THE DRAW SETUP FIRST.</div>`;
+            container.innerHTML = `<div style="text-align:center; padding: 40px; color: #cbd5e1; font-weight: 800;">YOU MUST COMPLETE THE DRAW SETUP FIRST.</div>`;
         }
     }
 
@@ -956,27 +851,6 @@
     // ====================================================
     // --- ORIGINAL ZONEDRAW APP ENGINE (UNEDITED) ---
     // ====================================================
-
-    // --- Smart Scroll Listener for Action Bar ---
-    let lastScrollY = window.scrollY;
-    window.addEventListener('scroll', () => {
-        const bar = document.getElementById('masterActionBar');
-        if (!bar || bar.style.display === 'none') return;
-        
-        const currentScrollY = window.scrollY;
-        
-        if (currentScrollY > lastScrollY && currentScrollY > 50) {
-            bar.style.transform = 'translateY(150%)'; 
-        } else {
-            bar.style.transform = 'translateY(0)';
-        }
-        
-        if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 10) {
-            bar.style.transform = 'translateY(0)';
-        }
-        
-        lastScrollY = currentScrollY;
-    }, { passive: true });
 
     function persistState() {
         if (!isAppReady) return; 
@@ -1048,7 +922,6 @@
         checkTeamClash();
     }
 
-    // --- Import Modal Logic ---
     function showImportModal() {
         document.getElementById('importRawData').value = '';
         document.getElementById('importModal').style.display = 'flex';
@@ -1129,7 +1002,9 @@
     function showWipeModal() { document.getElementById('wipeModal').style.display = 'flex'; }
     function closeWipeModal() { document.getElementById('wipeModal').style.display = 'none'; }
 
+    // FIXED: Now accurately routes to Setup Edit screen and switches tab automatically.
     function handleSafeEdit() {
+        switchTab('draw'); 
         handleAmend(true); 
     }
 
@@ -1143,6 +1018,8 @@
             });
         });
         currentZoneSize = 0; 
+        
+        switchTab('draw');
         handleAmend(false);
     }
 
@@ -1213,8 +1090,12 @@
         trashCan = null;
         applyAccToggleUI();
         
-        document.querySelectorAll('body > div[id$="Section"]').forEach(s => s.style.display = 'none');
+        document.querySelectorAll('.tab-content').forEach(s => s.style.display = 'none');
+        document.getElementById('drawTab').style.display = 'block';
+        document.body.className = 'stage-draw';
+
         document.getElementById('entrySection').style.display = 'block';
+        document.getElementById('resultsSection').style.display = 'none';
         document.getElementById('setupPanel').style.display = 'block';
         document.getElementById('editDrawBanner').style.display = 'none';
         
@@ -2008,7 +1889,10 @@
     }
 
     function displayDraw() {
-        document.querySelectorAll('body > div[id$="Section"]').forEach(s => s.style.display = 'none');
+        document.querySelectorAll('.tab-content').forEach(s => s.style.display = 'none');
+        document.getElementById('drawTab').style.display = 'block';
+
+        document.getElementById('entrySection').style.display = 'none';
         document.getElementById('resultsSection').style.display = 'block';
         
         let titleVal = document.getElementById('matchTitle').value;
@@ -2098,8 +1982,11 @@
         persistState();
     }
 
+    // FIXED: Correctly routed back to the edit screen
     function handleAmend(isSafe) { 
-        document.querySelectorAll('body > div[id$="Section"]').forEach(s => s.style.display = 'none');
+        switchTab('draw');
+
+        document.getElementById('resultsSection').style.display = 'none';
         document.getElementById('entrySection').style.display = 'block'; 
         document.getElementById('commandBar').style.display = 'flex'; 
         document.getElementById('masterActionBar').style.display = 'none';
