@@ -49,7 +49,8 @@
             margin: 0; padding: 0; 
             text-transform: uppercase; 
             line-height: 1.3; 
-            overflow-x: hidden; 
+            /* Fixed Sticky Bug: Removed overflow: hidden from body */
+            overflow-x: clip; 
             padding-bottom: 120px;
             font-variant-numeric: tabular-nums; 
             transition: background-color 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
@@ -61,8 +62,8 @@
 
         /* Floating Watermark */
         .day-watermark {
-            position: fixed; top: 55%; left: 50%; transform: translate(-50%, -50%);
-            font-size: 20vw; color: white; font-weight: 900; opacity: 0.03;
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 25vw; color: white; font-weight: 900; opacity: 0.04;
             pointer-events: none; z-index: 0; white-space: nowrap; display: none;
         }
         body.stage-score-d1 .day-watermark, body.stage-score-d2 .day-watermark { display: block; }
@@ -84,7 +85,7 @@
 
         /* Fixed Header & True Folder Tabs */
         .fixed-header { 
-            position: fixed; top: 0; left: 0; right: 0; z-index: 5000; 
+            position: fixed; top: 0; left: 0; right: 0; z-index: 6000; 
             background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
             border-bottom: 2px solid var(--border); padding: 14px 20px 0px; 
             box-shadow: 0 4px 20px rgba(0,0,0,0.08); transition: border-bottom-color 0.4s;
@@ -106,8 +107,8 @@
         body.stage-score-d1 #tabBtn-score.active { background: var(--bg-score-d1); color: white; border-color: #1e293b; box-shadow: 0 -4px 15px rgba(0,0,0,0.2); }
         body.stage-score-d2 #tabBtn-score.active { background: var(--bg-score-d2); color: white; border-color: #134e4a; box-shadow: 0 -4px 15px rgba(0,0,0,0.2); }
 
-        .tab-content { padding: 130px 20px 40px; position: relative; z-index: 1; }
-        #entrySection, #resultsSection, #dispatchSection, #rosterSection, #registrationPrintSection { max-width: 1400px; margin: 0 auto; }
+        .tab-content { padding: 130px 20px 40px; position: relative; z-index: 2; }
+        #entrySection, #resultsSection, #dispatchSection, #rosterSection, #registrationPrintSection { max-width: 1400px; margin: 0 auto; position: relative; z-index: 2; }
 
         /* Setup Control Panel */
         .control-panel { background: var(--card); border-radius: 20px; padding: 25px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.05); text-align: center; margin-bottom: 20px; }
@@ -143,15 +144,16 @@
         /* SCORECARD: STICKY HEADER & GRID            */
         /* ========================================== */
         .sticky-score-header {
-            position: sticky; top: 72px; /* Docks just below the main fixed header */
-            background: var(--bg-score-d1); z-index: 4000; padding: 25px 20px 0;
+            position: sticky; top: 76px; /* Docks just below the main fixed header */
+            background: var(--bg-score-d1); z-index: 5000; padding: 15px 20px 0;
             transition: background-color 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
             margin: -20px -20px 10px; /* Counteracts parent padding to fill width */
+            border-bottom: 1px solid rgba(255,255,255,0.1);
         }
         body.stage-score-d2 .sticky-score-header { background: var(--bg-score-d2); }
 
         .scorecard-search {
-            width: 100%; max-width: 600px; margin: 0 auto 20px; display: block;
+            width: 100%; max-width: 600px; margin: 0 auto 15px; display: block;
             font-size: 16px; padding: 16px 24px; border-radius: 50px;
             border: 2px solid transparent; box-shadow: 0 8px 25px rgba(0,0,0,0.1);
             background: #ffffff; color: var(--text-dark); transition: 0.3s;
@@ -159,16 +161,18 @@
         body.stage-score-d1 .scorecard-search:focus { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-glow); }
         body.stage-score-d2 .scorecard-search:focus { border-color: var(--accent-d2); box-shadow: 0 0 0 4px var(--accent-d2-glow); }
 
-        .day-tab-nav { display: flex; justify-content: center; gap: 4px; margin-bottom: 0px; align-items: flex-end; border-bottom: 2px solid rgba(255,255,255,0.1); max-width: 1400px; margin: 0 auto; }
+        .day-tab-nav { display: flex; justify-content: center; gap: 4px; margin-bottom: 0px; align-items: flex-end; max-width: 1400px; margin: 0 auto; }
         .day-tab-btn { padding: 12px 30px; font-weight: 900; font-size: 14px; border-radius: 12px 12px 0 0; background: #475569; color: #94a3b8; border: 2px solid transparent; border-bottom: none; cursor: pointer; transition: 0.2s; margin-bottom: -2px; }
         
         body.stage-score-d1 .day-tab-btn.active { background: var(--card); color: var(--accent); border-color: var(--border); padding-bottom: 14px; z-index: 10; }
         body.stage-score-d2 .day-tab-btn.active { background: var(--card); color: var(--accent-d2); border-color: var(--border); padding-bottom: 14px; z-index: 10; }
 
         .score-list-container { display: flex; flex-direction: column; gap: 8px; max-width: 1400px; margin: 0 auto; }
-        .score-list-header, .score-row { display: grid; grid-template-columns: minmax(180px, 2fr) minmax(140px, 1.5fr) 130px 90px 90px 90px 90px; gap: 12px; align-items: center; }
         
-        .score-list-header { padding: 12px 20px 8px; font-weight: 900; font-size: 11px; color: #cbd5e1; border-bottom: 2px solid rgba(255,255,255,0.1); margin-bottom: 0; max-width: 1400px; margin: 0 auto; }
+        /* Restored 7-Column Layout with exact text placeholders */
+        .score-list-header, .score-row { display: grid; grid-template-columns: minmax(180px, 2fr) minmax(140px, 1.5fr) 130px 105px 105px 105px 105px; gap: 12px; align-items: center; }
+        
+        .score-list-header { padding: 12px 20px 8px; font-weight: 900; font-size: 11px; color: #cbd5e1; border-bottom: none; margin-bottom: 0; max-width: 1400px; margin: 0 auto; }
 
         .score-row { background: var(--card); border: 2px solid transparent; border-radius: 12px; padding: 10px 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1); position: relative; z-index: 1; }
         
@@ -186,7 +190,7 @@
         .s-team { font-size: 12px; font-weight: 800; color: var(--text-light); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .s-peg { font-size: 13px; font-weight: 900; }
 
-        .scorecard-scroll-wrapper { width: 100%; overflow-x: auto; padding-bottom: 20px; margin-top: 15px; }
+        .scorecard-scroll-wrapper { width: 100%; overflow-x: auto; padding-bottom: 20px; margin-top: 15px; position: relative; z-index: 2;}
 
         /* Buttons */
         .btn-action { background: var(--accent); border: none; color: white; font-weight: 800; padding: 16px 32px; border-radius: 50px; cursor: pointer; font-size: 14px; letter-spacing: 0.5px; transition: all 0.3s; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3); }
@@ -276,6 +280,7 @@
 </head>
 <body class="stage-draw">
 
+<!-- Giant Floating Watermark (Visible only in Score Stage) -->
 <div id="dayWatermark" class="day-watermark no-print">DAY 1</div>
 
 <div id="toastBanner" class="no-print">ACTION COMPLETED</div>
@@ -288,12 +293,16 @@
         <button id="masterResetBtn" onclick="showWipeModal()" class="btn-action-outline btn-danger-outline" style="padding: 10px 16px; font-size: 11px; font-weight: 900; background: white;">🏁 FINISH AND RESET COMPETITION</button>
     </div>
     
+    <!-- True Folder Tabs -->
     <div class="tab-nav">
         <button id="tabBtn-draw" class="tab-btn active" onclick="switchTab('draw')">1. DRAW SETUP</button>
         <button id="tabBtn-score" class="tab-btn" onclick="switchTab('score')">2. SCORECARDS</button>
     </div>
 </div>
 
+<!-- ========================================== -->
+<!-- TAB 1: DRAW SETUP                          -->
+<!-- ========================================== -->
 <div id="drawTab" class="tab-content active">
 
     <div id="entrySection" class="no-print">
@@ -301,7 +310,7 @@
             <span style="font-size: 24px;">✏️</span>
             <div>
                 <h3 style="color:var(--green-color); margin:0 0 4px 0; font-size: 14px;">EDITING CURRENT DRAW</h3>
-                <p style="color:var(--text-dark); margin:0; font-size: 12px; text-transform: none; font-weight: 600;">You can safely change names, update mobility [A] tags, and link/unlink teams. Your existing peg numbers are locked.</p>
+                <p style="color:var(--text-dark); margin:0; font-size: 12px; text-transform: none; font-weight: 600;">You can safely change names, update mobility [A] tags, opt out of pairs, and link/unlink teams. Your existing peg numbers are locked.</p>
             </div>
         </div>
 
@@ -437,6 +446,7 @@
         </div>
     </div>
 
+    <!-- Modal Menus -->
     <div id="manageMenuModal" class="modal-overlay no-print">
         <div class="modal-content" style="max-width: 700px; padding: 25px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
@@ -445,7 +455,7 @@
             </div>
             <div class="master-menu-grid">
                 <button class="btn-ui" onclick="handleSafeEdit(); closePopups();">
-                    <strong>✏️ AMEND NAMES</strong><span>Safely fix typos. Existing pegs locked.</span>
+                    <strong>✏️ AMEND NAMES</strong><span>Safely fix typos and rules. Existing pegs locked.</span>
                 </button>
                 <button class="btn-ui" onclick="injectLatecomer(true); closePopups();">
                     <strong>➕ LATE TEAM</strong><span>Inject a 4-man team.</span>
@@ -471,7 +481,7 @@
             </div>
             <div class="master-menu-grid">
                 <button class="btn-ui" onclick="copyExcelData(); closePopups();">
-                    <strong>📋 COPY SETUP DATA</strong><span>Copies name/zone matrix to clipboard.</span>
+                    <strong>📋 COPY SETUP DATA</strong><span>Copies name/zone/pairs matrix to clipboard.</span>
                 </button>
                 <button class="btn-ui" onclick="generateRegistrationSheet(); closePopups();">
                     <strong>🖨️ PRINT REGISTRATION</strong><span>Master attendance sheet.</span>
@@ -536,8 +546,12 @@
     </div>
 </div>
 
+<!-- ========================================== -->
+<!-- TAB 2: SCORECARD DATA ENTRY                -->
+<!-- ========================================== -->
 <div id="scoreTab" class="tab-content" style="display:none; padding-top: 80px;">
     
+    <!-- The Sticky Score Header (Contains Search, Day Tabs, and Column Headers) -->
     <div class="sticky-score-header no-print">
         <div style="max-width: 1400px; margin: 0 auto; text-align: center;">
             <input type="text" id="scoreSearch" placeholder="🔍 SEARCH ANGLER OR TEAM..." oninput="filterScorecards()" class="scorecard-search">
@@ -551,11 +565,13 @@
         <div id="scoreListHeaderContainer"></div>
     </div>
 
-    <div class="scorecard-scroll-wrapper" style="position: relative; z-index: 1;">
+    <!-- The Scrollable Data Entry Area -->
+    <div class="scorecard-scroll-wrapper" style="position: relative; z-index: 2;">
         <div id="scoreListContainer" class="score-list-container"></div>
     </div>
 
-    <div style="text-align: center; margin-top: 40px; padding-top: 30px; border-top: 2px dashed rgba(255,255,255,0.1); position: relative; z-index: 1;">
+    <!-- Export Button at the Bottom -->
+    <div style="text-align: center; margin-top: 40px; padding-top: 30px; border-top: 2px dashed rgba(255,255,255,0.1); position: relative; z-index: 2;">
         <p style="color: #cbd5e1; font-weight: 800; font-size: 12px; margin-bottom: 15px;">ONCE ALL SCORES ARE ENTERED, EXPORT FOR EXCEL</p>
         <button onclick="exportMasterData()" class="btn-action" style="background: var(--green-color); font-size: 16px; padding: 20px 40px; width: 100%; max-width: 600px; box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);">
             📋 EXPORT MASTER SCORES FOR EXCEL
@@ -563,6 +579,9 @@
     </div>
 </div>
 
+<!-- ========================================== -->
+<!-- PRINT SECTIONS & MODALS                    -->
+<!-- ========================================== -->
 <div id="registrationPrintSection" class="no-print"></div>
 <div id="dispatchSection" class="no-print"></div>
 <div id="rosterSection" class="no-print"></div>
@@ -760,23 +779,24 @@
                 const row = document.createElement('div');
                 row.className = 'score-row';
                 
+                // Restored exact placeholders
                 row.innerHTML = `
                     <div class="s-name">${a.name}</div>
                     <div class="s-team">${tName}</div>
                     <div class="s-peg" style="color: ${zColor};">${targetZ} ${targetP}</div>
-                    <input type="number" placeholder="LEN" value="${s.len}" 
+                    <input type="number" placeholder="LENGTH" value="${s.len}" 
                         oninput="enforceLimits(this, 4)" 
                         onchange="saveScore('${key}', 'len', this.value)" 
                         onfocus="highlightRow(this)" onblur="unhighlightRow(this)">
-                    <input type="number" placeholder="CNT" value="${s.count}" 
+                    <input type="number" placeholder="COUNT" value="${s.count}" 
                         oninput="enforceLimits(this, 3)" 
                         onchange="saveScore('${key}', 'count', this.value)" 
                         onfocus="highlightRow(this)" onblur="unhighlightRow(this)">
-                    <input type="number" placeholder="BIG" value="${s.big}" 
+                    <input type="number" placeholder="BIGGEST" value="${s.big}" 
                         oninput="enforceLimits(this, 4)" 
                         onchange="saveScore('${key}', 'big', this.value)" 
                         onfocus="highlightRow(this)" onblur="unhighlightRow(this)">
-                    <input type="number" placeholder="SPC" value="${s.spec}" 
+                    <input type="number" placeholder="SPECIES" value="${s.spec}" 
                         oninput="enforceLimits(this, 2)" 
                         onchange="saveScore('${key}', 'spec', this.value)" 
                         onfocus="highlightRow(this)" onblur="unhighlightRow(this)">
@@ -937,7 +957,8 @@
                 rawName = rawName.replace(/[\(\[\{]A[\)\]\}]/i, '').trim();
             }
 
-            let anglerObj = { name: rawName, mobility: isMobility ? 1 : 0 };
+            // Defaults pairs to true (Yes)
+            let anglerObj = { name: rawName, mobility: isMobility ? 1 : 0, pairs: true };
 
             if (rawTeam) {
                 if (!tempTeams[rawTeam]) tempTeams[rawTeam] = [];
@@ -956,7 +977,8 @@
             let members = tempTeams[tName];
             for (let i = 0; i < members.length; i += 4) {
                 let chunk = members.slice(i, i + 4);
-                while (chunk.length < 4) { chunk.push({}); }
+                // Ensure empty slots also default pairs to true
+                while (chunk.length < 4) { chunk.push({pairs: true}); }
                 appState.push({ id: genId(), isTeam: true, tName: tName, anglers: chunk });
             }
         });
@@ -1099,8 +1121,8 @@
         let iVal = document.getElementById('initIndivs').value;
         const t = parseInt(tVal) || 0; const i = parseInt(iVal) || 0;
         
-        for(let x = 0; x < t; x++) appState.push({ id: genId(), isTeam: true, tName: '', anglers: [{},{},{},{}] });
-        for(let y = 0; y < i; y++) appState.push({ id: genId(), isTeam: false, tName: '', anglers: [{}] });
+        for(let x = 0; x < t; x++) appState.push({ id: genId(), isTeam: true, tName: '', anglers: [{pairs:true},{pairs:true},{pairs:true},{pairs:true}] });
+        for(let y = 0; y < i; y++) appState.push({ id: genId(), isTeam: false, tName: '', anglers: [{pairs:true}] });
         
         document.getElementById('rosterEntryZone').style.display = 'none';
         document.getElementById('commandBar').style.display = 'flex';
@@ -1116,8 +1138,8 @@
     }
 
     function addNewStateItem(isTeam) {
-        if (isTeam) appState.push({ id: genId(), isTeam: true, tName: '', anglers: [{},{},{},{}] });
-        else appState.push({ id: genId(), isTeam: false, tName: '', anglers: [{}] });
+        if (isTeam) appState.push({ id: genId(), isTeam: true, tName: '', anglers: [{pairs:true},{pairs:true},{pairs:true},{pairs:true}] });
+        else appState.push({ id: genId(), isTeam: false, tName: '', anglers: [{pairs:true}] });
         renderStateToScreen();
     }
 
@@ -1126,6 +1148,15 @@
         if (entry) { 
             entry.anglers[aIdx].mobility = entry.anglers[aIdx].mobility ? 0 : 1;
             renderStateToScreen(); 
+        }
+    }
+
+    // Toggle Secret Pairs Logic
+    function togglePairs(eId, aIdx) {
+        const entry = appState.find(e => e.id === eId);
+        if (entry) {
+            entry.anglers[aIdx].pairs = entry.anglers[aIdx].pairs === false ? true : false;
+            renderStateToScreen();
         }
     }
 
@@ -1253,11 +1284,18 @@
                 for (let i = 0; i < 4; i++) {
                     let mBg = entry.anglers[i].mobility ? 'var(--text-dark)' : '#f1f5f9';
                     let mColor = entry.anglers[i].mobility ? 'white' : 'var(--text-dark)';
+                    
+                    // Secret Pairs Logic Styling
+                    let pBg = entry.anglers[i].pairs !== false ? 'var(--green-color)' : 'var(--red-soft)';
+                    let pColor = entry.anglers[i].pairs !== false ? 'white' : 'var(--red-color)';
+                    let pText = entry.anglers[i].pairs !== false ? 'PAIRS: YES' : 'PAIRS: NO';
+
                     let aName = entry.anglers[i].name || '';
                     
                     h += `<div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
                             <input type="text" class="a-name-input" value="${aName}" placeholder="ANGLER ${i+1}" oninput="updateAnglerName('${entry.id}', ${i}, this.value)">
                             <button class="btn-tool" onclick="toggleMobility('${entry.id}', ${i})" tabindex="-1" style="padding:10px 14px; background:${mBg}; color:${mColor};">[A]</button>
+                            <button class="btn-tool" onclick="togglePairs('${entry.id}', ${i})" tabindex="-1" style="padding:10px 14px; background:${pBg}; color:${pColor}; border-color:${pBg}; width: 85px;">${pText}</button>
                           </div>`;
                 }
                 h += `</div>`;
@@ -1265,11 +1303,18 @@
                 h += `<div style="padding: 0 16px;"><label style="font-size:10px; font-weight:800; color:var(--text-light); letter-spacing:0.5px;">SOLO NAME</label>`;
                 let mBg = entry.anglers[0].mobility ? 'var(--text-dark)' : '#f1f5f9';
                 let mColor = entry.anglers[0].mobility ? 'white' : 'var(--text-dark)';
+                
+                // Secret Pairs Logic Styling
+                let pBg = entry.anglers[0].pairs !== false ? 'var(--green-color)' : 'var(--red-soft)';
+                let pColor = entry.anglers[0].pairs !== false ? 'white' : 'var(--red-color)';
+                let pText = entry.anglers[0].pairs !== false ? 'PAIRS: YES' : 'PAIRS: NO';
+
                 let aName = entry.anglers[0].name || '';
                 
                 h += `<div style="display:flex; align-items:center; gap:8px; margin-top:4px; margin-bottom:6px;">
                         <input type="text" class="a-name-input" value="${aName}" oninput="updateAnglerName('${entry.id}', 0, this.value)">
                         <button class="btn-tool" onclick="toggleMobility('${entry.id}', 0)" tabindex="-1" style="padding:10px 14px; background:${mBg}; color:${mColor};">[A]</button>
+                        <button class="btn-tool" onclick="togglePairs('${entry.id}', 0)" tabindex="-1" style="padding:10px 14px; background:${pBg}; color:${pColor}; border-color:${pBg}; width: 85px;">${pText}</button>
                       </div></div>`;
             }
             
@@ -1760,7 +1805,7 @@
                     if(avail2[d2Z[i]].length > 0) p2_val = avail2[d2Z[i]].splice(Math.floor(Math.random() * avail2[d2Z[i]].length), 1)[0];
                     else p2_val = getAlphaPeg(d2Z[i], 2, used2);
                 }
-                newEntry.anglers.push({ name: '', z1: d1Z[i], p1: p1_val, z2: matchDays === 2 ? d2Z[i] : undefined, p2: p2_val });
+                newEntry.anglers.push({ name: '', z1: d1Z[i], p1: p1_val, z2: matchDays === 2 ? d2Z[i] : undefined, p2: p2_val, pairs: true });
             }
         } else {
             let flat1 = []; zones.forEach(z => { if(avail1[z].length > 0) flat1.push(z); });
@@ -1779,7 +1824,7 @@
                 if(avail2[picked2Z] && avail2[picked2Z].length > 0) p2_val = avail2[picked2Z].splice(Math.floor(Math.random() * avail2[picked2Z].length), 1)[0];
                 else p2_val = getAlphaPeg(picked2Z, 2, used2);
             }
-            newEntry.anglers.push({ name: '', z1: picked1Z, p1: p1_val, z2: matchDays === 2 ? picked2Z : undefined, p2: p2_val });
+            newEntry.anglers.push({ name: '', z1: picked1Z, p1: p1_val, z2: matchDays === 2 ? picked2Z : undefined, p2: p2_val, pairs: true });
         }
         
         appState.push(newEntry);
@@ -1799,12 +1844,13 @@
     }
 
     function copyExcelData() {
-        let tsv = matchDays === 2 ? "NAME\tTEAM\tDAY 1 ZONE\tDAY 2 ZONE\n" : "NAME\tTEAM\tDAY 1 ZONE\n";
+        let tsv = matchDays === 2 ? "NAME\tTEAM\tDAY 1 ZONE\tDAY 2 ZONE\tSECRET PAIRS\n" : "NAME\tTEAM\tDAY 1 ZONE\tSECRET PAIRS\n";
         appState.forEach(g => { 
             g.anglers.forEach(a => { 
                 let tName = g.isTeam ? (g.tName || '') : '';
-                if (matchDays === 2) tsv += `${a.name || ''}\t${tName}\t${a.z1}\t${a.z2}\n`; 
-                else tsv += `${a.name || ''}\t${tName}\t${a.z1}\n`;
+                let pStr = a.pairs !== false ? 'YES' : 'NO';
+                if (matchDays === 2) tsv += `${a.name || ''}\t${tName}\t${a.z1}\t${a.z2}\t${pStr}\n`; 
+                else tsv += `${a.name || ''}\t${tName}\t${a.z1}\t${pStr}\n`;
             }); 
         });
 
@@ -2115,6 +2161,13 @@
             currentZoneSize = e.zoneSize || 0;
             accEnabled = e.accEnabled ? true : false;
             applyAccToggleUI();
+
+            // Ensure legacy saves have pairs applied
+            appState.forEach(e => {
+                e.anglers.forEach(a => {
+                    if(a.pairs === undefined) a.pairs = true;
+                });
+            });
 
             if (appState.length > 0) { 
                 document.getElementById('rosterEntryZone').style.display = 'none'; 
