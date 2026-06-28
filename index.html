@@ -878,18 +878,22 @@
                     <input type="number" placeholder="LEN" value="${s.len}" 
                         oninput="enforceLimits(this, 4)" 
                         onchange="saveScore('${key}', 'len', this.value)" 
+                        onkeydown="handleScoreEnter(event)"
                         onfocus="highlightRow(this)" onblur="unhighlightRow(this)">
                     <input type="number" placeholder="CNT" value="${s.count}" 
                         oninput="enforceLimits(this, 3)" 
                         onchange="saveScore('${key}', 'count', this.value)" 
+                        onkeydown="handleScoreEnter(event)"
                         onfocus="highlightRow(this)" onblur="unhighlightRow(this)">
                     <input type="number" placeholder="BIG" value="${s.big}" 
                         oninput="enforceLimits(this, 4)" 
                         onchange="saveScore('${key}', 'big', this.value)" 
+                        onkeydown="handleScoreEnter(event)"
                         onfocus="highlightRow(this)" onblur="unhighlightRow(this)">
                     <input type="number" placeholder="SPC" value="${s.spec}" 
                         oninput="enforceLimits(this, 2)" 
                         onchange="saveScore('${key}', 'spec', this.value)" 
+                        onkeydown="handleScoreEnter(event)"
                         onfocus="highlightRow(this)" onblur="unhighlightRow(this)">
                 `;
                 container.appendChild(row);
@@ -2260,6 +2264,13 @@
         setTimeout(() => { isAppReady = true; }, 500); 
     };
 
+    function handleScoreEnter(event) {
+        if (event.key === 'Enter') {
+            event.target.blur(); // Forces the box to save
+            showToast("✅ SCORE SAVED"); // Shows the confirmation banner
+            clearSearch(); // Clears the search and resets the view
+        }
+    }
     function clearSearch() {
         const input = document.getElementById('scoreSearch');
         input.value = '';
