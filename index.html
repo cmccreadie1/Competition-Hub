@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Competition Hub - v1.0.0</title>
+    <title>Competition Hub - v1.2.0</title>
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -12,18 +12,14 @@
         :root {
             /* Stage Backgrounds */
             --bg-base: #f8fafc; /* Draw Setup: Ghost White */
-            --bg-score-d1: #334155; /* Day 1 Scorecards: Deep Slate Blue */
-            --bg-score-d2: #0f766e; /* Day 2 Scorecards: Deep Forest Teal */
+            --bg-score: #334155; /* Scorecards: Deep Slate Blue for contrast */
             --card: #ffffff; 
             
             --text-dark: #0f172a; 
             --text-light: #64748b; 
             
-            --accent: #0ea5e9; /* Blue highlight */
+            --accent: #0ea5e9; 
             --accent-glow: rgba(14, 165, 233, 0.2);
-            --accent-d2: #10b981; /* Green highlight for Day 2 */
-            --accent-d2-glow: rgba(16, 185, 129, 0.2);
-            
             --border: #cbd5e1; 
             
             /* High-Contrast Status Colors */
@@ -49,81 +45,113 @@
             margin: 0; padding: 0; 
             text-transform: uppercase; 
             line-height: 1.3; 
-            overflow-x: clip; /* Replaced hidden to restore sticky functionality */
+            overflow-x: hidden; 
             padding-bottom: 120px;
             font-variant-numeric: tabular-nums; 
             transition: background-color 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
 
-        /* Day Background Logic */
-        body.stage-score-d1 { background: var(--bg-score-d1); }
-        body.stage-score-d2 { background: var(--bg-score-d2); }
-
-        /* Floating Watermark */
-        .day-watermark {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            font-size: 25vw; color: white; font-weight: 900; opacity: 0.04;
-            pointer-events: none; z-index: 0; white-space: nowrap; display: none;
-        }
-        body.stage-score-d1 .day-watermark, body.stage-score-d2 .day-watermark { display: block; }
-
         input, select, textarea { 
-            text-transform: uppercase; font-weight: 800 !important; color: var(--text-dark); 
-            background: #ffffff; border: 2px solid var(--border); border-radius: 12px; 
-            padding: 12px 16px; outline: none; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); 
-            width: 100%; box-sizing: border-box; font-size: 14px; 
+            text-transform: uppercase; 
+            font-weight: 800 !important; 
+            color: var(--text-dark); 
+            background: #ffffff; 
+            border: 2px solid var(--border); 
+            border-radius: 12px; 
+            padding: 12px 16px; 
+            outline: none; 
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); 
+            width: 100%; 
+            box-sizing: border-box; 
+            font-size: 14px; 
         }
 
-        input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-glow); }
+        input:focus, select:focus, textarea:focus { 
+            border-color: var(--accent); 
+            box-shadow: 0 0 0 4px var(--accent-glow);
+        }
 
-        #matchTitle { font-size: 18px; text-align: center; border: 2px dashed var(--border); background: #ffffff; padding: 16px; color: var(--text-dark); border-radius: 16px; }
+        #matchTitle {
+            font-size: 18px; text-align: center; border: 2px dashed var(--border);
+            background: #ffffff; padding: 16px; color: var(--text-dark); border-radius: 16px;
+        }
+
         #matchTitle:focus { border: 2px solid var(--accent); }
         #matchTitle::placeholder { color: #94a3b8; font-weight: 600 !important; text-transform: none; font-style: italic; }
         .input-error { background: var(--red-soft) !important; border-color: var(--red-color) !important; color: var(--red-color) !important; }
 
         /* Fixed Header & True Folder Tabs */
         .fixed-header { 
-            position: fixed; top: 0; left: 0; right: 0; z-index: 6000; 
-            background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            border-bottom: 2px solid var(--border); padding: 14px 20px 0px; 
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08); transition: border-bottom-color 0.4s;
+            position: fixed; top: 0; left: 0; right: 0; z-index: 5000; 
+            background: rgba(255, 255, 255, 0.98); 
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border-bottom: 2px solid var(--border); 
+            padding: 14px 20px 0px; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transition: border-bottom-color 0.4s;
         }
 
-        body.stage-score-d1 .fixed-header { border-bottom-color: #1e293b; }
-        body.stage-score-d2 .fixed-header { border-bottom-color: #134e4a; }
+        body.stage-score .fixed-header { border-bottom-color: #1e293b; }
 
         .header-content { display: flex; justify-content: space-between; align-items: center; max-width: 1400px; margin: 0 auto 15px; }
         .brand-name { font-size: 20px; font-weight: 900; letter-spacing: -0.5px; color: var(--text-dark); display: flex; align-items: center; }
         .v-tag { font-size: 12px; color: var(--accent); margin-left: 10px; font-weight: 900; background: var(--accent-glow); padding: 4px 8px; border-radius: 20px; }
 
         .tab-nav { display: flex; justify-content: center; gap: 8px; max-width: 1400px; margin: 0 auto; align-items: flex-end; }
-        .tab-btn { flex: 1; max-width: 400px; padding: 16px 20px; background: #cbd5e1; border: 2px solid var(--border); border-bottom: none; border-radius: 16px 16px 0 0; font-weight: 900; font-size: 15px; color: #475569; cursor: pointer; transition: all 0.3s; box-shadow: inset 0 -4px 10px rgba(0,0,0,0.05); position: relative; }
-        .tab-btn:hover { background: #e2e8f0; color: var(--text-dark); }
-        .tab-btn.active { padding-bottom: 20px; margin-bottom: -2px; z-index: 10; box-shadow: 0 -4px 15px rgba(0,0,0,0.05); border-color: var(--border); }
-        
-        #tabBtn-draw.active { background: var(--bg-base); color: var(--text-dark); }
-        body.stage-score-d1 #tabBtn-score.active { background: var(--bg-score-d1); color: white; border-color: #1e293b; box-shadow: 0 -4px 15px rgba(0,0,0,0.2); }
-        body.stage-score-d2 #tabBtn-score.active { background: var(--bg-score-d2); color: white; border-color: #134e4a; box-shadow: 0 -4px 15px rgba(0,0,0,0.2); }
 
-        .tab-content { padding: 130px 20px 40px; position: relative; z-index: 2; }
+        .tab-btn {
+            flex: 1; max-width: 400px; padding: 16px 20px;
+            background: #cbd5e1; border: 2px solid var(--border); border-bottom: none;
+            border-radius: 16px 16px 0 0; font-weight: 900; font-size: 15px;
+            color: #475569; cursor: pointer; transition: all 0.3s;
+            box-shadow: inset 0 -4px 10px rgba(0,0,0,0.05);
+            position: relative;
+        }
+
+        .tab-btn:hover { background: #e2e8f0; color: var(--text-dark); }
+
+        .tab-btn.active {
+            padding-bottom: 20px; margin-bottom: -2px; z-index: 10;
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.05);
+            border-color: var(--border);
+        }
+
+        #tabBtn-draw.active { background: var(--bg-base); color: var(--text-dark); }
+        #tabBtn-score.active { background: var(--bg-score); color: white; border-color: #1e293b; box-shadow: 0 -4px 15px rgba(0,0,0,0.2); }
+
+        .tab-content { padding: 160px 20px 40px; }
         #entrySection, #resultsSection, #dispatchSection, #rosterSection, #registrationPrintSection { max-width: 1400px; margin: 0 auto; }
 
         /* Setup Control Panel */
-        .control-panel { background: var(--card); border-radius: 20px; padding: 25px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.05); text-align: center; margin-bottom: 20px; }
+        .control-panel { 
+            background: var(--card); border-radius: 20px; padding: 25px; 
+            border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            text-align: center; margin-bottom: 20px; 
+        }
+
         .bucket-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
         .duration-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; background: #f1f5f9; padding: 6px; border-radius: 50px; width: 100%; margin: 0 auto; }
         .dt-opt { padding: 10px; border-radius: 50px; cursor: pointer; font-weight: 800; font-size: 13px; display: flex; align-items: center; justify-content: center; color: var(--text-light); transition: all 0.3s; }
         .dt-opt.active { color: var(--text-dark); background: #ffffff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
 
         /* Setup Zone Cards */
-        .zone-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 12px 0; position: relative; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.05); break-inside: avoid; page-break-inside: avoid; overflow: hidden; }
+        .zone-card { 
+            background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 12px 0; 
+            position: relative; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            break-inside: avoid; page-break-inside: avoid; overflow: hidden; 
+        }
         .zone-card:hover { box-shadow: 0 8px 25px rgba(0,0,0,0.1); transform: translateY(-2px); }
         .zone-card.solo-card { height: fit-content; align-self: start; }
         .zone-header { font-size: 13px; font-weight: 900; color: var(--text-dark); margin: 0 0 10px 0; padding: 0 16px 10px 16px; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; }
         .res-row { display: grid; grid-template-columns: 1fr 95px 95px; gap: 12px; align-items: center; padding: 6px 16px; border-bottom: none; }
         .angler-name { font-size: 13px; font-weight: 800; color: var(--text-dark); pointer-events: none; line-height: 1.3; }
 
-        .draw-pill { padding: 8px 10px; border-radius: 12px; font-size: 11px; font-weight: 900; text-align: center; border: 2px solid transparent; color: white; cursor: default; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 4px; }
+        .draw-pill { 
+            padding: 8px 10px; border-radius: 12px; font-size: 11px; font-weight: 900; text-align: center; 
+            border: 2px solid transparent; color: white; cursor: default; transition: all 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 4px;
+        }
+
         .draw-pill.swap-active { cursor: pointer; border: 2px dashed var(--text-dark); background: transparent !important; color: var(--text-dark); opacity: 0.7; }
         .draw-pill.swap-selected { border: 2px solid var(--text-dark) !important; background: var(--text-dark) !important; color: white !important; opacity: 1; z-index: 10; position: relative; transform: scale(1.1); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
         .clash-glow { border: 2px solid var(--red-color) !important; background: var(--red-soft) !important; color: var(--red-color) !important; box-shadow: 0 0 12px rgba(239, 68, 68, 0.3) !important; }
@@ -138,61 +166,64 @@
         .anomaly-banner ul { color: var(--text-dark); font-size: 12px; font-weight: 600; margin: 0; padding-left: 20px; text-transform: none; }
         .anomaly-banner li { margin-bottom: 4px; }
 
-        /* ========================================== */
-        /* SCORECARD: STICKY HEADER & GRID            */
-        /* ========================================== */
-        .sticky-score-header {
-            position: sticky; top: 76px; /* Locks smoothly beneath the main navigation bar */
-            background: var(--bg-score-d1); z-index: 4000; padding: 15px 20px 0;
-            transition: background-color 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-            margin: -20px -20px 10px; border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        body.stage-score-d2 .sticky-score-header { background: var(--bg-score-d2); }
+        /* SCORECARD: Horizontal Linear Layout */
+        .day-tab-nav { display: flex; justify-content: center; gap: 4px; margin-bottom: 20px; align-items: flex-end; border-bottom: 2px solid rgba(255,255,255,0.1); }
+        .day-tab-btn { padding: 12px 30px; font-weight: 900; font-size: 14px; border-radius: 12px 12px 0 0; background: #475569; color: #94a3b8; border: 2px solid transparent; border-bottom: none; cursor: pointer; transition: 0.2s; margin-bottom: -2px; }
+        .day-tab-btn.active { background: var(--card); color: var(--accent); border-color: var(--border); padding-bottom: 14px; z-index: 10; }
 
         .scorecard-search {
-            width: 100%; max-width: 600px; margin: 0 auto 15px; display: block;
+            width: 100%; max-width: 600px; margin: 0 auto 25px; display: block;
             font-size: 16px; padding: 16px 24px; border-radius: 50px;
-            border: 2px solid transparent; box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-            background: #ffffff; color: var(--text-dark); transition: 0.3s;
+            border: 2px solid var(--accent); box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            background: #ffffff; color: var(--text-dark);
         }
-        body.stage-score-d1 .scorecard-search:focus { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-glow); }
-        body.stage-score-d2 .scorecard-search:focus { border-color: var(--accent-d2); box-shadow: 0 0 0 4px var(--accent-d2-glow); }
-
-        .day-tab-nav { display: flex; justify-content: center; gap: 4px; margin-bottom: 0px; align-items: flex-end; max-width: 1400px; margin: 0 auto; }
-        .day-tab-btn { padding: 12px 30px; font-weight: 900; font-size: 14px; border-radius: 12px 12px 0 0; background: #475569; color: #94a3b8; border: 2px solid transparent; border-bottom: none; cursor: pointer; transition: 0.2s; margin-bottom: -2px; }
-        
-        body.stage-score-d1 .day-tab-btn.active { background: var(--card); color: var(--accent); border-color: var(--border); padding-bottom: 14px; z-index: 10; }
-        body.stage-score-d2 .day-tab-btn.active { background: var(--card); color: var(--accent-d2); border-color: var(--border); padding-bottom: 14px; z-index: 10; }
 
         .score-list-container { display: flex; flex-direction: column; gap: 8px; max-width: 1400px; margin: 0 auto; }
-        
-        .score-list-header, .score-row { display: grid; grid-template-columns: minmax(180px, 2fr) minmax(140px, 1.5fr) 130px 105px 105px 105px 105px; gap: 12px; align-items: center; }
-        
-        .score-list-header { padding: 12px 20px 8px; font-weight: 900; font-size: 11px; color: #cbd5e1; border-bottom: none; margin-bottom: 0; max-width: 1400px; margin: 0 auto; }
 
-        .score-row { background: var(--card); border: 2px solid transparent; border-radius: 12px; padding: 10px 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1); position: relative; z-index: 1; }
-        
-        body.stage-score-d1 .score-row.focused-row { border: 2px solid var(--accent); transform: scale(1.02); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4); z-index: 10; position: relative; }
-        body.stage-score-d2 .score-row.focused-row { border: 2px solid var(--accent-d2); transform: scale(1.02); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4); z-index: 10; position: relative; }
+        .score-list-header, .score-row {
+            display: grid;
+            grid-template-columns: minmax(180px, 2fr) minmax(140px, 1.5fr) 130px 90px 90px 90px 90px;
+            gap: 12px; align-items: center;
+        }
+
+        .score-list-header { padding: 0 20px 8px; font-weight: 900; font-size: 11px; color: #cbd5e1; border-bottom: 2px solid rgba(255,255,255,0.1); margin-bottom: 4px; }
+
+        .score-row {
+            background: var(--card); border: 2px solid transparent;
+            border-radius: 12px; padding: 10px 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1); transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .score-row.focused-row {
+            border: 2px solid var(--accent); transform: scale(1.02);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4); z-index: 10; position: relative;
+        }
 
         .score-row input { width: 100%; text-align: center; font-size: 15px; padding: 10px 4px; background: #f8fafc; border: 1px solid var(--border); }
-        
-        body.stage-score-d1 .score-row.focused-row input:focus { background: #ffffff; border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-glow); }
-        body.stage-score-d2 .score-row.focused-row input:focus { background: #ffffff; border-color: var(--accent-d2); box-shadow: 0 0 0 4px var(--accent-d2-glow); }
-        
+        .score-row.focused-row input:focus { background: #ffffff; border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-glow); }
         .score-row input::placeholder { font-size: 10px; color: #94a3b8; }
 
         .s-name { font-size: 14px; font-weight: 900; color: var(--text-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .s-team { font-size: 12px; font-weight: 800; color: var(--text-light); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .s-peg { font-size: 13px; font-weight: 900; }
 
-        .scorecard-scroll-wrapper { width: 100%; overflow-x: auto; padding-bottom: 20px; margin-top: 15px; position: relative; z-index: 2;}
+        .scorecard-scroll-wrapper { width: 100%; overflow-x: auto; padding-bottom: 20px; }
 
         /* Buttons */
-        .btn-action { background: var(--accent); border: none; color: white; font-weight: 800; padding: 16px 32px; border-radius: 50px; cursor: pointer; font-size: 14px; letter-spacing: 0.5px; transition: all 0.3s; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3); }
+        .btn-action { 
+            background: var(--accent); border: none; color: white; font-weight: 800; 
+            padding: 16px 32px; border-radius: 50px; cursor: pointer; font-size: 14px; 
+            letter-spacing: 0.5px; transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+        }
         .btn-action:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(14, 165, 233, 0.4); }
         .btn-action:disabled { background: var(--border); box-shadow: none; color: white; cursor: not-allowed; }
-        .btn-action-outline { background: transparent; border: 2px solid var(--border); color: var(--text-dark); font-weight: 800; padding: 16px 32px; border-radius: 50px; cursor: pointer; font-size: 14px; transition: all 0.3s; }
+
+        .btn-action-outline { 
+            background: transparent; border: 2px solid var(--border); color: var(--text-dark); 
+            font-weight: 800; padding: 16px 32px; border-radius: 50px; cursor: pointer; 
+            font-size: 14px; transition: all 0.3s;
+        }
         .btn-action-outline:hover { border-color: var(--text-dark); color: white; background: var(--text-dark); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
         
         .btn-tool { background: #f8fafc; border: 1px solid var(--border); color: var(--text-dark); font-size: 11px; font-weight: 800; padding: 8px 14px; border-radius: 50px; cursor: pointer; transition: all 0.2s; }
@@ -276,9 +307,6 @@
 </head>
 <body class="stage-draw">
 
-<!-- Giant Floating Watermark (Visible only in Score Stage) -->
-<div id="dayWatermark" class="day-watermark no-print">DAY 1</div>
-
 <div id="toastBanner" class="no-print">ACTION COMPLETED</div>
 
 <div class="fixed-header no-print">
@@ -289,16 +317,12 @@
         <button id="masterResetBtn" onclick="showWipeModal()" class="btn-action-outline btn-danger-outline" style="padding: 10px 16px; font-size: 11px; font-weight: 900; background: white;">🏁 FINISH AND RESET COMPETITION</button>
     </div>
     
-    <!-- True Folder Tabs -->
     <div class="tab-nav">
         <button id="tabBtn-draw" class="tab-btn active" onclick="switchTab('draw')">1. DRAW SETUP</button>
         <button id="tabBtn-score" class="tab-btn" onclick="switchTab('score')">2. SCORECARDS</button>
     </div>
 </div>
 
-<!-- ========================================== -->
-<!-- TAB 1: DRAW SETUP                          -->
-<!-- ========================================== -->
 <div id="drawTab" class="tab-content active">
 
     <div id="entrySection" class="no-print">
@@ -306,7 +330,7 @@
             <span style="font-size: 24px;">✏️</span>
             <div>
                 <h3 style="color:var(--green-color); margin:0 0 4px 0; font-size: 14px;">EDITING CURRENT DRAW</h3>
-                <p style="color:var(--text-dark); margin:0; font-size: 12px; text-transform: none; font-weight: 600;">You can safely change names, update mobility [A] tags, opt out of pairs, and link/unlink teams. Your existing peg numbers are locked.</p>
+                <p style="color:var(--text-dark); margin:0; font-size: 12px; text-transform: none; font-weight: 600;">You can safely change names, update mobility [A] tags, and link/unlink teams. Your existing peg numbers are locked.</p>
             </div>
         </div>
 
@@ -418,7 +442,7 @@
         </div>
     </div>
 
-    <div id="resultsSection" style="display:none;">
+    <div id="resultsSection">
         <div id="swapPrompt" class="no-print" style="display:none; text-align:center; background:var(--text-dark); color:white; border: 2px solid var(--border); padding:16px; font-weight:800; font-size: 13px; margin-bottom:20px; border-radius:16px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">SWAP MODE ACTIVE (Select a specific day peg to swap)</div>
         
         <div id="anomalyBanner" class="anomaly-banner no-print">
@@ -442,7 +466,6 @@
         </div>
     </div>
 
-    <!-- Modal Menus -->
     <div id="manageMenuModal" class="modal-overlay no-print">
         <div class="modal-content" style="max-width: 700px; padding: 25px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
@@ -477,7 +500,7 @@
             </div>
             <div class="master-menu-grid">
                 <button class="btn-ui" onclick="copyExcelData(); closePopups();">
-                    <strong>📋 COPY SETUP DATA</strong><span>Copies name/zone/pairs matrix to clipboard.</span>
+                    <strong>📋 COPY SETUP DATA</strong><span>Copies name/zone matrix to clipboard.</span>
                 </button>
                 <button class="btn-ui" onclick="generateRegistrationSheet(); closePopups();">
                     <strong>🖨️ PRINT REGISTRATION</strong><span>Master attendance sheet.</span>
@@ -542,24 +565,17 @@
     </div>
 </div>
 
-<!-- ========================================== -->
-<!-- TAB 2: SCORECARD DATA ENTRY                -->
-<!-- ========================================== -->
-<div id="scoreTab" class="tab-content" style="display:none; padding-top: 20px;">
-    
-    <!-- Sticky Score Header -->
-    <div class="sticky-score-header no-print">
-        <div style="max-width: 1400px; margin: 0 auto; text-align: center;">
-            <input type="text" id="scoreSearch" placeholder="🔍 SEARCH ANGLER OR TEAM..." oninput="filterScorecards()" class="scorecard-search">
-            <div id="dayTabsContainer" class="day-tab-nav">
-                <button id="subBtn-1" class="day-tab-btn active" onclick="switchScoreDay(1)">DAY 1 SCORES</button>
-                <button id="subBtn-2" class="day-tab-btn" onclick="switchScoreDay(2)">DAY 2 SCORES</button>
-            </div>
+<div id="scoreTab" class="tab-content" style="display:none;">
+    <div style="max-width: 1400px; margin: 0 auto; text-align: center; padding-bottom: 10px;">
+        
+        <input type="text" id="scoreSearch" placeholder="🔍 SEARCH ANGLER OR TEAM..." oninput="filterScorecards()" class="scorecard-search">
+
+        <div id="dayTabsContainer" class="day-tab-nav">
+            <button id="subBtn-1" class="day-tab-btn active" onclick="switchScoreDay(1)">DAY 1 SCORES</button>
+            <button id="subBtn-2" class="day-tab-btn" onclick="switchScoreDay(2)">DAY 2 SCORES</button>
         </div>
-        <div id="scoreListHeaderContainer"></div>
     </div>
 
-    <!-- Scrollable Area -->
     <div class="scorecard-scroll-wrapper">
         <div id="scoreListContainer" class="score-list-container"></div>
     </div>
@@ -572,9 +588,6 @@
     </div>
 </div>
 
-<!-- ========================================== -->
-<!-- PRINT SECTIONS & MODALS                    -->
-<!-- ========================================== -->
 <div id="registrationPrintSection" class="no-print"></div>
 <div id="dispatchSection" class="no-print"></div>
 <div id="rosterSection" class="no-print"></div>
@@ -624,7 +637,7 @@
 </div>
 
 <script>
-    const APP_VERSION = "v1.0.0";
+    const APP_VERSION = "v1.2.0";
     document.getElementById('vTag').innerText = APP_VERSION;
 
     const zones = ['RED', 'YELLOW', 'GREEN', 'BLUE'];
@@ -683,6 +696,7 @@
         if (tabId === 'draw') {
             document.body.className = 'stage-draw';
         } else {
+            document.body.className = 'stage-score';
             document.getElementById('dayTabsContainer').style.display = matchDays === 2 ? 'flex' : 'none';
             switchScoreDay(1); 
         }
@@ -690,9 +704,6 @@
 
     function switchScoreDay(day) {
         currentScoreDay = day;
-        document.body.className = day === 1 ? 'stage-score-d1' : 'stage-score-d2';
-        document.getElementById('dayWatermark').innerText = 'DAY ' + day;
-
         document.querySelectorAll('.day-sub-btn').forEach(btn => btn.classList.remove('active'));
         let activeSubBtn = document.getElementById(`subBtn-${day}`);
         if(activeSubBtn) activeSubBtn.classList.add('active');
@@ -733,8 +744,11 @@
     }
 
     function renderScorecards() {
-        let headerContainer = document.getElementById('scoreListHeaderContainer');
-        headerContainer.innerHTML = '';
+        const container = document.getElementById('scoreListContainer');
+        container.innerHTML = '';
+        
+        let hasDrawnData = false;
+        
         let headerRow = document.createElement('div');
         headerRow.className = 'score-list-header';
         headerRow.innerHTML = `
@@ -746,18 +760,9 @@
             <div style="text-align:center;">BIGGEST</div>
             <div style="text-align:center;">SPECIES</div>
         `;
-        headerContainer.appendChild(headerRow);
+        container.appendChild(headerRow);
 
-        const container = document.getElementById('scoreListContainer');
-        container.innerHTML = '';
-        
-        let hasDrawnData = false;
-
-        let sortedState = [...appState].sort((a, b) => {
-            if (a.isTeam && !b.isTeam) return -1;
-            if (!a.isTeam && b.isTeam) return 1;
-            return (a.tName || "").localeCompare(b.tName || "");
-        });
+        let sortedState = [...appState].sort((a,b) => (a.tName||"").localeCompare(b.tName||""));
 
         sortedState.forEach(e => {
             e.anglers.forEach((a, aIdx) => {
@@ -779,19 +784,19 @@
                     <div class="s-name">${a.name}</div>
                     <div class="s-team">${tName}</div>
                     <div class="s-peg" style="color: ${zColor};">${targetZ} ${targetP}</div>
-                    <input type="number" placeholder="LENGTH" value="${s.len}" 
+                    <input type="number" placeholder="LEN" value="${s.len}" 
                         oninput="enforceLimits(this, 4)" 
                         onchange="saveScore('${key}', 'len', this.value)" 
                         onfocus="highlightRow(this)" onblur="unhighlightRow(this)">
-                    <input type="number" placeholder="COUNT" value="${s.count}" 
+                    <input type="number" placeholder="CNT" value="${s.count}" 
                         oninput="enforceLimits(this, 3)" 
                         onchange="saveScore('${key}', 'count', this.value)" 
                         onfocus="highlightRow(this)" onblur="unhighlightRow(this)">
-                    <input type="number" placeholder="BIGGEST" value="${s.big}" 
+                    <input type="number" placeholder="BIG" value="${s.big}" 
                         oninput="enforceLimits(this, 4)" 
                         onchange="saveScore('${key}', 'big', this.value)" 
                         onfocus="highlightRow(this)" onblur="unhighlightRow(this)">
-                    <input type="number" placeholder="SPECIES" value="${s.spec}" 
+                    <input type="number" placeholder="SPC" value="${s.spec}" 
                         oninput="enforceLimits(this, 2)" 
                         onchange="saveScore('${key}', 'spec', this.value)" 
                         onfocus="highlightRow(this)" onblur="unhighlightRow(this)">
@@ -815,13 +820,7 @@
         let tsv = "NAME\tTEAM\tDAY\tZONE\tPEG\tLENGTH\tFISH COUNT\tBIGGEST FISH\tSPECIES\n";
         let dataCount = 0;
 
-        let sortedState = [...appState].sort((a, b) => {
-            if (a.isTeam && !b.isTeam) return -1;
-            if (!a.isTeam && b.isTeam) return 1;
-            return (a.tName || "").localeCompare(b.tName || "");
-        });
-
-        sortedState.forEach(e => {
+        appState.forEach(e => {
             e.anglers.forEach((a, i) => {
                 if (!a.name || !a.z1) return;
                 let tName = e.isTeam ? (e.tName || 'SOLO') : 'SOLO';
@@ -958,7 +957,7 @@
                 rawName = rawName.replace(/[\(\[\{]A[\)\]\}]/i, '').trim();
             }
 
-            let anglerObj = { name: rawName, mobility: isMobility ? 1 : 0, pairs: true };
+            let anglerObj = { name: rawName, mobility: isMobility ? 1 : 0 };
 
             if (rawTeam) {
                 if (!tempTeams[rawTeam]) tempTeams[rawTeam] = [];
@@ -977,7 +976,7 @@
             let members = tempTeams[tName];
             for (let i = 0; i < members.length; i += 4) {
                 let chunk = members.slice(i, i + 4);
-                while (chunk.length < 4) { chunk.push({pairs: true}); }
+                while (chunk.length < 4) { chunk.push({}); }
                 appState.push({ id: genId(), isTeam: true, tName: tName, anglers: chunk });
             }
         });
@@ -1003,6 +1002,7 @@
     function showWipeModal() { document.getElementById('wipeModal').style.display = 'flex'; }
     function closeWipeModal() { document.getElementById('wipeModal').style.display = 'none'; }
 
+    // FIXED: Now accurately routes to Setup Edit screen and switches tab automatically.
     function handleSafeEdit() {
         switchTab('draw'); 
         handleAmend(true); 
@@ -1120,8 +1120,8 @@
         let iVal = document.getElementById('initIndivs').value;
         const t = parseInt(tVal) || 0; const i = parseInt(iVal) || 0;
         
-        for(let x = 0; x < t; x++) appState.push({ id: genId(), isTeam: true, tName: '', anglers: [{pairs:true},{pairs:true},{pairs:true},{pairs:true}] });
-        for(let y = 0; y < i; y++) appState.push({ id: genId(), isTeam: false, tName: '', anglers: [{pairs:true}] });
+        for(let x = 0; x < t; x++) appState.push({ id: genId(), isTeam: true, tName: '', anglers: [{},{},{},{}] });
+        for(let y = 0; y < i; y++) appState.push({ id: genId(), isTeam: false, tName: '', anglers: [{}] });
         
         document.getElementById('rosterEntryZone').style.display = 'none';
         document.getElementById('commandBar').style.display = 'flex';
@@ -1137,8 +1137,8 @@
     }
 
     function addNewStateItem(isTeam) {
-        if (isTeam) appState.push({ id: genId(), isTeam: true, tName: '', anglers: [{pairs:true},{pairs:true},{pairs:true},{pairs:true}] });
-        else appState.push({ id: genId(), isTeam: false, tName: '', anglers: [{pairs:true}] });
+        if (isTeam) appState.push({ id: genId(), isTeam: true, tName: '', anglers: [{},{},{},{}] });
+        else appState.push({ id: genId(), isTeam: false, tName: '', anglers: [{}] });
         renderStateToScreen();
     }
 
@@ -1147,14 +1147,6 @@
         if (entry) { 
             entry.anglers[aIdx].mobility = entry.anglers[aIdx].mobility ? 0 : 1;
             renderStateToScreen(); 
-        }
-    }
-
-    function togglePairs(eId, aIdx) {
-        const entry = appState.find(e => e.id === eId);
-        if (entry) {
-            entry.anglers[aIdx].pairs = entry.anglers[aIdx].pairs === false ? true : false;
-            renderStateToScreen();
         }
     }
 
@@ -1282,17 +1274,11 @@
                 for (let i = 0; i < 4; i++) {
                     let mBg = entry.anglers[i].mobility ? 'var(--text-dark)' : '#f1f5f9';
                     let mColor = entry.anglers[i].mobility ? 'white' : 'var(--text-dark)';
-                    
-                    let pBg = entry.anglers[i].pairs !== false ? 'var(--green-color)' : 'var(--red-soft)';
-                    let pColor = entry.anglers[i].pairs !== false ? 'white' : 'var(--red-color)';
-                    let pText = entry.anglers[i].pairs !== false ? 'PAIRS: YES' : 'PAIRS: NO';
-
                     let aName = entry.anglers[i].name || '';
                     
                     h += `<div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
                             <input type="text" class="a-name-input" value="${aName}" placeholder="ANGLER ${i+1}" oninput="updateAnglerName('${entry.id}', ${i}, this.value)">
                             <button class="btn-tool" onclick="toggleMobility('${entry.id}', ${i})" tabindex="-1" style="padding:10px 14px; background:${mBg}; color:${mColor};">[A]</button>
-                            <button class="btn-tool" onclick="togglePairs('${entry.id}', ${i})" tabindex="-1" style="padding:10px 14px; background:${pBg}; color:${pColor}; border-color:${pBg}; width: 85px;">${pText}</button>
                           </div>`;
                 }
                 h += `</div>`;
@@ -1300,17 +1286,11 @@
                 h += `<div style="padding: 0 16px;"><label style="font-size:10px; font-weight:800; color:var(--text-light); letter-spacing:0.5px;">SOLO NAME</label>`;
                 let mBg = entry.anglers[0].mobility ? 'var(--text-dark)' : '#f1f5f9';
                 let mColor = entry.anglers[0].mobility ? 'white' : 'var(--text-dark)';
-                
-                let pBg = entry.anglers[0].pairs !== false ? 'var(--green-color)' : 'var(--red-soft)';
-                let pColor = entry.anglers[0].pairs !== false ? 'white' : 'var(--red-color)';
-                let pText = entry.anglers[0].pairs !== false ? 'PAIRS: YES' : 'PAIRS: NO';
-
                 let aName = entry.anglers[0].name || '';
                 
                 h += `<div style="display:flex; align-items:center; gap:8px; margin-top:4px; margin-bottom:6px;">
                         <input type="text" class="a-name-input" value="${aName}" oninput="updateAnglerName('${entry.id}', 0, this.value)">
                         <button class="btn-tool" onclick="toggleMobility('${entry.id}', 0)" tabindex="-1" style="padding:10px 14px; background:${mBg}; color:${mColor};">[A]</button>
-                        <button class="btn-tool" onclick="togglePairs('${entry.id}', 0)" tabindex="-1" style="padding:10px 14px; background:${pBg}; color:${pColor}; border-color:${pBg}; width: 85px;">${pText}</button>
                       </div></div>`;
             }
             
@@ -1763,6 +1743,246 @@
         return { list: uniqueErrors, markers: clashMap };
     }
 
+    function injectLatecomer(isTeam) {
+        let used1 = { 'RED':[], 'YELLOW':[], 'GREEN':[], 'BLUE':[] };
+        let used2 = { 'RED':[], 'YELLOW':[], 'GREEN':[], 'BLUE':[] };
+        
+        appState.forEach(e => {
+            e.anglers.forEach(a => {
+                if(a.z1 && a.p1 !== undefined && a.p1 !== 9999) used1[a.z1].push(String(a.p1));
+                if(matchDays === 2 && a.z2 && a.p2 !== undefined && a.p2 !== 9999) used2[a.z2].push(String(a.p2));
+            });
+        });
+
+        let avail1 = { 'RED':[], 'YELLOW':[], 'GREEN':[], 'BLUE':[] };
+        let avail2 = { 'RED':[], 'YELLOW':[], 'GREEN':[], 'BLUE':[] };
+        
+        zones.forEach((z, idx) => {
+            for(let i=1; i<=currentZoneSize; i++) {
+                let pN = String((idx * currentZoneSize) + i);
+                if(!used1[z].includes(pN)) avail1[z].push(pN);
+                if(matchDays === 2 && !used2[z].includes(pN)) avail2[z].push(pN);
+            }
+        });
+
+        let newEntry = { id: genId(), isTeam: isTeam, tName: '', anglers: [] };
+
+        if(isTeam) {
+            let d1Z = [...zones].sort(() => Math.random() - 0.5); 
+            let d2Z = [d1Z[1], d1Z[2], d1Z[3], d1Z[0]];
+            
+            for(let i=0; i<4; i++) {
+                let p1_val;
+                if(avail1[d1Z[i]].length > 0) p1_val = avail1[d1Z[i]].splice(Math.floor(Math.random() * avail1[d1Z[i]].length), 1)[0];
+                else p1_val = getAlphaPeg(d1Z[i], 1, used1);
+                
+                let p2_val = undefined;
+                if(matchDays === 2) {
+                    if(avail2[d2Z[i]].length > 0) p2_val = avail2[d2Z[i]].splice(Math.floor(Math.random() * avail2[d2Z[i]].length), 1)[0];
+                    else p2_val = getAlphaPeg(d2Z[i], 2, used2);
+                }
+                newEntry.anglers.push({ name: '', z1: d1Z[i], p1: p1_val, z2: matchDays === 2 ? d2Z[i] : undefined, p2: p2_val });
+            }
+        } else {
+            let flat1 = []; zones.forEach(z => { if(avail1[z].length > 0) flat1.push(z); });
+            let picked1Z = flat1.length > 0 ? flat1[Math.floor(Math.random() * flat1.length)] : zones[Math.floor(Math.random() * zones.length)];
+            
+            let p1_val;
+            if(avail1[picked1Z].length > 0) p1_val = avail1[picked1Z].splice(Math.floor(Math.random() * avail1[picked1Z].length), 1)[0];
+            else p1_val = getAlphaPeg(picked1Z, 1, used1);
+            
+            let picked2Z = undefined, p2_val = undefined;
+            if(matchDays === 2) {
+                let flat2 = []; zones.forEach(z => { if(z !== picked1Z && avail2[z].length > 0) flat2.push(z); });
+                if(flat2.length === 0) zones.forEach(z => { if(z !== picked1Z) flat2.push(z); });
+                picked2Z = flat2.length > 0 ? flat2[Math.floor(Math.random() * flat2.length)] : zones[Math.floor(Math.random() * zones.length)];
+                
+                if(avail2[picked2Z] && avail2[picked2Z].length > 0) p2_val = avail2[picked2Z].splice(Math.floor(Math.random() * avail2[picked2Z].length), 1)[0];
+                else p2_val = getAlphaPeg(picked2Z, 2, used2);
+            }
+            newEntry.anglers.push({ name: '', z1: picked1Z, p1: p1_val, z2: matchDays === 2 ? picked2Z : undefined, p2: p2_val });
+        }
+        
+        appState.push(newEntry);
+        displayDraw();
+        showToast("✅ LATECOMER ADDED SUCCESSFULLY");
+        setTimeout(() => { handleAmend(true); }, 800); 
+    }
+
+    function isPegSafe(p, d) { 
+        if (!accEnabled) return false;
+        if (mobilityMode === 'A') {
+            let safeStr = d === 1 ? document.getElementById('accPegs1_a').value : document.getElementById('accPegs2_a').value;
+            let safeArr = safeStr.match(/\d+/g) || [];
+            return safeArr.includes(String(p).replace(/[a-zA-Z]/g, ''));
+        }
+        return false;
+    }
+
+    function copyExcelData() {
+        let tsv = matchDays === 2 ? "NAME\tTEAM\tDAY 1 ZONE\tDAY 2 ZONE\n" : "NAME\tTEAM\tDAY 1 ZONE\n";
+        appState.forEach(g => { 
+            g.anglers.forEach(a => { 
+                let tName = g.isTeam ? (g.tName || '') : '';
+                if (matchDays === 2) tsv += `${a.name || ''}\t${tName}\t${a.z1}\t${a.z2}\n`; 
+                else tsv += `${a.name || ''}\t${tName}\t${a.z1}\n`;
+            }); 
+        });
+
+        navigator.clipboard.writeText(tsv).then(() => {
+            showToast("📋 SETUP DATA COPIED TO CLIPBOARD");
+        });
+    }
+
+    function buildBeachMap(day, s) {
+        let html = `<div style="display:flex; width:100%; gap:8px; margin-bottom: 6px;">`;
+        zones.forEach((z, idx) => {
+            let baseMax = (idx + 1) * s;
+            let baseMin = (idx * s) + 1;
+            let highestAlpha = '';
+            
+            let assignedPegs = [];
+            let aPegs = [];
+            
+            appState.forEach(e => e.anglers.forEach(a => {
+                let zp = day === 1 ? {z: a.z1, p: a.p1} : {z: a.z2, p: a.p2};
+                if (zp.z === z && zp.p !== undefined && zp.p !== 9999) {
+                    let pStr = String(zp.p);
+                    assignedPegs.push(pStr);
+                    if (a.mobility) aPegs.push(pStr);
+                    
+                    if (pStr.startsWith(String(baseMax))) {
+                        let alpha = pStr.replace(/[0-9]/g, '');
+                        if (alpha > highestAlpha) highestAlpha = alpha;
+                    }
+                }
+            }));
+            
+            let emptyPegs = [];
+            for (let i = baseMin; i <= baseMax; i++) {
+                if (!assignedPegs.includes(String(i))) {
+                    emptyPegs.push(i);
+                }
+            }
+            
+            let bg = zColors[z];
+            let label = highestAlpha ? `${baseMin}-${baseMax} + ${baseMax}${highestAlpha}` : `${baseMin}-${baseMax}`;
+            
+            let extraInfo = '';
+            let hasEmpty = emptyPegs.length > 0;
+            let hasA = accEnabled && aPegs.length > 0;
+
+            if (hasEmpty) {
+                extraInfo += `<span style="font-size:10px; font-weight:900; background:white; color:var(--text-dark); padding:4px 8px; border-radius:50px; white-space:nowrap; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">E: ${emptyPegs.join(', ')}</span>`;
+            }
+            if (hasA) {
+                extraInfo += `<span style="font-size:10px; font-weight:900; background:white; color:var(--text-dark); padding:4px 8px; border-radius:50px; white-space:nowrap; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">[A]: ${aPegs.join(', ')}</span>`;
+            }
+
+            html += `<div style="flex:1; background:${bg}; border-radius:12px; padding:6px 12px; color:white; font-weight:900; display:flex; flex-direction:row; flex-wrap:wrap; justify-content:center; align-items:center; gap:8px; min-height:26px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                        <span style="font-size:14px; letter-spacing:0.5px;">${label}</span>
+                        ${extraInfo}
+                     </div>`;
+        });
+        html += `</div>`;
+        return html;
+    }
+
+    function displayDraw() {
+        document.querySelectorAll('.tab-content').forEach(s => s.style.display = 'none');
+        document.getElementById('drawTab').style.display = 'block';
+
+        document.getElementById('entrySection').style.display = 'none';
+        document.getElementById('resultsSection').style.display = 'block';
+        
+        let titleVal = document.getElementById('matchTitle').value;
+        let titleStr = titleVal ? `LIVE: ${titleVal}` : "LIVE DRAW";
+        document.getElementById('resTitle').innerHTML = `<span class="live-dot">🔴</span> ${titleStr}`;
+        
+        document.getElementById('commandBar').style.display = 'none';
+        document.getElementById('masterActionBar').style.display = 'flex';
+
+        if (currentZoneSize === 0) {
+            let totAnglers = 0;
+            appState.forEach(e => { if (e.isTeam) totAnglers += 4; else totAnglers += 1; });
+            currentZoneSize = Math.max(Math.ceil(totAnglers / 4), 1);
+        }
+        const s = currentZoneSize;
+
+        let mapHtml = '';
+        
+        let masterLegend = `E = Empty Peg`;
+        if (accEnabled) masterLegend += ` <span style="margin: 0 8px; opacity:0.5;">|</span> [A] = Accesable Pegs`;
+        mapHtml += `<div style="font-size:12px; font-weight:900; color:var(--text-light); text-align:center; margin-bottom:15px; letter-spacing: 0.5px;">${masterLegend}</div>`;
+
+        if (matchDays >= 1) {
+            mapHtml += `<div style="font-size:14px; font-weight:900; color:var(--text-dark); margin-bottom:6px; letter-spacing: 0.5px; margin-left:5px;">DAY 1</div>`;
+            mapHtml += buildBeachMap(1, s);
+        }
+        if (matchDays === 2) {
+            mapHtml += `<div style="font-size:14px; font-weight:900; color:var(--text-dark); margin-bottom:6px; margin-top:10px; letter-spacing: 0.5px; margin-left:5px;">DAY 2</div>`;
+            mapHtml += buildBeachMap(2, s);
+        }
+        
+        const beachContainer = document.getElementById('beachMapContainer');
+        beachContainer.innerHTML = mapHtml;
+
+        const validation = runValidator(); 
+        const banner = document.getElementById('anomalyBanner'); 
+        const list = document.getElementById('anomalyList');
+        
+        if (validation.list.length > 0) { 
+            banner.style.display = 'block'; 
+            list.innerHTML = validation.list.map(err => `<li>${err}</li>`).join('');
+        } else { banner.style.display = 'none'; }
+
+        const tb = document.getElementById('teamsBucket'); tb.innerHTML = ''; 
+        const sb = document.getElementById('solosBucket'); sb.innerHTML = '';
+        
+        appState.forEach(g => {
+            const div = document.createElement('div'); div.className = 'zone-card';
+            
+            let nameStr = g.tName ? g.tName : 'SOLO';
+            let h = `<div class="zone-header"><span>${nameStr}</span></div>`;
+            h += `<div class="res-row" style="font-size:11px; color:var(--text-light); padding-bottom: 2px;"><span></span><span style="text-align:center;">DAY 1</span><span style="text-align:center;">DAY 2</span></div>`;
+            
+            g.anglers.forEach((a, aI) => {
+                let p1C = isSwapMode ? ' swap-active' : '';
+                if (swapObj1 && swapObj1.eId === g.id && swapObj1.aI === aI && swapObj1.day === 1) p1C += ' swap-selected';
+                if (validation.markers.find(m => m.eId === g.id && m.aI === aI && m.day === 1)) p1C += ' clash-glow';
+                
+                let p2C = isSwapMode ? ' swap-active' : '';
+                if (swapObj1 && swapObj1.eId === g.id && swapObj1.aI === aI && swapObj1.day === 2) p2C += ' swap-selected';
+                if (validation.markers.find(m => m.eId === g.id && m.aI === aI && m.day === 2)) p2C += ' clash-glow';
+                
+                let aName = a.name || '';
+                let aTag = (accEnabled && a.mobility) ? ' <span class="a-tag">[A]</span>' : '';
+                
+                let d1Bg = zColors[a.z1] || 'gray'; let d2Bg = zColors[a.z2] || 'gray';
+                let d1SafeTag = isPegSafe(a.p1, 1) ? '<br><small style="font-size:9px;">[A]</small>' : '';
+                let d2SafeTag = isPegSafe(a.p2, 2) ? '<br><small style="font-size:9px;">[A]</small>' : '';
+                
+                h += `<div class="res-row">
+                        <span class="angler-name">${aName}${aTag}</span>
+                        <div class="draw-pill${p1C}" style="background:${d1Bg}" onclick="handleSwapClick('${g.id}',${aI},1)">
+                            <span>${a.z1 || 'UNDEFINED'}</span> <span class="peg-num">${a.p1 !== undefined ? a.p1 : '-'}</span>${d1SafeTag}
+                        </div>
+                        <div class="draw-pill${p2C}" style="background:${d2Bg}" onclick="handleSwapClick('${g.id}',${aI},2)">
+                            <span>${a.z2 || '-'}</span> <span class="peg-num">${a.p2 !== undefined ? a.p2 : '-'}</span>${d2SafeTag}
+                        </div>
+                      </div>`;
+            });
+            div.innerHTML = h; 
+            if (g.isTeam) tb.appendChild(div); else sb.appendChild(div);
+        });
+        
+        document.getElementById('teamsBucketContainer').style.display = tb.innerHTML !== '' ? 'block' : 'none';
+        document.getElementById('solosBucketContainer').style.display = sb.innerHTML !== '' ? 'block' : 'none';
+        
+        persistState();
+    }
+
+    // FIXED: Correctly routed back to the edit screen
     function handleAmend(isSafe) { 
         switchTab('draw');
 
@@ -1801,12 +2021,7 @@
         let matchName = document.getElementById('matchTitle').value;
         let h = `<div class="roster-header"><h1>${matchName}</h1><h2>REGISTRATION SHEET</h2></div>
                  <table class="print-table"><thead><tr><th>ANGLER</th><th>TEAM</th><th>PRESENT</th><th>POT (£)</th><th>PAIRS (£)</th></tr></thead><tbody>`;
-        let sortedState = [...appState].sort((a, b) => {
-            if (a.isTeam && !b.isTeam) return -1;
-            if (!a.isTeam && b.isTeam) return 1;
-            return (a.tName || "").localeCompare(b.tName || "");
-        });
-
+        let sortedState = [...appState].sort((a,b) => (a.tName || "SOLO").localeCompare(b.tName || "SOLO"));
         sortedState.forEach(e => { 
             e.anglers.forEach(a => { 
                 let aName = a.name || ''; let mobStr = (accEnabled && a.mobility) ? ' [A]' : '';
@@ -1922,13 +2137,6 @@
             currentZoneSize = e.zoneSize || 0;
             accEnabled = e.accEnabled ? true : false;
             applyAccToggleUI();
-
-            // Ensure legacy saves have pairs applied
-            appState.forEach(e => {
-                e.anglers.forEach(a => {
-                    if(a.pairs === undefined) a.pairs = true;
-                });
-            });
 
             if (appState.length > 0) { 
                 document.getElementById('rosterEntryZone').style.display = 'none'; 
