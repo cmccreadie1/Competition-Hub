@@ -182,12 +182,21 @@
         border-bottom: 1px solid rgba(255,255,255,0.1);
     }
         .scorecard-search {
-            width: 100%; max-width: 600px; margin: 0 auto 25px; display: block;
-            font-size: 16px; padding: 16px 24px; border-radius: 50px;
-            border: 2px solid var(--accent); box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-            background: #ffffff; color: var(--text-dark);
-        }
+    width: 100%; max-width: 600px; margin: 0 auto 25px; display: block;
+    font-size: 16px; padding: 16px 80px 16px 24px; border-radius: 50px;
+    border: 2px solid var(--accent); box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    background: #ffffff; color: var(--text-dark); box-sizing: border-box;
+}
+/* Search Wrapper & Clear Button */
+.search-wrapper { position: relative; width: 100%; max-width: 600px; margin: 0 auto; }
 
+.clear-btn {
+    position: absolute; right: 25px; top: 16px;
+    background: transparent; border: none; cursor: pointer;
+    color: #64748b; font-weight: bold; font-size: 14px;
+    padding: 5px 10px; z-index: 10;
+}
+.clear-btn:hover { color: #000; }
         .score-list-container { display: flex; flex-direction: column; gap: 8px; max-width: 1400px; margin: 0 auto; }
 
         .score-list-header, .score-row {
@@ -595,7 +604,7 @@ body.stage-score-d2 #subBtn-2 { background: var(--card); color: var(--green-colo
         
        <div class="search-wrapper">
     <input type="text" id="scoreSearch" placeholder="🔍 SEARCH ANGLER OR TEAM..." oninput="filterScorecards()" class="scorecard-search">
-    <button id="clearSearchBtn" onclick="clearSearch()" class="clear-btn">&times;</button>
+    <button id="clearSearchBtn" onclick="clearSearch()" class="clear-btn">CLEAR</button>
 </div>
 
         <div id="dayTabsContainer" class="day-tab-nav">
