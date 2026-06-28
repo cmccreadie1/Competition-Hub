@@ -120,7 +120,7 @@
         #tabBtn-draw.active { background: var(--bg-base); color: var(--text-dark); }
         #tabBtn-score.active { background: var(--bg-score); color: white; border-color: #1e293b; box-shadow: 0 -4px 15px rgba(0,0,0,0.2); }
 
-        .tab-content { padding: 160px 20px 40px; }
+        .tab-content { padding: 180px 20px 40px; }
         #entrySection, #resultsSection, #dispatchSection, #rosterSection, #registrationPrintSection { max-width: 1400px; margin: 0 auto; }
 
         /* Setup Control Panel */
@@ -172,17 +172,7 @@
         .day-tab-btn { padding: 12px 30px; font-weight: 900; font-size: 14px; border-radius: 12px 12px 0 0; background: #475569; color: #94a3b8; border: 2px solid transparent; border-bottom: none; cursor: pointer; transition: 0.2s; margin-bottom: -2px; }
         .day-tab-btn.active { background: var(--card); color: var(--accent); border-color: var(--border); padding-bottom: 14px; z-index: 10; }
         
-.sticky-score-header {
-    position: sticky; 
-    top: 60px; /* Reduced to 60px to dock just below the nav bar */
-    width: 100%; /* Ensures it doesn't collapse */
-    box-sizing: border-box; /* Keeps padding inside the width */
-    background: var(--bg-score-d1); 
-    z-index: 4000; 
-    padding: 15px 20px 0;
-    margin: -20px 0 10px 0; /* Remove side margins to span full width */
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-}
+
         .scorecard-search {
             width: 100%; max-width: 600px; margin: 0 auto 25px; display: block;
             font-size: 16px; padding: 16px 24px; border-radius: 50px;
@@ -190,6 +180,17 @@
             background: #ffffff; color: var(--text-dark);
         }
 
+        .sticky-score-header {
+        position: sticky; 
+        top: 60px; 
+        width: 100%; 
+        box-sizing: border-box; 
+        background: var(--bg-score-d1); 
+        z-index: 4000; 
+        padding: 15px 20px 0;
+        margin: -20px 0 10px 0; 
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
         .score-list-container { display: flex; flex-direction: column; gap: 8px; max-width: 1400px; margin: 0 auto; }
 
         .score-list-header, .score-row {
