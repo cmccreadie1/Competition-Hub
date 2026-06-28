@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Competition Hub - v7.4.0</title>
+    <title>Competition Hub - v7.4.1</title>
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -49,7 +49,7 @@
             margin: 0; padding: 0; 
             text-transform: uppercase; 
             line-height: 1.3; 
-            /* Fixed Sticky Bug: Removed overflow: hidden from body */
+            /* Fixed Sticky Bug by clipping rather than hiding overflow */
             overflow-x: clip; 
             padding-bottom: 120px;
             font-variant-numeric: tabular-nums; 
@@ -107,7 +107,8 @@
         body.stage-score-d1 #tabBtn-score.active { background: var(--bg-score-d1); color: white; border-color: #1e293b; box-shadow: 0 -4px 15px rgba(0,0,0,0.2); }
         body.stage-score-d2 #tabBtn-score.active { background: var(--bg-score-d2); color: white; border-color: #134e4a; box-shadow: 0 -4px 15px rgba(0,0,0,0.2); }
 
-        .tab-content { padding: 130px 20px 40px; position: relative; z-index: 2; }
+        /* Fixed offset so page clears the header */
+        .tab-content { padding: 140px 20px 40px; position: relative; z-index: 2; }
         #entrySection, #resultsSection, #dispatchSection, #rosterSection, #registrationPrintSection { max-width: 1400px; margin: 0 auto; position: relative; z-index: 2; }
 
         /* Setup Control Panel */
@@ -144,7 +145,7 @@
         /* SCORECARD: STICKY HEADER & GRID            */
         /* ========================================== */
         .sticky-score-header {
-            position: sticky; top: 76px; /* Docks just below the main fixed header */
+            position: sticky; top: 110px; /* Docks flawlessly just below the main fixed header */
             background: var(--bg-score-d1); z-index: 5000; padding: 15px 20px 0;
             transition: background-color 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
             margin: -20px -20px 10px; /* Counteracts parent padding to fill width */
@@ -169,7 +170,7 @@
 
         .score-list-container { display: flex; flex-direction: column; gap: 8px; max-width: 1400px; margin: 0 auto; }
         
-        /* Restored 7-Column Layout with exact text placeholders */
+        /* 7-Column Layout with exact text placeholders */
         .score-list-header, .score-row { display: grid; grid-template-columns: minmax(180px, 2fr) minmax(140px, 1.5fr) 130px 105px 105px 105px 105px; gap: 12px; align-items: center; }
         
         .score-list-header { padding: 12px 20px 8px; font-weight: 900; font-size: 11px; color: #cbd5e1; border-bottom: none; margin-bottom: 0; max-width: 1400px; margin: 0 auto; }
@@ -549,9 +550,9 @@
 <!-- ========================================== -->
 <!-- TAB 2: SCORECARD DATA ENTRY                -->
 <!-- ========================================== -->
-<div id="scoreTab" class="tab-content" style="display:none; padding-top: 80px;">
+<div id="scoreTab" class="tab-content" style="display:none; padding-top: 0px;">
     
-    <!-- The Sticky Score Header (Contains Search, Day Tabs, and Column Headers) -->
+    <!-- The Sticky Score Header -->
     <div class="sticky-score-header no-print">
         <div style="max-width: 1400px; margin: 0 auto; text-align: center;">
             <input type="text" id="scoreSearch" placeholder="🔍 SEARCH ANGLER OR TEAM..." oninput="filterScorecards()" class="scorecard-search">
@@ -761,7 +762,17 @@
         `;
         headerContainer.appendChild(headerRow);
 
-        let sortedState = [...appState].sort((a,b) => (a.tName||"").localeCompare(b.tName||""));
+        // Fixed Late Angler Sorting Bug
+        let sortedState = [...appState].sort((a, b) => {
+            // Force Solos to the bottom
+            if (a.isTeam && !b.isTeam) return -1;
+            if (!a.isTeam && b.isTeam) return 1;
+            
+            // Sort remaining Teams alphabetically
+            let nameA = a.tName || "";
+            let nameB = b.tName || "";
+            return nameA.localeCompare(nameB);
+        });
 
         sortedState.forEach(e => {
             e.anglers.forEach((a, aIdx) => {
@@ -779,7 +790,7 @@
                 const row = document.createElement('div');
                 row.className = 'score-row';
                 
-                // Restored exact placeholders
+                // Full word placeholders restored
                 row.innerHTML = `
                     <div class="s-name">${a.name}</div>
                     <div class="s-team">${tName}</div>
@@ -820,7 +831,14 @@
         let tsv = "NAME\tTEAM\tDAY\tZONE\tPEG\tLENGTH\tFISH COUNT\tBIGGEST FISH\tSPECIES\n";
         let dataCount = 0;
 
-        appState.forEach(e => {
+        // Fixed Export Sorting (Match the visual list exactly)
+        let sortedState = [...appState].sort((a, b) => {
+            if (a.isTeam && !b.isTeam) return -1;
+            if (!a.isTeam && b.isTeam) return 1;
+            return (a.tName || "").localeCompare(b.tName || "");
+        });
+
+        sortedState.forEach(e => {
             e.anglers.forEach((a, i) => {
                 if (!a.name || !a.z1) return;
                 let tName = e.isTeam ? (e.tName || 'SOLO') : 'SOLO';
@@ -1263,7 +1281,14 @@
         const tb = document.getElementById('entryTeamsBucket'); tb.innerHTML = '';
         const sb = document.getElementById('entrySolosBucket'); sb.innerHTML = '';
         
-        appState.forEach(entry => {
+        // Fixed Sorting: Teams alphabetical, Solos strictly at the bottom.
+        let sortedState = [...appState].sort((a, b) => {
+            if (a.isTeam && !b.isTeam) return -1;
+            if (!a.isTeam && b.isTeam) return 1;
+            return (a.tName || "").localeCompare(b.tName || "");
+        });
+
+        sortedState.forEach(entry => {
             const div = document.createElement('div');
             div.className = !entry.isTeam ? 'zone-card solo-card' : 'zone-card';
             div.dataset.id = entry.id;
@@ -1285,7 +1310,6 @@
                     let mBg = entry.anglers[i].mobility ? 'var(--text-dark)' : '#f1f5f9';
                     let mColor = entry.anglers[i].mobility ? 'white' : 'var(--text-dark)';
                     
-                    // Secret Pairs Logic Styling
                     let pBg = entry.anglers[i].pairs !== false ? 'var(--green-color)' : 'var(--red-soft)';
                     let pColor = entry.anglers[i].pairs !== false ? 'white' : 'var(--red-color)';
                     let pText = entry.anglers[i].pairs !== false ? 'PAIRS: YES' : 'PAIRS: NO';
@@ -1304,7 +1328,6 @@
                 let mBg = entry.anglers[0].mobility ? 'var(--text-dark)' : '#f1f5f9';
                 let mColor = entry.anglers[0].mobility ? 'white' : 'var(--text-dark)';
                 
-                // Secret Pairs Logic Styling
                 let pBg = entry.anglers[0].pairs !== false ? 'var(--green-color)' : 'var(--red-soft)';
                 let pColor = entry.anglers[0].pairs !== false ? 'white' : 'var(--red-color)';
                 let pText = entry.anglers[0].pairs !== false ? 'PAIRS: YES' : 'PAIRS: NO';
@@ -1845,7 +1868,14 @@
 
     function copyExcelData() {
         let tsv = matchDays === 2 ? "NAME\tTEAM\tDAY 1 ZONE\tDAY 2 ZONE\tSECRET PAIRS\n" : "NAME\tTEAM\tDAY 1 ZONE\tSECRET PAIRS\n";
-        appState.forEach(g => { 
+        
+        let sortedState = [...appState].sort((a, b) => {
+            if (a.isTeam && !b.isTeam) return -1;
+            if (!a.isTeam && b.isTeam) return 1;
+            return (a.tName || "").localeCompare(b.tName || "");
+        });
+
+        sortedState.forEach(g => { 
             g.anglers.forEach(a => { 
                 let tName = g.isTeam ? (g.tName || '') : '';
                 let pStr = a.pairs !== false ? 'YES' : 'NO';
@@ -2045,7 +2075,12 @@
         let matchName = document.getElementById('matchTitle').value;
         let h = `<div class="roster-header"><h1>${matchName}</h1><h2>REGISTRATION SHEET</h2></div>
                  <table class="print-table"><thead><tr><th>ANGLER</th><th>TEAM</th><th>PRESENT</th><th>POT (£)</th><th>PAIRS (£)</th></tr></thead><tbody>`;
-        let sortedState = [...appState].sort((a,b) => (a.tName || "SOLO").localeCompare(b.tName || "SOLO"));
+        let sortedState = [...appState].sort((a, b) => {
+            if (a.isTeam && !b.isTeam) return -1;
+            if (!a.isTeam && b.isTeam) return 1;
+            return (a.tName || "").localeCompare(b.tName || "");
+        });
+
         sortedState.forEach(e => { 
             e.anglers.forEach(a => { 
                 let aName = a.name || ''; let mobStr = (accEnabled && a.mobility) ? ' [A]' : '';
