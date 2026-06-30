@@ -941,14 +941,16 @@
         updateScoreProgress();
     }
 
-    function exportMasterData() {
+   function exportMasterData() {
         let tsv = "NAME\tTEAM\tDAY\tZONE\tPEG\tLENGTH\tFISH COUNT\tBIGGEST FISH\tSPECIES\n";
         let dataCount = 0;
 
         appState.forEach(e => {
             e.anglers.forEach((a, i) => {
                 if (!a.name || !a.z1) return;
-                let tName = e.isTeam ? (e.tName || 'SOLO') : 'SOLO';
+                
+                // NEW LOGIC: Only show team name if it exists and isn't 'SOLO'
+                let tName = (e.isTeam && e.tName && e.tName.trim().toUpperCase() !== "SOLO" && e.tName.trim() !== "") ? e.tName.trim() : "";
                 
                 let k1 = `${e.id}_${i}_1`;
                 let s1 = scoreState[k1] || {len:'', count:'', big:'', spec:''};
