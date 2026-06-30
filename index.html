@@ -871,7 +871,7 @@
                 if (!a.name || !targetZ) return;
                 hasDrawnData = true;
 
-                let tName = e.isTeam ? (e.tName || 'SOLO') : 'SOLO';
+                let tName = (e.isTeam && e.tName && e.tName.trim() !== "") ? e.tName.trim() : "";
                 let key = `${e.id}_${aIdx}_${currentScoreDay}`;
                 let s = scoreState[key] || {len:'', count:'', big:'', spec:''};
                 let zColor = zColors[targetZ] || 'gray';
