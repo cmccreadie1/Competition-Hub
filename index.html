@@ -607,7 +607,10 @@
 <div id="scoreTab" class="tab-content" style="display:none;">
     
     <div style="max-width: 1400px; margin: 0 auto; text-align: center; padding-bottom: 10px;">
-        <div id="scoreProgressText" style="font-size: 13px; font-weight: 900; color: #94a3b8; text-align: center; margin-bottom: 15px;">SCORES LOGGED: 0 / 0</div>
+       <div id="scoreBadgeContainer" style="display: inline-block; background: #1e293b; border-radius: 50px; padding: 6px 20px; margin-bottom: 15px; position: relative; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: background-color 0.4s;">
+            <div id="scoreProgressText" style="font-size: 11px; font-weight: 900; color: #ffffff; text-align: center; position: relative; z-index: 2; letter-spacing: 0.5px;">DAY 1 SCORES: 0 ENTERED | 0 REMAINING</div>
+            <div id="scoreProgressBar" style="position: absolute; bottom: 0; left: 0; height: 4px; background: var(--accent); width: 0%; transition: width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); z-index: 1;"></div>
+        </div>
         
         <div class="search-wrapper">
             <input type="text" id="scoreSearch" placeholder="🔍 SEARCH ANGLER OR TEAM..." oninput="filterScorecards()" class="scorecard-search">
@@ -787,16 +790,27 @@
         });
 
         const progText = document.getElementById('scoreProgressText');
-        if (progText) {
-            progText.innerText = `DAY ${currentScoreDay} SCORES LOGGED: ${completelyFilled} / ${totalExpected}`;
+        const progContainer = document.getElementById('scoreBadgeContainer');
+        const progBar = document.getElementById('scoreProgressBar');
+        
+        if (progText && progContainer && progBar) {
+            let remaining = totalExpected - completelyFilled;
+            progText.innerText = `DAY ${currentScoreDay} SCORES: ${completelyFilled} ENTERED | ${remaining} REMAINING`;
+            
+            // Calculate percentage for the visual bar
+            let pct = totalExpected === 0 ? 0 : (completelyFilled / totalExpected) * 100;
+            progBar.style.width = pct + '%';
+
+            // Glow green when 100% complete
             if (completelyFilled === totalExpected && totalExpected > 0) {
-                progText.style.color = 'var(--green-color)';
+                progContainer.style.background = 'var(--green-color)';
+                progBar.style.display = 'none'; // hide the blue bar since the whole pill is green
             } else {
-                progText.style.color = '#94a3b8';
+                progContainer.style.background = '#1e293b'; // slate dark
+                progBar.style.display = 'block';
             }
         }
     }
-
     // ====================================================
     // --- LIVE SEARCH FILTER LOGIC ---
     // ====================================================
