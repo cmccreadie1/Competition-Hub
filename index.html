@@ -2277,6 +2277,26 @@
         filterScorecards(); 
         input.focus();      
     }
+    // --- SCROLL AUTO-HIDE FOR ACTION BAR ---
+    let lastScrollY = window.scrollY;
+    
+    window.addEventListener('scroll', () => {
+        const actionBar = document.getElementById('masterActionBar');
+        
+        // Only run this if the action bar is currently active/visible on screen
+        if (!actionBar || actionBar.style.display === 'none') return;
+        
+        let currentScrollY = window.scrollY;
+        
+        // If scrolling down, push it off screen. If scrolling up, bring it back.
+        if (currentScrollY > lastScrollY && currentScrollY > 50) {
+            actionBar.style.transform = 'translateY(150%)'; 
+        } else {
+            actionBar.style.transform = 'translateY(0)';
+        }
+        
+        lastScrollY = currentScrollY;
+    });
 </script>
 </body>
 </html>
