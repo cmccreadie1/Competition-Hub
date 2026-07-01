@@ -684,10 +684,9 @@
 
     <div id="reveal-area" style="display: none; text-align: center; margin-top: 40px; padding-top: 40px; border-top: 1px solid var(--border);">
         <div id="target-score-banner" class="target-banner"></div>
-        <div id="loading-indicator" style="display: none;">
-            <div class="spinner"></div>
-            <div style="color: var(--text-muted); font-weight: 900; font-size: 14px;">Steward and Witness Verification Period...</div>
-        </div>
+        
+        <div id="countdown-display" style="display: none; font-size: 80px; font-weight: 900; color: var(--accent); margin: 20px 0; text-shadow: 0 4px 15px rgba(14, 165, 233, 0.2);">5</div>
+        
         <div id="winners-podium" style="display: none;">
             </div>
     </div>
@@ -1206,12 +1205,23 @@
             i = j;
         }
 
-        // Timed Release for Independent Verification (3.5 Seconds)
-        setTimeout(() => {
-            document.getElementById('loading-indicator').style.display = 'none';
-            renderPodiumLayout(finalStandings, targetScore);
-        }, 3500);
-    }
+        
+        // 6. Suspense Pause (5-Second Countdown)
+        let timeLeft = 5;
+        const countdownEl = document.getElementById('countdown-display');
+        countdownEl.style.display = 'block';
+        countdownEl.innerText = timeLeft;
+
+        const timerInterval = setInterval(() => {
+            timeLeft--;
+            if (timeLeft > 0) {
+                countdownEl.innerText = timeLeft;
+            } else {
+                clearInterval(timerInterval);
+                countdownEl.style.display = 'none';
+                renderPodiumLayout(finalStandings, targetScore);
+            }
+        }, 1000);
 
     function renderPodiumLayout(standings, target) {
         const podium = document.getElementById('winners-podium');
@@ -1248,22 +1258,40 @@
         const tierLabels = ["1st Place", "2nd Place", "3rd Place"];
         const styles = ["first-place", "", ""];
 
-        for (let i = 0; i < Math.min(3, standings.length); i++) {
+       // Loop through ALL standings instead of just the top 3
+        for (let i = 0; i < standings.length; i++) {
             const pair = standings[i];
             const tieClass = pair.isTie ? "shared-tie" : "";
             const noteText = pair.isTie ? ` (Split Pot Tie)` : "";
             
+            // Determine if they are in the money
+            let prizeAmount = assignedPrizes[i] || 0;
+            let isWinner = prizeAmount > 0;
+            
+            // Assign proper rank labels
+            let rankStr = "";
+            if (i === 0) rankStr = "1st Place";
+            else if (i === 1) rankStr = "2nd Place";
+            else if (i === 2) rankStr = "3rd Place";
+            else rankStr = `${i + 1}th Position`;
+            
+            let rankLabel = rankStr + noteText;
+            let styleClass = (i === 0) ? "first-place" : "";
+            let highlightColor = isWinner ? 'var(--green-color)' : 'var(--text-light)';
+            let prizeText = isWinner ? `£${prizeAmount}` : ``;
+            let opacityStyle = isWinner ? `opacity: 1;` : `opacity: 0.7;`; // Fade the non-winners slightly
+            
             podium.innerHTML += `
-                <div class="podium-card ${styles[i]} ${tieClass}">
+                <div class="podium-card ${styleClass} ${tieClass}" style="${opacityStyle}">
                     <div style="text-align: left;">
-                        <h4 style="margin: 0 0 4px 0; color: var(--text-dark);">${tierLabels[i]}${noteText}</h4>
+                        <h4 style="margin: 0 0 4px 0; color: var(--text-dark);">${rankLabel}</h4>
                         <div style="font-weight: 900; font-size: 18px; color: var(--text-dark);">${pair.p1.name} & ${pair.p2.name}</div>
                         <div style="font-size: 14px; font-weight: 600; color: var(--text-light); margin-top: 4px;">
                             Combined Length: ${pair.combinedLength}cm (Off by ${pair.diff}cm) | Volume: ${pair.combinedCount} Fish
                         </div>
                     </div>
-                    <div style="font-size: 24px; font-weight: 900; color: var(--green-color);">
-                        £${assignedPrizes[i]}
+                    <div style="font-size: 24px; font-weight: 900; color: ${highlightColor};">
+                        ${prizeText}
                     </div>
                 </div>
             `;
