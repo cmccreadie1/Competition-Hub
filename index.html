@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Competition Hub - v2.4.0</title>
+    <title>Competition Hub - v7.4.0</title>
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -14,14 +14,14 @@
             --bg-base: #f8fafc; /* Draw Setup: Ghost White */
             --bg-score-d1: #334155; /* Day 1: Slate Blue */
             --bg-score-d2: #0f766e; /* Day 2: Forest Teal */
-            --card: #ffffff; 
             
+            --card: #ffffff; 
             --text-dark: #0f172a; 
             --text-light: #64748b; 
             
             --accent: #0ea5e9; 
             --accent-glow: rgba(14, 165, 233, 0.2);
-            --border: #cbd5e1; 
+            --border: #cbd5e1;
             
             /* High-Contrast Status Colors */
             --red-color: #ef4444;
@@ -34,7 +34,8 @@
             --green-soft: #ecfdf5;
             --blue-soft: #eff6ff;
             --pending: #f59e0b; 
-            --a-color: #ca8a04; 
+            --a-color: #ca8a04;
+            --warning: #ffab00;
         }
 
         html { scroll-behavior: smooth; scroll-padding-top: 100px; }
@@ -48,7 +49,7 @@
             line-height: 1.3; 
             overflow-x: clip; 
             padding-bottom: 120px;
-            font-variant-numeric: tabular-nums; 
+            font-variant-numeric: tabular-nums;
             transition: background-color 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
 
@@ -73,7 +74,8 @@
         }
 
         #matchTitle {
-            font-size: 18px; text-align: center; border: 2px dashed var(--border);
+            font-size: 18px; 
+            text-align: center; border: 2px dashed var(--border);
             background: #ffffff; padding: 16px; color: var(--text-dark); border-radius: 16px;
         }
 
@@ -81,9 +83,10 @@
         #matchTitle::placeholder { color: #94a3b8; font-weight: 600 !important; text-transform: none; font-style: italic; }
         .input-error { background: var(--red-soft) !important; border-color: var(--red-color) !important; color: var(--red-color) !important; }
 
-        /* Fixed Header & True Folder Tabs - Adjusted for less height and solid background to prevent bleed */
+        /* Fixed Header & True Folder Tabs */
         .fixed-header { 
-            position: fixed; top: 0; left: 0; right: 0; z-index: 5000; 
+            position: fixed; 
+            top: 0; left: 0; right: 0; z-index: 5000; 
             background: #ffffff; 
             border-bottom: 2px solid var(--border); 
             padding: 8px 20px 0px; 
@@ -101,12 +104,13 @@
 
         /* Slimmer Main Tabs */
         .tab-btn {
-            flex: 1; max-width: 400px; padding: 10px 20px;
+            flex: 1; 
+            max-width: 400px; padding: 10px 20px;
             background: #cbd5e1; border: 2px solid var(--border); border-bottom: none;
             border-radius: 16px 16px 0 0; font-weight: 900; font-size: 15px;
             color: #475569; cursor: pointer; transition: all 0.3s;
             box-shadow: inset 0 -4px 10px rgba(0,0,0,0.05);
-            position: relative;
+            position: relative; 
         }
 
         .tab-btn:hover { background: #e2e8f0; color: var(--text-dark); }
@@ -114,13 +118,12 @@
         .tab-btn.active {
             padding-bottom: 12px; margin-bottom: -2px; z-index: 10;
             box-shadow: 0 -4px 15px rgba(0,0,0,0.05);
-            border-color: var(--border);
+            border-color: var(--border); 
         }
 
-        #tabBtn-draw.active { background: var(--bg-base); color: var(--text-dark); }
+        #tabBtn-draw.active, #tabBtn-pairs.active { background: var(--bg-base); color: var(--text-dark); }
         #tabBtn-score.active { background: #1e293b; color: white; border-color: #1e293b; box-shadow: 0 -4px 15px rgba(0,0,0,0.2); }
 
-        /* Restored padding to ensure content clears the fixed header completely */
         .tab-content { padding: 130px 20px 40px; }
         #entrySection, #resultsSection, #dispatchSection, #rosterSection, #registrationPrintSection { max-width: 1400px; margin: 0 auto; }
         #registrationPrintSection, #dispatchSection, #rosterSection { display: none; }
@@ -151,8 +154,7 @@
 
         .draw-pill { 
             padding: 8px 10px; border-radius: 12px; font-size: 11px; font-weight: 900; text-align: center; 
-            border: 2px solid transparent; color: white; cursor: default; transition: all 0.2s;
-            display: flex; align-items: center; justify-content: center; gap: 4px;
+            border: 2px solid transparent; color: white; cursor: default; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 4px;
         }
 
         .draw-pill.swap-active { cursor: pointer; border: 2px dashed var(--text-dark); background: transparent !important; color: var(--text-dark); opacity: 0.7; }
@@ -183,51 +185,37 @@
 
         /* Search Wrapper & Clear Button */
         .search-wrapper { position: relative; width: 100%; max-width: 600px; margin: 0 auto; }
-
-        .clear-btn {
-            position: absolute; right: 25px; top: 16px;
-            background: transparent; border: none; cursor: pointer;
-            color: #64748b; font-weight: bold; font-size: 14px;
-            padding: 5px 10px; z-index: 10;
-        }
+        .clear-btn { position: absolute; right: 25px; top: 16px; background: transparent; border: none; cursor: pointer; color: #64748b; font-weight: bold; font-size: 14px; padding: 5px 10px; z-index: 10; }
         .clear-btn:hover { color: #000; }
         
         /* Maximize Real Estate: Smaller gaps between rows */
         .score-list-container { display: flex; flex-direction: column; gap: 4px; max-width: 1400px; margin: 0 auto; }
 
+        /* UPDATED: Added Witness Peg Column Width */
         .score-list-header, .score-row {
             display: grid;
-            grid-template-columns: minmax(180px, 2fr) minmax(140px, 1.5fr) 130px 90px 90px 90px 90px;
+            grid-template-columns: minmax(160px, 2fr) minmax(120px, 1.5fr) 100px 75px 75px 75px 75px 75px;
             gap: 8px; align-items: center;
         }
 
         .score-list-header { padding: 6px 15px 4px; font-weight: 900; font-size: 11px; color: var(--text-dark); border-bottom: none; }
         
-        /* Maximize Real Estate: Thinner padding on rows */
         .score-row {
             background: var(--card); border: 2px solid transparent;
             border-radius: 12px; padding: 4px 15px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1); transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
 
-        .score-row.focused-row {
-            border: 2px solid var(--accent); transform: scale(1.02);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4); z-index: 10; position: relative;
-        }
-        
-        /* Error checking class for incomplete inputs */
-        .score-row.incomplete-row {
-            border: 2px solid var(--red-color) !important;
-            background: var(--red-soft) !important;
-        }
+        .score-row.focused-row { border: 2px solid var(--accent); transform: scale(1.02); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4); z-index: 10; position: relative; }
+        .score-row.incomplete-row { border: 2px solid var(--red-color) !important; background: var(--red-soft) !important; }
 
-        /* Maximize Real Estate: Thinner padding inside inputs */
-        .score-row input { width: 100%; text-align: center; font-size: 15px; padding: 6px 4px; background: #f8fafc; border: 1px solid var(--border); }
+        .score-row input { width: 100%; text-align: center; font-size: 13px; padding: 6px 4px; background: #f8fafc; border: 1px solid var(--border); }
         .score-row.focused-row input:focus { background: #ffffff; border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-glow); }
         .score-row input::placeholder { font-size: 10px; color: #94a3b8; }
 
-        .s-name { font-size: 14px; font-weight: 900; color: var(--text-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .s-team { font-size: 12px; font-weight: 800; color: var(--text-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .s-name { font-size: 13px; font-weight: 900; color: var(--text-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .s-team { font-size: 11px; font-weight: 800; color: var(--text-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .s-peg { font-size: 13px; font-weight: 900; }
 
         .scorecard-scroll-wrapper { width: 100%; overflow-x: auto; padding-bottom: 20px; }
@@ -236,8 +224,7 @@
         .btn-action { 
             background: var(--accent); border: none; color: white; font-weight: 800; 
             padding: 16px 32px; border-radius: 50px; cursor: pointer; font-size: 14px; 
-            letter-spacing: 0.5px; transition: all 0.3s;
-            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+            letter-spacing: 0.5px; transition: all 0.3s; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
         }
         .btn-action:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(14, 165, 233, 0.4); }
         .btn-action:disabled { background: var(--border); box-shadow: none; color: white; cursor: not-allowed; }
@@ -245,7 +232,7 @@
         .btn-action-outline { 
             background: transparent; border: 2px solid var(--border); color: var(--text-dark); 
             font-weight: 800; padding: 16px 32px; border-radius: 50px; cursor: pointer; 
-            font-size: 14px; transition: all 0.3s;
+            font-size: 14px; transition: all 0.3s; 
         }
         .btn-action-outline:hover { border-color: var(--text-dark); color: white; background: var(--text-dark); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
         
@@ -283,6 +270,28 @@
         /* Modals */
         .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(8px); z-index: 9999; display: none; align-items: center; justify-content: center; }
         .modal-content { background: var(--card); border-radius: 24px; padding: 35px; width: 90%; max-width: 500px; text-align: left; box-shadow: 0 25px 50px rgba(0,0,0,0.3); color: var(--text-dark); border: 1px solid var(--border); }
+
+        /* Secret Pairs Sweepstake UI Overrides */
+        .switch { position: relative; display: inline-block; width: 44px; height: 22px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .4s; border-radius: 999px; }
+        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--green-color); }
+        input:checked + .slider:before { transform: translateX(22px); }
+
+        .finance-panel { background: #ffffff; border: 1px solid var(--border); border-radius: 20px; padding: 24px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .finance-stat { text-align: center; flex: 1; min-width: 120px; }
+        .finance-stat span { display: block; font-size: 24px; font-weight: 900; color: var(--text-dark); }
+        .finance-stat label { font-size: 11px; color: var(--text-light); font-weight: 900; letter-spacing: 0.5px; }
+
+        .target-banner { font-size: 28px; font-weight: 900; color: white; background: var(--red-color); padding: 16px 24px; border-radius: 16px; display: inline-block; margin-bottom: 24px; box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3); }
+
+        .podium-card { background: var(--card); border: 2px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .podium-card.first-place { background: var(--green-soft); border-color: var(--green-color); }
+        .podium-card.shared-tie { border-left: 6px solid var(--warning); }
+
+        .spinner { border: 4px solid rgba(0, 0, 0, 0.1); width: 36px; height: 36px; border-radius: 50%; border-left-color: var(--accent); animation: spin 1s linear infinite; margin: 0 auto 16px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         /* Print Overrides */
         .mobile-pdf-export .no-print { display: none !important; }
@@ -326,6 +335,7 @@
             .roster-page { page-break-after: always; padding: 20px; }
             .roster-header { border-bottom: 3px solid black; margin-bottom: 20px; padding-bottom: 12px; text-align: left; }
         }
+        
         /* Watermark & Background Stages */
         .day-watermark {
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -359,6 +369,7 @@
     <div class="tab-nav">
         <button id="tabBtn-draw" class="tab-btn active" onclick="switchTab('draw')">1. DRAW SETUP</button>
         <button id="tabBtn-score" class="tab-btn" onclick="switchTab('score')">2. SCORECARDS</button>
+        <button id="tabBtn-pairs" class="tab-btn" onclick="switchTab('pairs')">3. SECRET PAIRS</button>
     </div>
 </div>
 
@@ -635,6 +646,53 @@
     </div>
 </div>
 
+<div id="pairsTab" class="tab-content" style="display:none; max-width: 900px; margin: 0 auto;">
+    <h2 style="margin-top:0; text-align: center;">Secret Pairs Draw</h2>
+    
+    <div class="finance-panel">
+        <div style="display: flex; flex-direction: column; gap: 8px; margin:0;">
+            <label style="font-weight: 900; font-size: 11px; color: var(--text-light);">ENTRY FEE (£)</label>
+            <input type="number" id="entry-fee" value="5" min="1" style="width: 100px;" oninput="updatePrizeFund()">
+        </div>
+        <div class="finance-stat">
+            <label>Total Prize Fund</label>
+            <span>£<span id="prize-fund-display">0</span></span>
+        </div>
+        <div class="finance-stat">
+            <label>1st Place (50%)</label>
+            <span>£<span id="prize-1st">0</span></span>
+        </div>
+        <div class="finance-stat">
+            <label>2nd Place (30%)</label>
+            <span>£<span id="prize-2nd">0</span></span>
+        </div>
+        <div class="finance-stat">
+            <label>3rd Place (20%)</label>
+            <span>£<span id="prize-3rd">0</span></span>
+        </div>
+    </div>
+    
+    <div style="background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+        <div style="font-size: 14px; font-weight: 900; color: var(--text-dark); margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 12px;">ANGLER OPT-IN STATUS</div>
+        <div id="opt-in-list" style="max-height: 400px; overflow-y: auto;">
+            </div>
+    </div>
+
+    <div style="text-align: center;">
+        <button onclick="runSecretPairsSequence()" class="btn-action" style="padding: 20px 40px; font-size: 18px; width: 100%; max-width: 400px; box-shadow: 0 8px 25px rgba(14, 165, 233, 0.3);">GENERATE WINNERS</button>
+    </div>
+
+    <div id="reveal-area" style="display: none; text-align: center; margin-top: 40px; padding-top: 40px; border-top: 1px solid var(--border);">
+        <div id="target-score-banner" class="target-banner"></div>
+        <div id="loading-indicator" style="display: none;">
+            <div class="spinner"></div>
+            <div style="color: var(--text-muted); font-weight: 900; font-size: 14px;">Steward and Witness Verification Period...</div>
+        </div>
+        <div id="winners-podium" style="display: none;">
+            </div>
+    </div>
+</div>
+
 <div id="registrationPrintSection" class="no-print"></div>
 <div id="dispatchSection" class="no-print"></div>
 <div id="rosterSection" class="no-print"></div>
@@ -684,7 +742,7 @@
 </div>
 
 <script>
-    const APP_VERSION = "v2.4.0";
+    const APP_VERSION = "v7.4.0";
     document.getElementById('vTag').innerText = APP_VERSION;
 
     const zones = ['RED', 'YELLOW', 'GREEN', 'BLUE'];
@@ -707,6 +765,7 @@
     let accEnabled = false; 
     let trashCan = null;
     let currentScoreDay = 1;
+    let sweepstakeOptIns = {}; // Track secret pairs opt in logic
 
     const genId = () => {
         return 'id_' + Math.random().toString(36).substr(2, 9);
@@ -739,26 +798,25 @@
         let activeTabBtn = document.getElementById(`tabBtn-${tabId}`);
         activeTabBtn.classList.add('active');
         document.getElementById(`${tabId}Tab`).style.display = 'block';
-
+        
         if (tabId === 'draw') {
             document.body.className = 'stage-draw';
+        } else if (tabId === 'pairs') {
+            document.body.className = 'stage-draw'; // Reuse standard light bg
+            renderOptInList();
+            updatePrizeFund();
         } else {
             document.body.className = 'stage-score';
             document.getElementById('dayTabsContainer').style.display = matchDays === 2 ? 'flex' : 'none';
-            switchScoreDay(1); 
+            switchScoreDay(1);
         }
     }
 
    function switchScoreDay(day) {
         currentScoreDay = day;
-        
-        // This line tells the app which CSS background to use:
         document.body.className = day === 1 ? 'stage-score-d1' : 'stage-score-d2';
-        
-        // This line updates the floating watermark text:
         document.getElementById('dayWatermark').innerText = 'DAY ' + day;
-
-        // This keeps your tab-highlighting logic working:
+        
         document.querySelectorAll('.day-tab-btn').forEach(btn => btn.classList.remove('active'));
         let activeSubBtn = document.getElementById(`subBtn-${day}`);
         if(activeSubBtn) activeSubBtn.classList.add('active');
@@ -782,13 +840,11 @@
                     let key = `${e.id}_${aIdx}_${currentScoreDay}`;
                     let s = scoreState[key] || {};
                     let filled = (s.len ? 1 : 0) + (s.count ? 1 : 0) + (s.big ? 1 : 0) + (s.spec ? 1 : 0);
-                    if (filled === 4) {
-                        completelyFilled++;
-                    }
+                    if (filled === 4) { completelyFilled++; }
                 }
             });
         });
-
+        
         const progText = document.getElementById('scoreProgressText');
         const progContainer = document.getElementById('scoreBadgeContainer');
         const progBar = document.getElementById('scoreProgressBar');
@@ -797,20 +853,19 @@
             let remaining = totalExpected - completelyFilled;
             progText.innerText = `DAY ${currentScoreDay} SCORES: ${completelyFilled} ENTERED | ${remaining} REMAINING`;
             
-            // Calculate percentage for the visual bar
             let pct = totalExpected === 0 ? 0 : (completelyFilled / totalExpected) * 100;
             progBar.style.width = pct + '%';
-
-            // Glow green when 100% complete
+            
             if (completelyFilled === totalExpected && totalExpected > 0) {
                 progContainer.style.background = 'var(--green-color)';
-                progBar.style.display = 'none'; // hide the blue bar since the whole pill is green
+                progBar.style.display = 'none'; 
             } else {
-                progContainer.style.background = '#1e293b'; // slate dark
+                progContainer.style.background = '#1e293b';
                 progBar.style.display = 'block';
             }
         }
     }
+    
     // ====================================================
     // --- LIVE SEARCH FILTER LOGIC ---
     // ====================================================
@@ -823,7 +878,7 @@
             let team = row.querySelector('.s-team').innerText.toUpperCase();
             
             if (name.includes(filter) || team.includes(filter)) {
-                row.style.display = 'grid'; // Maintain grid layout
+                row.style.display = 'grid'; 
             } else {
                 row.style.display = 'none';
             }
@@ -858,6 +913,7 @@
             <div style="text-align:center;">FISH CT</div>
             <div style="text-align:center;">BIGGEST</div>
             <div style="text-align:center;">SPECIES</div>
+            <div style="text-align:center;">WIT. PEG</div>
         `;
         container.appendChild(headerRow);
 
@@ -873,14 +929,13 @@
 
                 let tName = (e.isTeam && e.tName && e.tName.trim() !== "") ? e.tName.trim() : "";
                 let key = `${e.id}_${aIdx}_${currentScoreDay}`;
-                let s = scoreState[key] || {len:'', count:'', big:'', spec:''};
+                let s = scoreState[key] || {len:'', count:'', big:'', spec:'', witPeg:''};
                 let zColor = zColors[targetZ] || 'gray';
 
                 const row = document.createElement('div');
                 row.className = 'score-row';
                 row.id = 'row_' + key;
                 
-                // Initialize incomplete class if partially filled
                 let filledCount = (s.len ? 1 : 0) + (s.count ? 1 : 0) + (s.big ? 1 : 0) + (s.spec ? 1 : 0);
                 if (filledCount > 0 && filledCount < 4) {
                     row.classList.add('incomplete-row');
@@ -905,9 +960,14 @@
                         onchange="saveScore('${key}', 'big', this.value)" 
                         onkeydown="handleScoreEnter(event)"
                         onfocus="highlightRow(this)" onblur="unhighlightRow(this)">
-                    <input type="number" placeholder="SPC" value="${s.spec}" 
-                        oninput="enforceLimits(this, 2)" 
+                    <input type="text" placeholder="SPC" value="${s.spec}" 
+                        oninput="enforceLimits(this, 20)" 
                         onchange="saveScore('${key}', 'spec', this.value)" 
+                        onkeydown="handleScoreEnter(event)"
+                        onfocus="highlightRow(this)" onblur="unhighlightRow(this)">
+                    <input type="text" placeholder="W.PEG" value="${s.witPeg || ''}" 
+                        oninput="enforceLimits(this, 5)" 
+                        onchange="saveScore('${key}', 'witPeg', this.value)" 
                         onkeydown="handleScoreEnter(event)"
                         onfocus="highlightRow(this)" onblur="unhighlightRow(this)">
                 `;
@@ -923,11 +983,10 @@
     }
 
     function saveScore(key, field, value) {
-        if (!scoreState[key]) scoreState[key] = { len:'', count:'', big:'', spec:'' };
+        if (!scoreState[key]) scoreState[key] = { len:'', count:'', big:'', spec:'', witPeg:'' };
         scoreState[key][field] = value;
         persistState();
         
-        // Live Error Checking for Incomplete Box
         let s = scoreState[key];
         let filledCount = (s.len ? 1 : 0) + (s.count ? 1 : 0) + (s.big ? 1 : 0) + (s.spec ? 1 : 0);
         let rowEl = document.getElementById('row_' + key);
@@ -942,29 +1001,28 @@
     }
 
    function exportMasterData() {
-        let tsv = "NAME\tTEAM\tDAY\tZONE\tPEG\tLENGTH\tFISH COUNT\tBIGGEST FISH\tSPECIES\n";
+        let tsv = "NAME\tTEAM\tDAY\tZONE\tPEG\tLENGTH\tFISH COUNT\tBIGGEST FISH\tSPECIES\tWITNESS PEG\n";
         let dataCount = 0;
 
         appState.forEach(e => {
             e.anglers.forEach((a, i) => {
                 if (!a.name || !a.z1) return;
                 
-                // NEW LOGIC: Only show team name if it exists and isn't 'SOLO'
                 let tName = (e.isTeam && e.tName && e.tName.trim().toUpperCase() !== "SOLO" && e.tName.trim() !== "") ? e.tName.trim() : "";
                 
                 let k1 = `${e.id}_${i}_1`;
-                let s1 = scoreState[k1] || {len:'', count:'', big:'', spec:''};
-                tsv += `${a.name}\t${tName}\t1\t${a.z1}\t${a.p1}\t${s1.len}\t${s1.count}\t${s1.big}\t${s1.spec}\n`;
+                let s1 = scoreState[k1] || {len:'', count:'', big:'', spec:'', witPeg:''};
+                tsv += `${a.name}\t${tName}\t1\t${a.z1}\t${a.p1}\t${s1.len}\t${s1.count}\t${s1.big}\t${s1.spec}\t${s1.witPeg}\n`;
                 dataCount++;
 
                 if (matchDays === 2 && a.z2) {
                     let k2 = `${e.id}_${i}_2`;
-                    let s2 = scoreState[k2] || {len:'', count:'', big:'', spec:''};
-                    tsv += `${a.name}\t${tName}\t2\t${a.z2}\t${a.p2}\t${s2.len}\t${s2.count}\t${s2.big}\t${s2.spec}\n`;
+                    let s2 = scoreState[k2] || {len:'', count:'', big:'', spec:'', witPeg:''};
+                    tsv += `${a.name}\t${tName}\t2\t${a.z2}\t${a.p2}\t${s2.len}\t${s2.count}\t${s2.big}\t${s2.spec}\t${s2.witPeg}\n`;
                 }
             });
         });
-
+        
         if (dataCount === 0) {
             alert("No draw data exists to export.");
             return;
@@ -976,12 +1034,249 @@
     }
 
     // ====================================================
+    // --- V7.4.0 SECRET PAIRS ENGINE LOGIC ---
+    // ====================================================
+    function renderOptInList() {
+        const tbody = document.getElementById('opt-in-list');
+        tbody.innerHTML = '';
+        
+        let pool = [];
+        appState.forEach(e => {
+            e.anglers.forEach((a, aIdx) => {
+                if (a.name && a.name.trim() !== '') {
+                    let key = `${e.id}_${aIdx}`;
+                    pool.push({ name: a.name, key: key });
+                }
+            });
+        });
+        
+        if (pool.length === 0) {
+            tbody.innerHTML = `<div style="padding: 20px; text-align: center; color: var(--text-light); font-weight: 800;">Register Anglers in the Draw Setup first.</div>`;
+            return;
+        }
+
+        pool.sort((a,b) => a.name.localeCompare(b.name));
+        
+        pool.forEach(angler => {
+            let isOptedIn = sweepstakeOptIns[angler.key] !== false; // true by default
+            tbody.innerHTML += `
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--border);">
+                    <strong style="font-size: 14px; color: var(--text-dark);">${angler.name}</strong>
+                    <label class="switch">
+                        <input type="checkbox" ${isOptedIn ? 'checked' : ''} onchange="toggleOptIn('${angler.key}', this.checked)">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            `;
+        });
+    }
+
+    function toggleOptIn(key, status) {
+        sweepstakeOptIns[key] = status;
+        updatePrizeFund();
+    }
+
+    function updatePrizeFund() {
+        const fee = parseInt(document.getElementById('entry-fee').value) || 0;
+        
+        let optedInCount = 0;
+        appState.forEach(e => {
+            e.anglers.forEach((a, aIdx) => {
+                if (a.name && a.name.trim() !== '') {
+                    let key = `${e.id}_${aIdx}`;
+                    if (sweepstakeOptIns[key] !== false) optedInCount++;
+                }
+            });
+        });
+
+        const totalFund = fee * optedInCount;
+        const first = Math.round(totalFund * 0.50);
+        const second = Math.round(totalFund * 0.30);
+        const third = Math.round(totalFund * 0.20);
+        
+        document.getElementById('prize-fund-display').innerText = totalFund;
+        document.getElementById('prize-1st').innerText = first;
+        document.getElementById('prize-2nd').innerText = second;
+        document.getElementById('prize-3rd').innerText = third;
+
+        return { first, second, third, totalFund };
+    }
+
+    function getAnglerTotals(eId, aI) {
+        let len = 0, count = 0;
+        let s1 = scoreState[`${eId}_${aI}_1`];
+        let s2 = scoreState[`${eId}_${aI}_2`];
+        if (s1) { len += (parseInt(s1.len) || 0); count += (parseInt(s1.count) || 0); }
+        if (s2 && matchDays === 2) { len += (parseInt(s2.len) || 0); count += (parseInt(s2.count) || 0); }
+        return { len, count };
+    }
+
+    function runSecretPairsSequence() {
+        let activePairsPool = [];
+        appState.forEach(e => {
+            e.anglers.forEach((a, aI) => {
+                if (a.name && a.name.trim() !== '') {
+                    let key = `${e.id}_${aI}`;
+                    if (sweepstakeOptIns[key] !== false) {
+                        let totals = getAnglerTotals(e.id, aI);
+                        activePairsPool.push({
+                            name: a.name,
+                            totalLength: totals.len,
+                            fishCount: totals.count
+                        });
+                    }
+                }
+            });
+        });
+        
+        if (activePairsPool.length < 2) {
+            alert("Minimum of 2 paid anglers required to initialize draw metrics.");
+            return;
+        }
+
+        // Ghost Angler Calculations
+        if (activePairsPool.length % 2 !== 0) {
+            const sortedLengths = activePairsPool.map(a => a.totalLength).sort((a,b) => a-b);
+            const sortedCounts = activePairsPool.map(a => a.fishCount).sort((a,b) => a-b);
+            
+            const midL = sortedLengths.length;
+            const medianLength = midL % 2 !== 0 ? sortedLengths[Math.floor(midL / 2)] : (sortedLengths[Math.floor((midL - 1) / 2)] + sortedLengths[Math.floor(midL / 2)]) / 2;
+            
+            const midC = sortedCounts.length;
+            const medianCount = midC % 2 !== 0 ? sortedCounts[Math.floor(midC / 2)] : (sortedCounts[Math.floor((midC - 1) / 2)] + sortedCounts[Math.floor(midC / 2)]) / 2;
+            
+            activePairsPool.push({
+                name: "JOE AVERAGE (GHOST)",
+                totalLength: Math.round(medianLength),
+                fishCount: Math.round(medianCount)
+            });
+        }
+
+        // Shuffle and Build Random Pairs
+        activePairsPool.sort(() => Math.random() - 0.5);
+        let secretPairs = [];
+        for (let i = 0; i < activePairsPool.length; i += 2) {
+            secretPairs.push({
+                p1: activePairsPool[i],
+                p2: activePairsPool[i+1],
+                combinedLength: activePairsPool[i].totalLength + activePairsPool[i+1].totalLength,
+                combinedCount: activePairsPool[i].fishCount + activePairsPool[i+1].fishCount
+            });
+        }
+
+        // Generate Random Target between actual range extremes
+        let lengthsArray = secretPairs.map(p => p.combinedLength);
+        let minLength = Math.min(...lengthsArray);
+        let maxLength = Math.max(...lengthsArray);
+        const targetScore = Math.floor(Math.random() * (maxLength - minLength + 1)) + minLength;
+
+        // UI Progression
+        document.getElementById('reveal-area').style.display = 'block';
+        document.getElementById('winners-podium').style.display = 'none';
+        document.getElementById('target-score-banner').innerText = `TARGET COMBINED LENGTH: ${targetScore}cm`;
+        document.getElementById('loading-indicator').style.display = 'block';
+
+        // Process Rankings with Tie-Breaker Priority (Closest Proximity -> Total Fish Count)
+        let rankedPairs = secretPairs.map(pair => {
+            pair.diff = Math.abs(pair.combinedLength - targetScore);
+            return pair;
+        }).sort((a, b) => {
+            if (a.diff !== b.diff) return a.diff - b.diff;
+            return b.combinedCount - a.combinedCount;
+        });
+
+        // Process Absolute Ties (Split the Pot Logic)
+        let finalStandings = [];
+        let i = 0;
+        while (i < rankedPairs.length) {
+            let tieGroup = [rankedPairs[i]];
+            let j = i + 1;
+            while (j < rankedPairs.length && rankedPairs[j].diff === rankedPairs[i].diff && rankedPairs[j].combinedCount === rankedPairs[i].combinedCount) {
+                tieGroup.push(rankedPairs[j]);
+                j++;
+            }
+            
+            tieGroup.forEach(p => {
+                p.isTie = tieGroup.length > 1;
+                p.tieSize = tieGroup.length;
+                p.startIndex = i;
+            });
+            
+            finalStandings = finalStandings.concat(tieGroup);
+            i = j;
+        }
+
+        // Timed Release for Independent Verification (3.5 Seconds)
+        setTimeout(() => {
+            document.getElementById('loading-indicator').style.display = 'none';
+            renderPodiumLayout(finalStandings, targetScore);
+        }, 3500);
+    }
+
+    function renderPodiumLayout(standings, target) {
+        const podium = document.getElementById('winners-podium');
+        const funds = updatePrizeFund();
+        podium.innerHTML = '';
+        
+        const basePrizes = [funds.first, funds.second, funds.third];
+        let assignedPrizes = [0, 0, 0];
+
+        // Calculate Prize Multipliers for Ties
+        let idx = 0;
+        while (idx < Math.min(3, standings.length)) {
+            let item = standings[idx];
+            if (!item.isTie) {
+                assignedPrizes[idx] = basePrizes[idx];
+                idx++;
+            } else {
+                let size = item.tieSize;
+                let startIndex = item.startIndex;
+                let combinedPool = 0;
+                
+                for (let k = startIndex; k < startIndex + size; k++) {
+                    if (k < 3) combinedPool += basePrizes[k];
+                }
+                
+                let splitAward = Math.round(combinedPool / size);
+                for (let k = startIndex; k < startIndex + size; k++) {
+                    if (k < 3) assignedPrizes[k] = splitAward;
+                }
+                idx += size;
+            }
+        }
+
+        const tierLabels = ["1st Place", "2nd Place", "3rd Place"];
+        const styles = ["first-place", "", ""];
+
+        for (let i = 0; i < Math.min(3, standings.length); i++) {
+            const pair = standings[i];
+            const tieClass = pair.isTie ? "shared-tie" : "";
+            const noteText = pair.isTie ? ` (Split Pot Tie)` : "";
+            
+            podium.innerHTML += `
+                <div class="podium-card ${styles[i]} ${tieClass}">
+                    <div style="text-align: left;">
+                        <h4 style="margin: 0 0 4px 0; color: var(--text-dark);">${tierLabels[i]}${noteText}</h4>
+                        <div style="font-weight: 900; font-size: 18px; color: var(--text-dark);">${pair.p1.name} & ${pair.p2.name}</div>
+                        <div style="font-size: 14px; font-weight: 600; color: var(--text-light); margin-top: 4px;">
+                            Combined Length: ${pair.combinedLength}cm (Off by ${pair.diff}cm) | Volume: ${pair.combinedCount} Fish
+                        </div>
+                    </div>
+                    <div style="font-size: 24px; font-weight: 900; color: var(--green-color);">
+                        £${assignedPrizes[i]}
+                    </div>
+                </div>
+            `;
+        }
+        podium.style.display = 'block';
+    }
+
+    // ====================================================
     // --- ORIGINAL ZONEDRAW APP ENGINE (UNEDITED) ---
     // ====================================================
 
     function persistState() {
-        if (!isAppReady) return; 
-
+        if (!isAppReady) return;
         const stateObj = { 
             title: document.getElementById('matchTitle').value || '',
             data: appState, 
@@ -993,9 +1288,9 @@
             safePegs1_a: document.getElementById('accPegs1_a').value,
             safePegs2_a: document.getElementById('accPegs2_a').value,
             anchorZone: document.getElementById('anchorZoneSelect').value,
-            anchorZone2: document.getElementById('anchorZoneSelect2').value
+            anchorZone2: document.getElementById('anchorZoneSelect2').value,
+            sweepstakeOptIns: sweepstakeOptIns // Included new Secret Pairs memory
         };
-        
         localStorage.setItem('zonedraw_current_state_v1', JSON.stringify(stateObj));
     }
 
@@ -1016,7 +1311,6 @@
         const btn = document.getElementById('accToggleBtn');
         const title = document.getElementById('accToggleTitle');
         const sub = document.getElementById('accToggleSub');
-        
         if (accEnabled) {
             panel.style.display = 'flex';
             title.innerText = 'ACCESSIBLE PEGS: ON';
@@ -1068,7 +1362,6 @@
         let rows = rawData.split('\n');
         let tempTeams = {};
         let tempSolos = [];
-
         rows.forEach(row => {
             if (!row.trim()) return;
             let cols = row.split('\t'); 
@@ -1093,12 +1386,10 @@
                 tempSolos.push(anglerObj);
             }
         });
-
         appState = [];
         scoreState = {}; 
         trashCan = null;
         document.getElementById('undoBtn').style.display = 'none';
-
         Object.keys(tempTeams).forEach(tName => {
             let members = tempTeams[tName];
             for (let i = 0; i < members.length; i += 4) {
@@ -1107,11 +1398,9 @@
                 appState.push({ id: genId(), isTeam: true, tName: tName, anglers: chunk });
             }
         });
-
         tempSolos.forEach(solo => {
             appState.push({ id: genId(), isTeam: false, tName: '', anglers: [solo] });
         });
-
         closeImportModal();
         
         document.getElementById('rosterEntryZone').style.display = 'none';
@@ -1129,15 +1418,13 @@
     function showWipeModal() { document.getElementById('wipeModal').style.display = 'flex'; }
     function closeWipeModal() { document.getElementById('wipeModal').style.display = 'none'; }
 
-    // FIXED: Now accurately routes to Setup Edit screen and switches tab automatically.
     function handleSafeEdit() {
         switchTab('draw'); 
-        handleAmend(true); 
+        handleAmend(true);
     }
 
     function executePegWipe() {
         closeRedrawModal();
-        
         appState.forEach(e => {
             e.anglers.forEach(a => {
                 a.z1 = undefined; a.p1 = undefined;
@@ -1173,13 +1460,11 @@
             });
             txt += "\n";
         });
-
         const blob = new Blob([txt], {type: 'text/plain'});
         const lnk = document.createElement('a'); 
         lnk.href = URL.createObjectURL(blob); 
         lnk.download = `${title.replace(/\s+/g, '_')}_FINAL_REPORT.txt`; 
         lnk.click();
-        
         isAppReady = false; 
         localStorage.removeItem('zonedraw_current_state_v1');
         closeWipeModal();
@@ -1209,7 +1494,8 @@
         document.getElementById('accPegs2_a').value = '';
         
         appState = []; 
-        scoreState = {}; 
+        scoreState = {};
+        sweepstakeOptIns = {};
         currentZoneSize = 0;
         setMobilityMode('A'); 
         setDays(2);
@@ -1234,22 +1520,23 @@
         document.getElementById('accToggleBtn').style.display = 'flex';
         
         updateTicker();
-        renderStateToScreen(); 
+        renderStateToScreen();
     }
 
     function bulkInit() {
         appState = [];
-        scoreState = {}; 
+        scoreState = {};
+        sweepstakeOptIns = {};
         trashCan = null;
         document.getElementById('undoBtn').style.display = 'none';
         
         let tVal = document.getElementById('initTeams').value;
         let iVal = document.getElementById('initIndivs').value;
-        const t = parseInt(tVal) || 0; const i = parseInt(iVal) || 0;
+        const t = parseInt(tVal) || 0;
+        const i = parseInt(iVal) || 0;
         
         for(let x = 0; x < t; x++) appState.push({ id: genId(), isTeam: true, tName: '', anglers: [{},{},{},{}] });
         for(let y = 0; y < i; y++) appState.push({ id: genId(), isTeam: false, tName: '', anglers: [{}] });
-        
         document.getElementById('rosterEntryZone').style.display = 'none';
         document.getElementById('commandBar').style.display = 'flex';
         document.getElementById('masterActionBar').style.display = 'none';
@@ -1306,14 +1593,12 @@
 
     function runEntryValidation() {
         if (document.getElementById('entrySection').style.display !== 'block') return;
-
         let errors = [];
         let severeErrors = false;
         let anglerNames = {};
         let teamNames = {};
 
         document.querySelectorAll('.a-name-input, .t-name').forEach(el => el.classList.remove('input-error'));
-
         appState.forEach((entry) => {
             if (entry.isTeam) {
                 let tName = (entry.tName || '').trim();
@@ -1373,13 +1658,13 @@
         }
 
         window.currentSevereErrors = severeErrors;
-        checkTeamClash(); 
+        checkTeamClash();
     }
 
     function renderStateToScreen() {
-        const tb = document.getElementById('entryTeamsBucket'); tb.innerHTML = '';
+        const tb = document.getElementById('entryTeamsBucket');
+        tb.innerHTML = '';
         const sb = document.getElementById('entrySolosBucket'); sb.innerHTML = '';
-        
         appState.forEach(entry => {
             const div = document.createElement('div');
             div.className = !entry.isTeam ? 'zone-card solo-card' : 'zone-card';
@@ -1393,16 +1678,13 @@
             else h += `<button onclick="deleteStateEntry('${entry.id}')" tabindex="-1" style="background:none; border:none; color:var(--red-color); font-weight:900; font-size:22px; cursor:pointer; margin-left:12px; transition: 0.2s;">×</button>`; 
             
             h += `</div></div>`;
-            
             if (entry.isTeam) {
                 h += `<div style="padding: 0 16px;"><label style="font-size:10px; font-weight:800; color:var(--text-light); letter-spacing:0.5px;">TEAM NAME</label>
                       <input type="text" class="t-name" value="${entry.tName}" oninput="updateTeamName('${entry.id}', this.value)" style="margin-bottom:12px; margin-top:4px;">`;
-                      
                 for (let i = 0; i < 4; i++) {
                     let mBg = entry.anglers[i].mobility ? 'var(--text-dark)' : '#f1f5f9';
                     let mColor = entry.anglers[i].mobility ? 'white' : 'var(--text-dark)';
                     let aName = entry.anglers[i].name || '';
-                    
                     h += `<div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
                             <input type="text" class="a-name-input" value="${aName}" placeholder="ANGLER ${i+1}" oninput="updateAnglerName('${entry.id}', ${i}, this.value)">
                             <button class="btn-tool" onclick="toggleMobility('${entry.id}', ${i})" tabindex="-1" style="padding:10px 14px; background:${mBg}; color:${mColor};">[A]</button>
@@ -1421,7 +1703,7 @@
                       </div></div>`;
             }
             
-            div.innerHTML = h; 
+            div.innerHTML = h;
             if (entry.isTeam) tb.appendChild(div); else sb.appendChild(div);
         });
         
@@ -1432,7 +1714,7 @@
     }
 
     function deleteStateEntry(id) { 
-        const idx = appState.findIndex(e => e.id === id); 
+        const idx = appState.findIndex(e => e.id === id);
         if (idx > -1) { 
             trashCan = { action: 'delete', data: appState[idx], index: idx };
             document.getElementById('undoBtn').style.display = 'inline-block';
@@ -1442,17 +1724,17 @@
     }
     
     function breakStateTeam(id) { 
-        const idx = appState.findIndex(e => e.id === id); 
+        const idx = appState.findIndex(e => e.id === id);
         if (idx > -1) { 
-            const t = appState.splice(idx, 1)[0]; 
+            const t = appState.splice(idx, 1)[0];
             let nIds = [];
             t.anglers.forEach(a => { 
                 let nId = genId(); nIds.push(nId);
                 appState.push({ id: nId, isTeam: false, tName: '', anglers: [{...a}] }); 
-            }); 
+            });
             trashCan = { action: 'break', originalTeam: t, index: idx, newIds: nIds };
             document.getElementById('undoBtn').style.display = 'inline-block';
-            renderStateToScreen(); 
+            renderStateToScreen();
         } 
     }
 
@@ -1470,19 +1752,19 @@
     }
     
     function mergeSelected() { 
-        const sel = document.querySelectorAll('.merge-cb:checked'); 
+        const sel = document.querySelectorAll('.merge-cb:checked');
         if (sel.length !== 4) return; 
         const ids = Array.from(sel).map(cb => cb.closest('.zone-card').dataset.id); 
-        const angs = []; 
+        const angs = [];
         ids.forEach(id => { 
             const idx = appState.findIndex(e => e.id === id); 
             if (idx > -1) {
                 let removed = appState.splice(idx, 1)[0];
                 angs.push(removed.anglers[0]); 
             }
-        }); 
+        });
         appState.push({ id: genId(), isTeam: true, tName: '', anglers: angs }); 
-        renderStateToScreen(); 
+        renderStateToScreen();
     }
     
     function checkMerge() { 
@@ -1491,14 +1773,14 @@
     }
     
     function checkTeamClash() {
-        let clash = false; 
+        let clash = false;
         if (mobilityMode === 'B') {
             appState.forEach(e => { 
                 if (e.isTeam) {
                     let mobCount = e.anglers.filter(a => a.mobility).length;
                     if (mobCount > 1) clash = true;
                 } 
-            }); 
+            });
         }
         document.getElementById('teamClashWarning').style.display = clash ? 'block' : 'none';
         
@@ -1517,9 +1799,9 @@
     }
     
     function updateTicker() { 
-        let ent = 0; 
+        let ent = 0;
         appState.forEach(e => { e.anglers.forEach(a => { if (a.name && a.name.trim() !== '') ent++; }); });
-        document.getElementById('tkAnglers').innerText = ent; 
+        document.getElementById('tkAnglers').innerText = ent;
     }
 
     function initiateShuffle() {
@@ -1533,17 +1815,14 @@
                 if ((e.anglers[0].name || '').trim() !== '') filteredState.push(e);
             }
         });
-        
         appState = filteredState;
         appState.forEach(e => { e.anglers.forEach(a => { a.z1 = undefined; a.p1 = undefined; a.z2 = undefined; a.p2 = undefined; }); });
-        
         renderStateToScreen();
         
         const over = document.getElementById('shuffleOverlay'); 
         const pBar = document.getElementById('pBar');
         over.style.display = 'flex'; 
         let p = 0;
-        
         const inv = setInterval(() => { 
             p += 5; pBar.style.width = p + '%'; 
             if (p >= 100) { clearInterval(inv); over.style.display = 'none'; runDraw(); } 
@@ -1561,7 +1840,7 @@
                 return testPeg;
             }
         }
-        return maxBase + 'Z'; 
+        return maxBase + 'Z';
     }
 
     function runDraw() {
@@ -1575,21 +1854,18 @@
             };
             return getPriority(b) - getPriority(a);
         });
-
         let s1A_str = document.getElementById('accPegs1_a').value || '';
         let s2A_str = document.getElementById('accPegs2_a').value || '';
         let s1A = s1A_str.match(/\d+/g) ? s1A_str.match(/\d+/g).map(Number) : [];
         let s2A = s2A_str.match(/\d+/g) ? s2A_str.match(/\d+/g).map(Number) : [];
         const ancZ1 = document.getElementById('anchorZoneSelect').value;
         const ancZ2 = document.getElementById('anchorZoneSelect2').value;
-        
         if (currentZoneSize === 0) {
-            let tot = 0; 
+            let tot = 0;
             appState.forEach(e => { if (e.isTeam) tot += 4; else tot += 1; });
-            currentZoneSize = Math.max(Math.ceil(tot / 4), 1); 
+            currentZoneSize = Math.max(Math.ceil(tot / 4), 1);
         }
         let zSize = currentZoneSize;
-        
         let p1 = zones.map((z, idx) => { 
             let p = []; for (let i = 1; i <= zSize; i++) p.push((idx * zSize) + i);
             p.sort(() => Math.random() - 0.5); return {z, p}; 
@@ -1598,14 +1874,14 @@
             let p = []; for (let i = 1; i <= zSize; i++) p.push((idx * zSize) + i);
             p.sort(() => Math.random() - 0.5); return {z, p}; 
         });
-
         let aEntries = [];
         if (accEnabled) {
             appState.forEach(e => { if (e.anglers.some(a => a.mobility)) aEntries.push(e); });
         }
 
         if (accEnabled && mobilityMode === 'A' && aEntries.length > 0) {
-            let availableD1Safe = []; let availableD2Safe = [];
+            let availableD1Safe = [];
+            let availableD2Safe = [];
             zones.forEach(z => {
                 let zI = zones.indexOf(z); let safeCount = 0;
                 p1[zI].p.forEach(pegNum => { if (s1A.includes(pegNum)) safeCount++; });
@@ -1616,7 +1892,6 @@
                 p2[zI].p.forEach(pegNum => { if (s2A.includes(pegNum)) safeCount++; });
                 for (let i = 0; i < safeCount; i++) availableD2Safe.push(z);
             });
-
             let bestPairing = []; let leastClashes = 999;
             for (let attempt = 0; attempt < 100; attempt++) {
                 let tempD1 = [...availableD1Safe].sort(() => Math.random() - 0.5);
@@ -1630,7 +1905,8 @@
                     currentPairs.push({z1: z1, z2: z2});
                 }
                 if (clashes < leastClashes) {
-                    leastClashes = clashes; bestPairing = currentPairs;
+                    leastClashes = clashes;
+                    bestPairing = currentPairs;
                     if (leastClashes === 0) break; 
                 }
             }
@@ -1645,10 +1921,10 @@
             if (accEnabled && mobilityMode === 'A') {
                 const sL = d2 ? s2A : s1A;
                 if (mob) { 
-                    let sI = pools[zI].p.findIndex(p => sL.includes(p)); 
+                    let sI = pools[zI].p.findIndex(p => sL.includes(p));
                     if (sI > -1) return pools[zI].p.splice(sI, 1)[0]; 
                 } else if (sL.length > 0) { 
-                    let nI = pools[zI].p.findIndex(p => !sL.includes(p)); 
+                    let nI = pools[zI].p.findIndex(p => !sL.includes(p));
                     if (nI > -1) return pools[zI].p.splice(nI, 1)[0]; 
                 }
             }
@@ -1685,19 +1961,23 @@
                         a.z2 = d2Z[i]; a.p2 = pull(a.z2, 1, a.mobility); 
                     });
                 } else if (accEnabled && mobilityMode === 'A' && hasA) {
-                    let mI = e.anglers.findIndex(a => a.mobility); let a = e.anglers[mI];
+                    let mI = e.anglers.findIndex(a => a.mobility);
+                    let a = e.anglers[mI];
                     let targetZ1 = a.preZ1; let targetZ2 = a.preZ2;
                     if (!targetZ1) targetZ1 = [...zones].sort(() => Math.random() - 0.5)[0];
                     if (!targetZ2) {
-                        let randZones = []; zones.forEach(z => { if (z !== targetZ1) randZones.push(z); });
+                        let randZones = [];
+                        zones.forEach(z => { if (z !== targetZ1) randZones.push(z); });
                         randZones.sort(() => Math.random() - 0.5);
                         targetZ2 = randZones.length > 0 ? randZones[0] : targetZ1;
                     }
                     let d1Z = [null, null, null, null]; let d2Z = [null, null, null, null];
                     d1Z[mI] = targetZ1; d2Z[mI] = targetZ2;
                     
-                    let remainingD1 = []; zones.forEach(z => { if (z !== targetZ1) remainingD1.push(z); });
-                    let remainingD2 = []; zones.forEach(z => { if (z !== targetZ2) remainingD2.push(z); });
+                    let remainingD1 = [];
+                    zones.forEach(z => { if (z !== targetZ1) remainingD1.push(z); });
+                    let remainingD2 = [];
+                    zones.forEach(z => { if (z !== targetZ2) remainingD2.push(z); });
                     remainingD1.sort(() => Math.random() - 0.5);
                     
                     let bestD2Perm = [...remainingD2];
@@ -1708,7 +1988,6 @@
                         if (isValid) { bestD2Perm = [...remainingD2]; break; }
                     }
                     remainingD2 = bestD2Perm;
-                    
                     let rIdx = 0;
                     for (let i = 0; i < 4; i++) {
                         if (i !== mI) { d1Z[i] = remainingD1[rIdx]; d2Z[i] = remainingD2[rIdx]; rIdx++; }
@@ -1718,7 +1997,7 @@
                         ang.z2 = d2Z[i]; ang.p2 = pull(ang.z2, 1, ang.mobility); 
                     });
                 } else {
-                    let d1Z = [...zones].sort(() => Math.random() - 0.5); 
+                    let d1Z = [...zones].sort(() => Math.random() - 0.5);
                     let d2Z = [d1Z[1], d1Z[2], d1Z[3], d1Z[0]];
                     e.anglers.forEach((a, i) => { 
                         a.z1 = d1Z[i]; a.p1 = pull(a.z1, 0, 0); 
@@ -1726,18 +2005,21 @@
                     });
                 }
             } else {
-                let a = e.anglers[0]; let hasMobility = accEnabled && a.mobility;
+                let a = e.anglers[0];
+                let hasMobility = accEnabled && a.mobility;
                 if (accEnabled && mobilityMode === 'B' && hasMobility) { 
                     a.z1 = ancZ1; a.z2 = ancZ2; 
                 } else if (accEnabled && mobilityMode === 'A' && hasMobility) {
-                    if (a.preZ1) a.z1 = a.preZ1; else a.z1 = zones[Math.floor(Math.random() * zones.length)];
+                    if (a.preZ1) a.z1 = a.preZ1;
+                    else a.z1 = zones[Math.floor(Math.random() * zones.length)];
                     if (a.preZ2) a.z2 = a.preZ2;
                     else {
-                        let av2 = []; zones.forEach(z => { if (z !== a.z1) av2.push(z); });
+                        let av2 = [];
+                        zones.forEach(z => { if (z !== a.z1) av2.push(z); });
                         a.z2 = av2.length > 0 ? av2[0] : a.z1;
                     }
                 } else { 
-                    let av = []; 
+                    let av = [];
                     zones.forEach(z => { 
                         if (p1[zones.indexOf(z)].p.length > 0) av.push({z: z, left: p1[zones.indexOf(z)].p.length}); 
                     });
@@ -1748,7 +2030,7 @@
                         a.z1 = candidates[Math.floor(Math.random() * candidates.length)];
                     } 
                     
-                    let av2 = []; 
+                    let av2 = [];
                     zones.forEach(z => { 
                         if (z !== a.z1 && p2[zones.indexOf(z)].p.length > 0) av2.push({z: z, left: p2[zones.indexOf(z)].p.length}); 
                     });
@@ -1762,7 +2044,8 @@
                         a.z2 = candidates2[Math.floor(Math.random() * candidates2.length)];
                     }
                 }
-                a.p1 = pull(a.z1, 0, hasMobility); a.p2 = pull(a.z2, 1, hasMobility);
+                a.p1 = pull(a.z1, 0, hasMobility);
+                a.p2 = pull(a.z2, 1, hasMobility);
             }
         });
         displayDraw();
@@ -1772,17 +2055,17 @@
         isSwapMode = !isSwapMode;
         swapObj1 = null; 
         document.getElementById('swapPrompt').style.display = isSwapMode ? 'block' : 'none';
-        displayDraw(); 
+        displayDraw();
     }
 
     function handleSwapClick(eId, aI, day) { 
-        if (!isSwapMode) return; 
+        if (!isSwapMode) return;
         if (!swapObj1) { 
-            swapObj1 = { eId: eId, aI: aI, day: day }; 
+            swapObj1 = { eId: eId, aI: aI, day: day };
             displayDraw(); 
         } else { 
             if (swapObj1.day !== day) { 
-                alert("Please select another Day " + swapObj1.day + " peg to complete the swap."); 
+                alert("Please select another Day " + swapObj1.day + " peg to complete the swap.");
                 return; 
             }
             let e1 = null, e2 = null;
@@ -1798,13 +2081,15 @@
                 let tempZ = a1.z2; a1.z2 = a2.z2; a2.z2 = tempZ;
                 let tempP = a1.p2; a1.p2 = a2.p2; a2.p2 = tempP;
             }
-            toggleSwapMode(); 
+            toggleSwapMode();
         } 
     }
 
     function runValidator() {
-        let errors = []; let clashMap = [];
-        let pM1 = { RED:[], YELLOW:[], GREEN:[], BLUE:[] }; let pM2 = { RED:[], YELLOW:[], GREEN:[], BLUE:[] };
+        let errors = [];
+        let clashMap = [];
+        let pM1 = { RED:[], YELLOW:[], GREEN:[], BLUE:[] };
+        let pM2 = { RED:[], YELLOW:[], GREEN:[], BLUE:[] };
 
         appState.forEach(team => {
             let tN = team.tName || 'SOLO';
@@ -1880,10 +2165,8 @@
                 if(matchDays === 2 && a.z2 && a.p2 !== undefined && a.p2 !== 9999) used2[a.z2].push(String(a.p2));
             });
         });
-
         let avail1 = { 'RED':[], 'YELLOW':[], 'GREEN':[], 'BLUE':[] };
         let avail2 = { 'RED':[], 'YELLOW':[], 'GREEN':[], 'BLUE':[] };
-        
         zones.forEach((z, idx) => {
             for(let i=1; i<=currentZoneSize; i++) {
                 let pN = String((idx * currentZoneSize) + i);
@@ -1893,9 +2176,8 @@
         });
 
         let newEntry = { id: genId(), isTeam: isTeam, tName: '', anglers: [] };
-
         if(isTeam) {
-            let d1Z = [...zones].sort(() => Math.random() - 0.5); 
+            let d1Z = [...zones].sort(() => Math.random() - 0.5);
             let d2Z = [d1Z[1], d1Z[2], d1Z[3], d1Z[0]];
             
             for(let i=0; i<4; i++) {
@@ -1911,7 +2193,8 @@
                 newEntry.anglers.push({ name: '', z1: d1Z[i], p1: p1_val, z2: matchDays === 2 ? d2Z[i] : undefined, p2: p2_val });
             }
         } else {
-            let flat1 = []; zones.forEach(z => { if(avail1[z].length > 0) flat1.push(z); });
+            let flat1 = [];
+            zones.forEach(z => { if(avail1[z].length > 0) flat1.push(z); });
             let picked1Z = flat1.length > 0 ? flat1[Math.floor(Math.random() * flat1.length)] : zones[Math.floor(Math.random() * zones.length)];
             
             let p1_val;
@@ -1920,7 +2203,8 @@
             
             let picked2Z = undefined, p2_val = undefined;
             if(matchDays === 2) {
-                let flat2 = []; zones.forEach(z => { if(z !== picked1Z && avail2[z].length > 0) flat2.push(z); });
+                let flat2 = [];
+                zones.forEach(z => { if(z !== picked1Z && avail2[z].length > 0) flat2.push(z); });
                 if(flat2.length === 0) zones.forEach(z => { if(z !== picked1Z) flat2.push(z); });
                 picked2Z = flat2.length > 0 ? flat2[Math.floor(Math.random() * flat2.length)] : zones[Math.floor(Math.random() * zones.length)];
                 
@@ -1933,7 +2217,7 @@
         appState.push(newEntry);
         displayDraw();
         showToast("✅ LATECOMER ADDED SUCCESSFULLY");
-        setTimeout(() => { handleAmend(true); }, 800); 
+        setTimeout(() => { handleAmend(true); }, 800);
     }
 
     function isPegSafe(p, d) { 
@@ -1955,7 +2239,6 @@
                 else tsv += `${a.name || ''}\t${tName}\t${a.z1}\n`;
             }); 
         });
-
         navigator.clipboard.writeText(tsv).then(() => {
             showToast("📋 SETUP DATA COPIED TO CLIPBOARD");
         });
@@ -2009,7 +2292,7 @@
             html += `<div style="flex:1; background:${bg}; border-radius:12px; padding:6px 12px; color:white; font-weight:900; display:flex; flex-direction:row; flex-wrap:wrap; justify-content:center; align-items:center; gap:8px; min-height:26px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
                         <span style="font-size:14px; letter-spacing:0.5px;">${label}</span>
                         ${extraInfo}
-                     </div>`;
+                    </div>`;
         });
         html += `</div>`;
         return html;
@@ -2028,7 +2311,6 @@
         
         document.getElementById('commandBar').style.display = 'none';
         document.getElementById('masterActionBar').style.display = 'flex';
-
         if (currentZoneSize === 0) {
             let totAnglers = 0;
             appState.forEach(e => { if (e.isTeam) totAnglers += 4; else totAnglers += 1; });
@@ -2037,11 +2319,9 @@
         const s = currentZoneSize;
 
         let mapHtml = '';
-        
         let masterLegend = `E = Empty Peg`;
         if (accEnabled) masterLegend += ` <span style="margin: 0 8px; opacity:0.5;">|</span> [A] = Accesable Pegs`;
         mapHtml += `<div style="font-size:12px; font-weight:900; color:var(--text-light); text-align:center; margin-bottom:15px; letter-spacing: 0.5px;">${masterLegend}</div>`;
-
         if (matchDays >= 1) {
             mapHtml += `<div style="font-size:14px; font-weight:900; color:var(--text-dark); margin-bottom:6px; letter-spacing: 0.5px; margin-left:5px;">DAY 1</div>`;
             mapHtml += buildBeachMap(1, s);
@@ -2057,14 +2337,14 @@
         const validation = runValidator(); 
         const banner = document.getElementById('anomalyBanner'); 
         const list = document.getElementById('anomalyList');
-        
         if (validation.list.length > 0) { 
-            banner.style.display = 'block'; 
+            banner.style.display = 'block';
             list.innerHTML = validation.list.map(err => `<li>${err}</li>`).join('');
         } else { banner.style.display = 'none'; }
 
         const tb = document.getElementById('teamsBucket'); tb.innerHTML = ''; 
-        const sb = document.getElementById('solosBucket'); sb.innerHTML = '';
+        const sb = document.getElementById('solosBucket');
+        sb.innerHTML = '';
         
         appState.forEach(g => {
             const div = document.createElement('div'); div.className = 'zone-card';
@@ -2081,14 +2361,11 @@
                 let p2C = isSwapMode ? ' swap-active' : '';
                 if (swapObj1 && swapObj1.eId === g.id && swapObj1.aI === aI && swapObj1.day === 2) p2C += ' swap-selected';
                 if (validation.markers.find(m => m.eId === g.id && m.aI === aI && m.day === 2)) p2C += ' clash-glow';
-                
                 let aName = a.name || '';
                 let aTag = (accEnabled && a.mobility) ? ' <span class="a-tag">[A]</span>' : '';
-                
                 let d1Bg = zColors[a.z1] || 'gray'; let d2Bg = zColors[a.z2] || 'gray';
                 let d1SafeTag = isPegSafe(a.p1, 1) ? '<br><small style="font-size:9px;">[A]</small>' : '';
                 let d2SafeTag = isPegSafe(a.p2, 2) ? '<br><small style="font-size:9px;">[A]</small>' : '';
-                
                 h += `<div class="res-row">
                         <span class="angler-name">${aName}${aTag}</span>
                         <div class="draw-pill${p1C}" style="background:${d1Bg}" onclick="handleSwapClick('${g.id}',${aI},1)">
@@ -2109,17 +2386,14 @@
         persistState();
     }
 
-    // FIXED: Correctly routed back to the edit screen
     function handleAmend(isSafe) { 
         switchTab('draw');
-
         document.getElementById('resultsSection').style.display = 'none';
         document.getElementById('entrySection').style.display = 'block'; 
         document.getElementById('commandBar').style.display = 'flex'; 
         document.getElementById('masterActionBar').style.display = 'none';
-        
         if (appState.length > 0) { 
-            document.getElementById('rosterEntryZone').style.display = 'none'; 
+            document.getElementById('rosterEntryZone').style.display = 'none';
             document.getElementById('commandBar').style.display = 'flex'; 
             document.getElementById('amendTools').style.display = 'flex'; 
             document.getElementById('actionBtnArea').style.display = 'flex'; 
@@ -2144,7 +2418,8 @@
     }
 
     function generateRegistrationSheet() {
-        const c = document.getElementById('registrationPrintSection'); c.innerHTML = '';
+        const c = document.getElementById('registrationPrintSection');
+        c.innerHTML = '';
         let matchName = document.getElementById('matchTitle').value;
         let h = `<div class="roster-header"><h1>${matchName}</h1><h2>REGISTRATION SHEET</h2></div>
                  <table class="print-table"><thead><tr><th>ANGLER</th><th>TEAM</th><th>PRESENT</th><th>POT (£)</th><th>PAIRS (£)</th></tr></thead><tbody>`;
@@ -2156,12 +2431,14 @@
                 h += `<tr><td>${aName}${mobStr}</td><td>${tName}</td><td><div class="print-checkbox"></div></td><td><div class="print-checkbox"></div></td><td><div class="print-checkbox"></div></td></tr>`; 
             }); 
         });
-        h += `</tbody></table>`; c.innerHTML = h;
+        h += `</tbody></table>`;
+        c.innerHTML = h;
         document.body.classList.add('printing-registration'); window.print(); document.body.classList.remove('printing-registration');
     }
 
     function printZoneRosters() {
-        const c = document.getElementById('rosterSection'); c.innerHTML = '';
+        const c = document.getElementById('rosterSection');
+        c.innerHTML = '';
         let days = matchDays === 2 ? [1, 2] : [1];
         days.forEach(d => { 
             zones.forEach(z => {
@@ -2192,7 +2469,8 @@
     }
 
     function generateDispatchSlips() {
-        const c = document.getElementById('dispatchSection'); c.innerHTML = '';
+        const c = document.getElementById('dispatchSection');
+        c.innerHTML = '';
         let teamsOnly = []; appState.forEach(e => { if (e.isTeam) teamsOnly.push(e); });
         teamsOnly.forEach(e => {
             let h = `<div class="dispatch-slip" style="page-break-after: always;"><div class="dispatch-header"><h1>TEAM: ${e.tName || 'UNNAMED TEAM'}</h1></div>
@@ -2209,7 +2487,8 @@
         
         let solosOnly = []; appState.forEach(e => { if (!e.isTeam) solosOnly.push(e); });
         for (let i = 0; i < solosOnly.length; i += 4) {
-            let batch = []; for (let j = 0; j < 4; j++) { if (i + j < solosOnly.length) batch.push(solosOnly[i + j]); }
+            let batch = [];
+            for (let j = 0; j < 4; j++) { if (i + j < solosOnly.length) batch.push(solosOnly[i + j]); }
             const page = document.createElement('div'); page.style.pageBreakAfter = 'always';
             batch.forEach(e => { 
                 const a = e.anglers[0]; 
@@ -2239,6 +2518,7 @@
             if (e.target.id !== 'importRawData' && e.target.closest('#entrySection')) {
                 runEntryValidation();
             }
+            
             const ind = document.getElementById('saveIndicator');
             if (ind) {
                 ind.style.opacity = '1'; clearTimeout(saveTimeout);
@@ -2251,7 +2531,7 @@
         isAppReady = false; 
         let saved = localStorage.getItem('zonedraw_current_state_v1');
         if (saved) {
-            let e = JSON.parse(saved); 
+            let e = JSON.parse(saved);
             document.getElementById('matchTitle').value = e.title || '';
             document.getElementById('accPegs1_a').value = e.safePegs1_a || ''; 
             document.getElementById('accPegs2_a').value = e.safePegs2_a || '';
@@ -2263,10 +2543,11 @@
             scoreState = e.scores || {}; 
             currentZoneSize = e.zoneSize || 0;
             accEnabled = e.accEnabled ? true : false;
+            sweepstakeOptIns = e.sweepstakeOptIns || {};
             applyAccToggleUI();
-
+            
             if (appState.length > 0) { 
-                document.getElementById('rosterEntryZone').style.display = 'none'; 
+                document.getElementById('rosterEntryZone').style.display = 'none';
                 document.getElementById('commandBar').style.display = 'flex'; 
                 document.getElementById('amendTools').style.display = 'flex';
                 let tCount = 0, iCount = 0;
@@ -2278,34 +2559,33 @@
             appState.forEach(x => { x.anglers.forEach(a => { if (a.z1) hasDraw = true; }); });
             if (hasDraw) displayDraw(); else handleAmend(false);
         } else { startNewDraw(); }
-        setTimeout(() => { isAppReady = true; }, 500); 
+        setTimeout(() => { isAppReady = true; }, 500);
     };
 
     function handleScoreEnter(event) {
         if (event.key === 'Enter') {
-            event.target.blur(); // Forces the box to save
-            showToast("✅ SCORE SAVED"); // Shows the confirmation banner
-            clearSearch(); // Clears the search and resets the view
+            event.target.blur();
+            showToast("✅ SCORE SAVED");
+            clearSearch();
         }
     }
+    
     function clearSearch() {
         const input = document.getElementById('scoreSearch');
         input.value = '';
         filterScorecards(); 
         input.focus();      
     }
+    
     // --- SCROLL AUTO-HIDE FOR ACTION BAR ---
     let lastScrollY = window.scrollY;
-    
     window.addEventListener('scroll', () => {
         const actionBar = document.getElementById('masterActionBar');
         
-        // Only run this if the action bar is currently active/visible on screen
         if (!actionBar || actionBar.style.display === 'none') return;
         
         let currentScrollY = window.scrollY;
         
-        // If scrolling down, push it off screen. If scrolling up, bring it back.
         if (currentScrollY > lastScrollY && currentScrollY > 50) {
             actionBar.style.transform = 'translateY(150%)'; 
         } else {
