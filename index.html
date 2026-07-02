@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Competition Hub - v1.2.0</title>
+    <title>Competition Hub - v7.4.0</title>
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -191,7 +191,7 @@
         /* Maximize Real Estate: Smaller gaps between rows */
         .score-list-container { display: flex; flex-direction: column; gap: 4px; max-width: 1400px; margin: 0 auto; }
 
-        /* V1.2.0 Scorecard Layout (Added Wit Peg) */
+        /* V7.4.0 Scorecard Layout (Added Wit Peg) */
         .score-list-header, .score-row {
             display: grid;
             grid-template-columns: minmax(180px, 2fr) minmax(130px, 1.5fr) 110px 75px 75px 75px 75px 75px;
@@ -223,13 +223,6 @@
         .s-peg { font-size: 12px; font-weight: 900; }
 
         .scorecard-scroll-wrapper { width: 100%; overflow-x: auto; padding-bottom: 20px; }
-        .score-table th, .scoring-table th, th {
-    color: #ffffff !important;
-    position: sticky !important;
-    top: 0;
-    z-index: 100;
-    background-color: #222222 !important;
-}
 
         /* Buttons */
         .btn-action { 
@@ -660,17 +653,9 @@
         </div>
 
         <div id="dayTabsContainer" class="day-tab-nav">
-    <button id="subBtn-1" class="day-tab-btn active" style="margin-right: 35px;" onclick="switchScoreDay(1)">DAY 1 SCORES</button>
-    <button id="subBtn-2" class="day-tab-btn" onclick="switchScoreDay(2)">DAY 2 SCORES</button>
-</div>
-<div id="day1-banner" class="day-indicator-banner" style="background-color: #d32f2f; color: white; text-align: center; padding: 12px; font-weight: bold; font-size: 1.2rem; margin: 15px 0; border-radius: 6px;">
-    ⚠️ NOW RECORDING: DAY 1 SCORES ONLY
-</div>
-<div id="day2-banner" class="day-indicator-banner" style="background-color: #1976d2; color: white; text-align: center; padding: 12px; font-weight: bold; font-size: 1.2rem; margin: 15px 0; border-radius: 6px; display: none;">
-    ⚠️ NOW RECORDING: DAY 2 SCORES ONLY
-</div>
-<div id="day2-banner" class="day-indicator-banner" style="background-color: #1976d2; color: white; text-align: center; padding: 12px; font-weight: bold; font-size: 1.2rem; margin: 15px 0; border-radius: 6px; display: none;">
-    ⚠️ NOW RECORDING: DAY 2 SCORES ONLY
+            <button id="subBtn-1" class="day-tab-btn active" onclick="switchScoreDay(1)">DAY 1 SCORES</button>
+            <button id="subBtn-2" class="day-tab-btn" onclick="switchScoreDay(2)">DAY 2 SCORES</button>
+        </div>
     </div>
 
     <div class="scorecard-scroll-wrapper">
@@ -858,13 +843,6 @@
 
    function switchScoreDay(day) {
         currentScoreDay = day;
-       // Toggle the high-visibility banners
-    const d1B = document.getElementById('day1-banner');
-    const d2B = document.getElementById('day2-banner');
-    if (d1B && d2B) {
-        d1B.style.display = (day === 1) ? 'block' : 'none';
-        d2B.style.display = (day === 2) ? 'block' : 'none';
-    }
         document.body.className = day === 1 ? 'stage-score-d1' : 'stage-score-d2';
         document.getElementById('dayWatermark').innerText = 'DAY ' + day;
         
