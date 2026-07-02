@@ -223,6 +223,13 @@
         .s-peg { font-size: 12px; font-weight: 900; }
 
         .scorecard-scroll-wrapper { width: 100%; overflow-x: auto; padding-bottom: 20px; }
+        .score-table th, .scoring-table th, th {
+    color: #ffffff !important;
+    position: sticky !important;
+    top: 0;
+    z-index: 100;
+    background-color: #222222 !important;
+}
 
         /* Buttons */
         .btn-action { 
@@ -653,9 +660,17 @@
         </div>
 
         <div id="dayTabsContainer" class="day-tab-nav">
-            <button id="subBtn-1" class="day-tab-btn active" onclick="switchScoreDay(1)">DAY 1 SCORES</button>
-            <button id="subBtn-2" class="day-tab-btn" onclick="switchScoreDay(2)">DAY 2 SCORES</button>
-        </div>
+    <button id="subBtn-1" class="day-tab-btn active" style="margin-right: 35px;" onclick="switchScoreDay(1)">DAY 1 SCORES</button>
+    <button id="subBtn-2" class="day-tab-btn" onclick="switchScoreDay(2)">DAY 2 SCORES</button>
+</div>
+<div id="day1-banner" class="day-indicator-banner" style="background-color: #d32f2f; color: white; text-align: center; padding: 12px; font-weight: bold; font-size: 1.2rem; margin: 15px 0; border-radius: 6px;">
+    ⚠️ NOW RECORDING: DAY 1 SCORES ONLY
+</div>
+<div id="day2-banner" class="day-indicator-banner" style="background-color: #1976d2; color: white; text-align: center; padding: 12px; font-weight: bold; font-size: 1.2rem; margin: 15px 0; border-radius: 6px; display: none;">
+    ⚠️ NOW RECORDING: DAY 2 SCORES ONLY
+</div>
+<div id="day2-banner" class="day-indicator-banner" style="background-color: #1976d2; color: white; text-align: center; padding: 12px; font-weight: bold; font-size: 1.2rem; margin: 15px 0; border-radius: 6px; display: none;">
+    ⚠️ NOW RECORDING: DAY 2 SCORES ONLY
     </div>
 
     <div class="scorecard-scroll-wrapper">
@@ -843,6 +858,13 @@
 
    function switchScoreDay(day) {
         currentScoreDay = day;
+       // Toggle the high-visibility banners
+    const d1B = document.getElementById('day1-banner');
+    const d2B = document.getElementById('day2-banner');
+    if (d1B && d2B) {
+        d1B.style.display = (day === 1) ? 'block' : 'none';
+        d2B.style.display = (day === 2) ? 'block' : 'none';
+    }
         document.body.className = day === 1 ? 'stage-score-d1' : 'stage-score-d2';
         document.getElementById('dayWatermark').innerText = 'DAY ' + day;
         
