@@ -194,12 +194,12 @@
         /* Maximize Real Estate: Smaller gaps between rows */
         .score-list-container { display: flex; flex-direction: column; gap: 4px; max-width: 1400px; margin: 0 auto; }
 
-        /* V7.4.0 Scorecard Layout (Added Wit Peg) */
-        .score-list-header, .score-row {
-            display: grid;
-            grid-template-columns: minmax(180px, 2fr) minmax(130px, 1.5fr) 110px 75px 75px 75px 75px 75px;
-            gap: 6px; align-items: center;
-        }
+        /* V7.4.0 Scorecard Layout */
+.score-list-header, .score-row {
+    display: grid;
+    grid-template-columns: minmax(180px, 2fr) minmax(130px, 1.5fr) 110px 75px 75px 75px 75px;
+    gap: 6px; align-items: center;
+}
 
         .score-list-header { padding: 6px 15px 4px; font-weight: 900; font-size: 11px; color: #ffffff; border-bottom: none; }
         
@@ -949,7 +949,7 @@
             <div style="text-align:center;">FISH CT</div>
             <div style="text-align:center;">BIGGEST</div>
             <div style="text-align:center;">SPECIES</div>
-            <div style="text-align:center;">WIT. PEG</div>
+        
         `;
         container.appendChild(headerRow);
 
@@ -1001,11 +1001,7 @@
                         onchange="saveScore('${key}', 'spec', this.value)" 
                         onkeydown="handleScoreEnter(event)"
                         onfocus="highlightRow(this)" onblur="unhighlightRow(this)">
-                    <input type="text" placeholder="W.PEG" value="${s.witPeg || ''}" 
-                        oninput="enforceLimits(this, 5)" 
-                        onchange="saveScore('${key}', 'witPeg', this.value)" 
-                        onkeydown="handleScoreEnter(event)"
-                        onfocus="highlightRow(this)" onblur="unhighlightRow(this)">
+                   
                 `;
                 container.appendChild(row);
             });
