@@ -381,108 +381,9 @@
         /* Dynamic Search Bar Borders for Day Identification */
         body.stage-score-d1 .scorecard-search { border-color: var(--bg-score-d1); box-shadow: 0 0 0 4px rgba(51, 65, 85, 0.2); }
         body.stage-score-d2 .scorecard-search { border-color: var(--bg-score-d2); box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.2); }
-        /* Secret Pairs Info Button & Modal Popup Styles */
-.info-btn {
-    background: transparent;
-    border: 1px solid #ffffff;
-    color: #ffffff;
-    padding: 4px 12px;
-    border-radius: 50px;
-    font-size: 11px;
-    font-weight: 600;
-    cursor: pointer;
-    margin-left: 15px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    transition: all 0.2s ease;
-}
-.info-btn:hover {
-    background: #ffffff;
-    color: #004d40; /* Fits nicely inside the dark header background */
-}
-.secret-pairs-modal {
-    display: none;
-    position: fixed;
-    z-index: 10000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(4px);
-    align-items: center;
-    justify-content: center;
-}
-.sp-modal-content {
-    background-color: #ffffff;
-    color: #333333;
-    padding: 24px;
-    border-radius: 12px;
-    width: 90%;
-    max-width: 450px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-    border: 1px solid #e0e0e0;
-}
-.sp-modal-content h3 {
-    margin-top: 0;
-    color: #004d40;
-    font-size: 18px;
-    border-bottom: 2px solid #e0e0e0;
-    padding-bottom: 8px;
-}
-.sp-modal-section {
-    margin: 16px 0;
-}
-.sp-modal-section h4 {
-    margin: 0 0 4px 0;
-    font-size: 13px;
-    color: #00796b;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-.sp-modal-section p {
-    margin: 0;
-    font-size: 13px;
-    line-height: 1.5;
-    color: #555555;
-}
-.sp-close-btn {
-    width: 100%;
-    background: #004d40;
-    color: white;
-    border: none;
-    padding: 10px;
-    border-radius: 6px;
-    font-weight: 600;
-    cursor: pointer;
-    margin-top: 8px;
-    font-size: 13px;
-}
-.sp-close-btn:hover {
-    background: #00332c;
-}
     </style>
 </head>
 <body class="stage-draw">
-    <!-- Secret Pairs Help Modal -->
-<div id="secretPairsModal" class="secret-pairs-modal">
-    <div class="sp-modal-content">
-        <h3>Secret Pairs</h3>
-        <div class="sp-modal-section">
-            <h4>How it Works</h4>
-            <p>Once final scores are locked, a <strong>random target length</strong> is drawn. The winning pair is whoever is <strong>closest</strong> to that target number.</p>
-        </div>
-        <div class="sp-modal-section">
-            <h4>Why it's Fairer</h4>
-            <p>Traditional pools just reward the top match-winners. This gives <strong>everyone a genuine chance</strong> at a prize—not just the top weights.</p>
-        </div>
-        <div class="sp-modal-section">
-            <h4>What is "Joe Average"?</h4>
-            <p>If there’s an odd number of anglers, the app creates a dummy partner named <strong>Joe Average</strong>. Joe is given the exact average score of the fleet, ensuring nobody gets left out or penalized.</p>
-        </div>
-        <button class="sp-close-btn" onclick="toggleSecretPairsModal(false)">Close</button>
-    </div>
-</div>
     <div id="dayWatermark" class="day-watermark no-print">DAY 1</div>
 
 <div id="toastBanner" class="no-print">ACTION COMPLETED</div>
@@ -1235,9 +1136,7 @@
         document.getElementById('prize-3rd').innerText = third;
 
         const titleSpan = document.getElementById('accordion-title');
-       if (titleSpan) {
-            titleSpan.innerHTML = `${optedInCount} ANGLERS OPTED IN - CLICK TO MANAGE <button class="info-btn" onclick="event.stopPropagation(); toggleSecretPairsModal(true);">How It Works</button>`;
-        }
+        if (titleSpan) titleSpan.innerText = `${optedInCount} ANGLERS OPTED IN - CLICK TO MANAGE`;
 
         return { first, second, third, totalFund };
     }
@@ -1250,17 +1149,6 @@
         if (s2 && matchDays === 2) { len += (parseInt(s2.len) || 0); count += (parseInt(s2.count) || 0); }
         return { len, count };
     }
-    return { len, count };
-    }
-
-    function toggleSecretPairsModal(show) {
-        const modal = document.getElementById('secretPairsModal');
-        if (modal) {
-            modal.style.display = show ? 'flex' : 'none';
-        }
-    }
-
-    function runSecretPairsSequence() {
 
     function runSecretPairsSequence() {
         let activePairsPool = [];
