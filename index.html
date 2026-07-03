@@ -361,7 +361,7 @@
         }
         /* Watermark & Background Stages */
         .day-watermark {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            position: fixed; top: 35%; left: 50%; transform: translate(-50%, -50%);
             font-size: 25vw; color: white; font-weight: 900; opacity: 0.20;
             pointer-events: none; z-index: 0; white-space: nowrap; display: none;
         }
@@ -374,6 +374,10 @@
         /* Active Day Tab Highlights */
         body.stage-score-d1 #subBtn-1 { background: var(--card); color: var(--accent); }
         body.stage-score-d2 #subBtn-2 { background: var(--card); color: var(--green-color); }
+
+        /* Dynamic Search Bar Borders for Day Identification */
+        body.stage-score-d1 .scorecard-search { border-color: var(--bg-score-d1); box-shadow: 0 0 0 4px rgba(51, 65, 85, 0.2); }
+        body.stage-score-d2 .scorecard-search { border-color: var(--bg-score-d2); box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.2); }
     </style>
 </head>
 <body class="stage-draw">
