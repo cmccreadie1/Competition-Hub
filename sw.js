@@ -1,4 +1,4 @@
-const CACHE_NAME = 'zonedraw-cache-v7.4.0';
+const CACHE_NAME = 'zonedraw-cache-v1.5.0';
 const urlsToCache = [
     '/',
     '/index.html',
@@ -9,7 +9,7 @@ self.addEventListener('install', event => {
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then(cache => {
-                console.log('Opened cache for v7.4.0');
+                console.log('Opened cache for v1.5.0');
                 return cache.addAll(urlsToCache);
             })
     );
