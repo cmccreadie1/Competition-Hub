@@ -383,6 +383,55 @@
         /* Dynamic Search Bar Borders for Day Identification */
         body.stage-score-d1 .scorecard-search { border-color: var(--bg-score-d1); box-shadow: 0 0 0 4px rgba(51, 65, 85, 0.2); }
         body.stage-score-d2 .scorecard-search { border-color: var(--bg-score-d2); box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.2); }
+
+        /* Excel Export Modal Styles */
+.export-modal {
+    position: fixed;
+    top: 0; 
+    left: 0; 
+    right: 0; 
+    bottom: 0;
+    background: rgba(15, 23, 42, 0.9); 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 20px;
+}
+
+.export-modal-content {
+    background: var(--bg-base);
+    padding: 20px;
+    border-radius: 16px;
+    max-width: 900px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.export-infographic {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.btn-close-modal {
+    background: var(--accent);
+    color: #ffffff;
+    border: none;
+    padding: 12px 32px;
+    font-size: 16px;
+    font-weight: 700;
+    border-radius: 9999px; 
+    cursor: pointer;
+    box-shadow: 0 4px 6px var(--accent-glow);
+    transition: opacity 0.2s ease;
+}
+
+.btn-close-modal:active {
+    opacity: 0.8;
+}
     </style>
 </head>
 <body class="stage-draw">
@@ -1063,6 +1112,7 @@
 
         navigator.clipboard.writeText(tsv).then(() => {
             showToast("✅ MASTER SCORES COPIED TO CLIPBOARD");
+            showExportModal(); // Add this line right here
         });
     }
 
@@ -2670,6 +2720,21 @@
         
         lastScrollY = currentScrollY;
     });
+
+    function showExportModal() {
+    document.getElementById('exportGuideModal').style.display = 'flex';
+}
+
+function closeExportModal() {
+    document.getElementById('exportGuideModal').style.display = 'none';
+}
 </script>
+    <!-- Excel Export Infographic Modal -->
+<div id="exportGuideModal" class="export-modal" style="display: none;">
+    <div class="export-modal-content">
+        <img src="excel-export-guide.png" alt="Excel Export Next Steps" class="export-infographic">
+        <button onclick="closeExportModal()" class="btn-close-modal">CLOSE</button>
+    </div>
+</div>
 </body>
 </html>
