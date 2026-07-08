@@ -470,14 +470,22 @@
 <div id="toastBanner" class="no-print">ACTION COMPLETED</div>
 
 <div class="fixed-header no-print">
-    <div class="header-content">
-        <div class="brand-name">COMPETITION HUB <span id="vTag" class="v-tag"></span></div>
+    <div class="header-content" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+        
+        <div class="brand-name" style="flex: 1; text-align: left;">
+            COMPETITION HUB <span id="vTag" class="v-tag"></span>
+        </div>
+
+        <div style="flex: 1; display: flex; justify-content: center;">
+            <button id="globalHelpBtn" onclick="toggleEmbeddedManual()" class="btn-action-outline" style="padding: 10px 16px; font-size: 11px; font-weight: 900; background: #e0f2fe; color: #0369a1; border-color: #bae6fd; white-space: nowrap; margin: 0;">📘 LOST? VIEW USER GUIDE</button>
+        </div>
+
+        <div style="flex: 1; display: flex; justify-content: flex-end; padding-right: 15px;">
+            <button id="masterResetBtn" onclick="showWipeModal()" class="btn-action-outline btn-danger-outline" style="padding: 10px 16px; font-size: 11px; font-weight: 900; background: white; white-space: nowrap; margin: 0;">🏁 FINISH AND RESET COMPETITION</button>
+        </div>
+
         <div id="saveIndicator" style="position: fixed; top: 18px; right: 20px; background: var(--green-color); color: white; padding: 4px 10px; border-radius: 50px; font-weight: 800; font-size: 11px; opacity: 0; transition: opacity 0.3s; z-index: 9999; pointer-events: none; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);">✓ SAVED</div>
         
-        <div style="display: flex; gap: 8px;">
-            <button id="masterResetBtn" onclick="showWipeModal()" class="btn-action-outline btn-danger-outline" style="padding: 10px 16px; font-size: 11px; font-weight: 900; background: white;">🏁 FINISH AND RESET COMPETITION</button>
-            <button id="globalHelpBtn" onclick="toggleEmbeddedManual()" class="btn-action-outline" style="padding: 10px 16px; font-size: 11px; font-weight: 900; background: #e0f2fe; color: #0369a1; border-color: #bae6fd;">📘 LOST? VIEW USER GUIDE</button>
-        </div>
     </div>
 </div>
 
@@ -487,10 +495,7 @@
     <button id="tabBtn-pairs" class="tab-btn" onclick="switchTab('pairs')">3. SECRET PAIRS (Optional)</button>
 </div>
         
-        <div style="display: flex; gap: 8px;">
-            <button id="masterResetBtn" onclick="showWipeModal()" class="btn-action-outline btn-danger-outline" style="padding: 10px 16px; font-size: 11px; font-weight: 900; background: white;">🏁 FINISH AND RESET COMPETITION</button>
-            <button id="globalHelpBtn" onclick="toggleEmbeddedManual()" class="btn-action-outline" style="padding: 10px 16px; font-size: 11px; font-weight: 900; background: #e0f2fe; color: #0369a1; border-color: #bae6fd;">📘 LOST? VIEW USER GUIDE</button>
-        </div>
+        
     </div>
 </div>
 
