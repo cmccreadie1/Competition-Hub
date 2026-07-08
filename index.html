@@ -953,6 +953,7 @@
         activeTabBtn.style.color = '#ffffff';
     }
     
+    // Ensure content displays
     let targetTab = document.getElementById(`${tabId}Tab`);
     if (targetTab) {
         targetTab.style.display = 'block';
@@ -972,7 +973,6 @@
         switchScoreDay(1);
     }
 }
-
    function switchScoreDay(day) {
         currentScoreDay = day;
         document.body.className = day === 1 ? 'stage-score-d1' : 'stage-score-d2';
