@@ -938,22 +938,38 @@
         document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
         document.querySelectorAll('.tab-content').forEach(content => content.style.display = 'none');
         
-        function switchTab(tabName) {
-    // Hide all tab contents and remove active states from buttons
-    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        function switchTab(tabId) {
+    // Reset all tabs to default state
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.classList.remove('active');
-        btn.style.color = ''; // Resets inactive tabs to their default styling
+        btn.style.color = ''; 
     });
+    document.querySelectorAll('.tab-content').forEach(content => content.style.display = 'none');
 
-    // Show selected tab and apply active styles
-    const activeContent = document.getElementById(tabName + 'Tab');
-    const activeBtn = document.getElementById('tabBtn-' + tabName);
+    // Apply active state and white text to clicked tab
+    let activeTabBtn = document.getElementById(`tabBtn-${tabId}`);
+    if (activeTabBtn) {
+        activeTabBtn.classList.add('active');
+        activeTabBtn.style.color = '#ffffff';
+    }
     
-    if (activeContent) activeContent.classList.add('active');
-    if (activeBtn) {
-        activeBtn.classList.add('active');
-        activeBtn.style.color = '#ffffff'; // Forces active tab text to be bright white
+    let targetTab = document.getElementById(`${tabId}Tab`);
+    if (targetTab) {
+        targetTab.style.display = 'block';
+    }
+
+    // Core app logic for switching stages
+    if (tabId === 'draw') {
+        document.body.className = 'stage-draw';
+    } else if (tabId === 'pairs') {
+        document.body.className = 'stage-pairs';
+        renderOptInList();
+        updatePrizeFund();
+    } else {
+        document.body.className = 'stage-score';
+        let dayTabs = document.getElementById('dayTabsContainer');
+        if (dayTabs) dayTabs.style.display = matchDays === 2 ? 'flex' : 'none';
+        switchScoreDay(1);
     }
 }
 
