@@ -475,6 +475,7 @@
         <div id="saveIndicator" style="position: fixed; top: 18px; right: 20px; background: var(--green-color); color: white; padding: 4px 10px; border-radius: 50px; font-weight: 800; font-size: 11px; opacity: 0; transition: opacity 0.3s; z-index: 9999; pointer-events: none; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);">✓ SAVED</div>
         
         <button id="masterResetBtn" onclick="showWipeModal()" class="btn-action-outline btn-danger-outline" style="padding: 10px 16px; font-size: 11px; font-weight: 900; background: white;">🏁 FINISH AND RESET COMPETITION</button>
+        <button id="globalHelpBtn" onclick="toggleEmbeddedManual()" class="btn-action-outline" style="padding: 10px 16px; font-size: 11px; font-weight: 900; background: #e0f2fe; color: #0369a1; border-color: #bae6fd; margin-left: 8px;">📘 LOST? VIEW USER GUIDE</button>
     </div>
     
     <div class="tab-nav">
@@ -610,6 +611,9 @@
         </div>
 
         <div id="embedded-manual" class="no-print">
+            <div class="no-print" style="display: flex; justify-content: flex-end; margin-bottom: 20px;">
+        <button onclick="toggleEmbeddedManual()" class="btn-action-outline btn-danger-outline" style="padding: 8px 16px; font-size: 12px; font-weight: 900; background: #fef2f2; color: #ef4444; border-color: #fca5a5;">❌ CLOSE MANUAL</button>
+    </div>
             <h1>COMPETITION HUB MANUAL</h1>
             <div class="manual-subtitle">Master Organiser's Companion Guide</div>
 
@@ -2943,7 +2947,19 @@
             }
         }
     });
-
+    
+function toggleEmbeddedManual() {
+    const manual = document.getElementById('embedded-manual');
+    if (!manual) return;
+    
+    if (manual.style.display === 'none' || manual.style.display === '') {
+        manual.style.display = 'block';
+        manual.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+        manual.style.display = 'none';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+}
     window.onload = () => {
         isAppReady = false; 
         let saved = localStorage.getItem('zonedraw_current_state_v1');
