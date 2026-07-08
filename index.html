@@ -470,39 +470,19 @@
 <div id="toastBanner" class="no-print">ACTION COMPLETED</div>
 
 <div class="fixed-header no-print">
-    <div class="header-content" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-        
-        <div class="brand-name" style="flex: 1; text-align: left;">
-            COMPETITION HUB <span id="vTag" class="v-tag"></span>
-        </div>
-
-        <div style="flex: 1; display: flex; justify-content: center;">
-            <button id="globalHelpBtn" onclick="toggleEmbeddedManual()" class="btn-action-outline" style="padding: 10px 16px; font-size: 11px; font-weight: 900; background: #e0f2fe; color: #0369a1; border-color: #bae6fd; white-space: nowrap; margin: 0;">📘 LOST? VIEW USER GUIDE</button>
-        </div>
-
-        <div style="flex: 1; display: flex; justify-content: flex-end; padding-right: 15px;">
-            <button id="masterResetBtn" onclick="showWipeModal()" class="btn-action-outline btn-danger-outline" style="padding: 10px 16px; font-size: 11px; font-weight: 900; background: white; white-space: nowrap; margin: 0;">🏁 FINISH AND RESET COMPETITION</button>
-        </div>
-
+    <div class="header-content">
+        <div class="brand-name">COMPETITION HUB <span id="vTag" class="v-tag"></span></div>
         <div id="saveIndicator" style="position: fixed; top: 18px; right: 20px; background: var(--green-color); color: white; padding: 4px 10px; border-radius: 50px; font-weight: 800; font-size: 11px; opacity: 0; transition: opacity 0.3s; z-index: 9999; pointer-events: none; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);">✓ SAVED</div>
         
+        <button id="masterResetBtn" onclick="showWipeModal()" class="btn-action-outline btn-danger-outline" style="padding: 10px 16px; font-size: 11px; font-weight: 900; background: white;">🏁 FINISH AND RESET COMPETITION</button>
+        <button id="globalHelpBtn" onclick="toggleEmbeddedManual()" class="btn-action-outline" style="padding: 10px 16px; font-size: 11px; font-weight: 900; background: #e0f2fe; color: #0369a1; border-color: #bae6fd; margin-left: 8px;">📘 LOST? VIEW USER GUIDE</button>
     </div>
-</div>
-
-<div class="tab-nav no-print">
-    <button id="tabBtn-draw" class="tab-btn active" onclick="switchTab('draw')">1. DRAW SETUP</button>
-    <button id="tabBtn-score" class="tab-btn" onclick="switchTab('score')">2. SCORECARDS</button>
-    <button id="tabBtn-pairs" class="tab-btn" onclick="switchTab('pairs')">3. SECRET PAIRS (Optional)</button>
-</div>
-        
-        
+    
+    <div class="tab-nav">
+        <button id="tabBtn-draw" class="tab-btn active" onclick="switchTab('draw')">1. DRAW SETUP</button>
+        <button id="tabBtn-score" class="tab-btn" onclick="switchTab('score')">2. SCORECARDS</button>
+        <button id="tabBtn-pairs" class="tab-btn" onclick="switchTab('pairs')">3. SECRET PAIRS (Optional)</button>
     </div>
-</div>
-
-<div class="tab-nav no-print">
-    <button id="tabBtn-draw" class="tab-btn active" onclick="switchTab('draw')">1. DRAW SETUP</button>
-    <button id="tabBtn-score" class="tab-btn" onclick="switchTab('score')">2. SCORECARDS</button>
-    <button id="tabBtn-pairs" class="tab-btn" onclick="switchTab('pairs')">3. SECRET PAIRS (Optional)</button>
 </div>
 
 <div id="drawTab" class="tab-content active">
@@ -510,7 +490,9 @@
     <div id="entrySection" class="no-print">
         
         <!-- NEW HELP JUMP LINK -->
-        
+        <div style="text-align: right; margin-bottom: 10px;">
+            <a href="#embedded-manual" style="background: #e0f2fe; color: #0284c7; border: 1px solid #bae6fd; font-weight: 800; font-size: 12px; padding: 8px 16px; border-radius: 50px; text-decoration: none; display: inline-block; transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">📘 Need Help? View Manual ↓</a>
+        </div>
         
         <div id="editDrawBanner" style="display:none; background:var(--green-soft); border: 1px solid var(--green-color); border-radius:16px; padding: 16px; margin-bottom: 20px; text-align: left; display: flex; align-items: center; gap: 15px;">
             <span style="font-size: 24px;">✏️</span>
@@ -628,7 +610,262 @@
             </div>
         </div>
 
-        
+        <div id="embedded-manual" class="no-print">
+            <div class="no-print" style="display: flex; justify-content: flex-end; margin-bottom: 20px;">
+        <button onclick="toggleEmbeddedManual()" class="btn-action-outline btn-danger-outline" style="padding: 8px 16px; font-size: 12px; font-weight: 900; background: #fef2f2; color: #ef4444; border-color: #fca5a5;">❌ CLOSE MANUAL</button>
+    </div>
+            <h1>COMPETITION HUB MANUAL</h1>
+            <div class="manual-subtitle">Master Organiser's Companion Guide</div>
+
+            <!-- SLIDE 1 -->
+            <div class="manual-slide">
+                <div class="manual-slide-header">
+                    <h2>1. WELCOME & OVERVIEW</h2>
+                    <span class="manual-badge">Slide 1 of 11</span>
+                </div>
+                <h3>Getting Started with Your Match Software</h3>
+                <p>Welcome! This simple, interactive guide is designed to walk you through running a fishing competition step-by-step. The software does all the hard math for you behind the scenes, so you can focus entirely on running a smooth match.</p>
+                <div class="manual-grid">
+                    <div class="manual-card">
+                        <span class="manual-card-title">1. Set Up & Draw</span>
+                        <p style="font-size: 13px; margin:0;">Create your competitor draw list and generate the random peg draw instantly.</p>
+                    </div>
+                    <div class="manual-card">
+                        <span class="manual-card-title">2. Record & Export</span>
+                        <p style="font-size: 13px; margin:0;">Record the angler catches and easily copy-paste scores directly into Excel with a single click.</p>
+                    </div>
+                    <div class="manual-card">
+                        <span class="manual-card-title">3. Secret Pairs</span>
+                        <p style="font-size: 13px; margin:0;">Run an exciting, fully automated random pool competition on the side.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SLIDE 2 -->
+            <div class="manual-slide">
+                <div class="manual-slide-header">
+                    <h2>2. PRE-MATCH DAY PREPARATION</h2>
+                    <span class="manual-badge">Slide 2 of 11</span>
+                </div>
+                <h3>Setting Up Your Files and Names</h3>
+                <p>Before match day arrives, taking a few minutes to organise your spreadsheet ensures the entire automated process runs completely error-free.</p>
+                <div class="manual-box">
+                    <strong>1. Save a Fresh Workbook Copy</strong>
+                    <p style="margin-top:4px;">Always navigate to your computer storage, locate your master file, and save a clean, distinct copy of the <strong>Competition Scorecard</strong> Excel file specifically named for the upcoming match. This protects your historical archives.</p>
+                </div>
+                <div class="manual-box">
+                    <strong>2. Pre-Populate Competitor Names</strong>
+                    <p style="margin-top:4px;">Open your newly saved spreadsheet, click over to the <strong>Competitor list</strong> tab, and type or paste the names of all pre-registered anglers directly into the designated column. This fully prepares the sheet so you can effortlessly feed Option A during the morning check-in draw.</p>
+                </div>
+            </div>
+
+            <!-- SLIDE 3 -->
+            <div class="manual-slide">
+                <div class="manual-slide-header">
+                    <h2>3. COMPETITION SETUP (PART 1)</h2>
+                    <span class="manual-badge">Slide 3 of 11</span>
+                </div>
+                <h3>Basic Match Details & Accessibility Settings</h3>
+                <p>This is where you set up the basic structure of your match and prepare the parameters for your random peg draw.</p>
+                <ul>
+                    <li><strong>Match Name:</strong> Click the title area and type the official name of your competition.</li>
+                    <li><strong>Duration:</strong> Choose whether this is a <strong>1-Day</strong> or <strong>2-Day</strong> match.</li>
+                </ul>
+                <h3 style="margin-top:24px;">Accessibility Options (Optional)</h3>
+                <p>Toggle this <strong>"ON"</strong> if you have anglers who require flat, easy-to-reach beach pegs. Once the draw is performed, these specific anglers will automatically be allocated from your chosen easy-access pegs.</p>
+                <div class="manual-box">
+                    <strong>OPTION A: DISTRIBUTED PEGS</strong>
+                    <p style="margin-top:4px; margin-bottom:0;">Use if you have suitable, easy-access pegs scattered along the beach. Simply type specific peg numbers separated by commas (e.g., <code style="background:#e2e8f0; padding:2px 4px; border-radius:4px;">5, 12, 18</code>).</p>
+                </div>
+                <div class="manual-box">
+                    <strong>OPTION B: STATIC ZONES</strong>
+                    <p style="margin-top:4px; margin-bottom:0;">Use if beach access is highly restricted and only one specific zone is suitable. Simply assign which general zone they will fish in for each day of the match.</p>
+                </div>
+            </div>
+
+            <!-- SLIDE 4 -->
+            <div class="manual-slide">
+                <div class="manual-slide-header">
+                    <h2>4. COMPETITION SETUP (PART 2)</h2>
+                    <span class="manual-badge">Slide 4 of 11</span>
+                </div>
+                <h3>Entering the Anglers' Details</h3>
+                <p>There are two straightforward options to get your competitor names into the hub.</p>
+                <div class="manual-box">
+                    <strong style="color: #0369a1; font-size:16px;">OPTION A: COPY FROM EXCEL FILE (Recommended)</strong>
+                    <p style="margin-top:4px;">This is the fastest and most common way to get your draw list ready.</p>
+                    <ol>
+                        <li>Open your saved <strong>Competition Scorecard</strong> Excel sheet, and open the <strong>Competitor list</strong> tab.</li>
+                        <li>Highlight and <strong>Copy</strong> the pre-populated list of angler names.</li>
+                        <li>In Competition Hub, click <strong>"Quick Import"</strong>, paste the list, and hit <strong>Submit</strong>. The system builds your list instantly!</li>
+                    </ol>
+                </div>
+                <div class="manual-box">
+                    <strong style="color: #0f172a; font-size:16px;">OPTION B: MANUAL LIST ENTRY</strong>
+                    <p style="margin-top:4px;">Ideal for smaller matches, late entries, or organising individual teams on the spot.</p>
+                    <ol>
+                        <li>Use the simple controls to enter the total number of teams and solo anglers. The hub dynamically generates the exact number of input boxes you need.</li>
+                        <li>Type the names directly into the fields. You can also assign individual team affiliations on this screen.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- SLIDE 5 -->
+            <div class="manual-slide">
+                <div class="manual-slide-header">
+                    <h2>5. RUNNING THE LIVE DRAW</h2>
+                    <span class="manual-badge">Slide 5 of 11</span>
+                </div>
+                <h3>Mark Accessibility Requests & Process the Pegs</h3>
+                <p>Once your names are entered, you are ready to prepare your draw list and execute the peg assignments.</p>
+                <strong>1. PREPARE & CHECK DRAW LIST:</strong>
+                <ul>
+                    <li>Ensure all entered competitor names are fully visible in the draw list.</li>
+                    <li><strong>Identify Access Requests:</strong> Look down your draw list. Click the small <code style="background:#e2e8f0; padding:2px 4px; border-radius:4px;">[A]</code> button sitting right beside any angler who has requested an accessible beach peg.</li>
+                    <li><strong>Visual Confirmation:</strong> The button will highlight to verify that this angler is marked for automatic, priority peg placement.</li>
+                </ul>
+                <strong style="margin-top: 16px; display: inline-block;">2. PROCESS DRAW:</strong>
+                <ul>
+                    <li>Confirm the total number of selected accessible anglers matches your physical list.</li>
+                    <li>When you are confident, click the bright, primary <strong>"Process Draw"</strong> button.</li>
+                    <li><strong>The Magic:</strong> The system instantly assigns easy-access pegs first, and randomly distributes all remaining beach pegs in seconds.</li>
+                </ul>
+            </div>
+
+            <!-- SLIDE 6 -->
+            <div class="manual-slide">
+                <div class="manual-slide-header">
+                    <h2>6. UNDERSTANDING THE LIVE DRAW</h2>
+                    <span class="manual-badge">Slide 6 of 11</span>
+                </div>
+                <h3>Decoding the Peg Legends & the Smart Draw Rules</h3>
+                <p>Once you click "Process Draw", the system instantly presents your finalized match layout.</p>
+                <strong>1. THE GOLDEN RULES OF THE DRAW (The Math Engine):</strong>
+                <p style="margin-top:4px;">Behind the scenes, a clever algorithm automatically calculates your peg placements based on strict fairness rules:</p>
+                <ul>
+                    <li><strong>Separated Teams:</strong> Anglers from the same team are automatically split up so they never fish in the same zone.</li>
+                    <li><strong>No Repeat Zones:</strong> No angler will fish the same zone on both days.</li>
+                    <li><strong>The Only Exception:</strong> Accessible anglers may be allocated to the same zone on both days if choice is highly restricted.</li>
+                </ul>
+                <strong style="margin-top: 16px; display: inline-block;">2. THE DRAW LEGEND (Top of Screen):</strong>
+                <p style="margin-top:4px;">This bar shows the sequence of pegs for each day of the match, color-coded by zone:</p>
+                <ul>
+                    <li><strong>Zone Colour Blocks:</strong> Easily see which peg numbers belong to which coloured zones for Day 1 and Day 2.</li>
+                    <li><strong>Accessible Peg Markers:</strong> Any easy-access peg allocated to a registered angler is highlighted inside the colored zone bar.</li>
+                    <li><strong>Extended Pegs (e.g., 15A):</strong> If you add late entries after the initial draw is done, they are allocated as "extended" pegs. This squeezes them onto the beach without altering any of the already drawn pegs.</li>
+                </ul>
+            </div>
+
+            <!-- SLIDE 7 -->
+            <div class="manual-slide">
+                <div class="manual-slide-header">
+                    <h2>7. POST-DRAW MANAGEMENT & PRINTING</h2>
+                    <span class="manual-badge">Slide 7 of 11</span>
+                </div>
+                <h3>Making Adjustments and Printing Lists for Stewards</h3>
+                <p>After the draw is generated, two floating menus appear at the bottom of the screen, providing tools to handle last-minute adjustments.</p>
+                <div class="manual-box">
+                    <strong style="color: #0369a1; font-size:16px;">1. MANAGE DRAW (Floating Button)</strong>
+                    <ul style="margin-top:8px; margin-bottom:0;">
+                        <li><strong>Amend Names:</strong> Easily correct spelling mistakes directly without resetting the draw.</li>
+                        <li><strong>Delete Cancellations:</strong> Remove anglers who didn't turn up. <span style="color:#b45309; font-weight:800;">Important Team Rule:</span> If the no-show is part of a team, you must first click to <strong>unlink</strong> the remainder of that team into individual solo anglers before you can delete the missing person.</li>
+                        <li><strong>Add Teams or Solos Post-Draw:</strong> Add late entries on the fly. The system automatically places them on extended pegs (like 15A) to keep the initial draw safe.</li>
+                        <li><strong>Full Redraw:</strong> Use only as a last resort. This completely wipes the slate clean and generates a brand-new random draw.</li>
+                    </ul>
+                </div>
+                <div class="manual-box">
+                    <strong style="color: #0f172a; font-size:16px;">2. OUTPUT MENU (Floating Button)</strong>
+                    <ul style="margin-top:8px; margin-bottom:0;">
+                        <li><strong>Current Angler List:</strong> A complete master sheet of all competitors.</li>
+                        <li><strong>Individual Team Draws:</strong> Handy printouts grouped by team so captains can easily see positions.</li>
+                        <li><strong>Zone List for Stewards:</strong> A clean sequence of pegs broken down by zone, perfect for stewards physically pegging out the beach or checking in stations.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- SLIDE 8 -->
+            <div class="manual-slide">
+                <div class="manual-slide-header">
+                    <h2>8. RECORDING MATCH SCORES</h2>
+                    <span class="manual-badge">Slide 8 of 11</span>
+                </div>
+                <h3>Inputting the Stewards' Paper Catch Sheets</h3>
+                <p>Once the match has concluded and the stewards submit the physical scorecards, you are ready to input the data.</p>
+                <ul>
+                    <li>Click on the <strong>"Scorecards"</strong> tab in the Hub.</li>
+                    <li><strong>Select the Correct Day:</strong> The screen is split into Day 1 and Day 2 sub-screens. <span style="color:#b91c1c; font-weight:800;">Make sure you select the correct active day!</span></li>
+                    <li><strong>Input the Totals:</strong> Beside each pre-populated angler name, copy and type the totals directly from their paper scorecard:
+                        <ul style="margin-top: 8px;">
+                            <li><strong>Length:</strong> Total length of fish caught (in cm).</li>
+                            <li><strong>Fish Count:</strong> Total number of fish caught.</li>
+                            <li><strong>Biggest Fish:</strong> The length of their largest individual fish.</li>
+                            <li><strong>Species:</strong> The total number of different species caught.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Handy Search Bar:</strong> With a long list of competitors, do not waste time scrolling! Simply type the first few letters of the angler's name into the search box at the top of the day card. The hub will instantly find them and bring their scorecard straight to the front.</li>
+                </ul>
+            </div>
+
+            <!-- SLIDE 9 -->
+            <div class="manual-slide">
+                <div class="manual-slide-header">
+                    <h2>9. EXPORTING & RE-ENTERING DATA</h2>
+                    <span class="manual-badge">Slide 9 of 11</span>
+                </div>
+                <h3>Transferring the Final Data Records to Excel</h3>
+                <p>This step explains how to securely copy your calculated match records into your main workbook computer terminal.</p>
+                <strong>1. TRIGGER THE EXPORT COPIER:</strong>
+                <ul>
+                    <li><strong>1-Day Match:</strong> Scroll to the bottom of the scoresheet and click the green <strong>"Export Master Scores for Excel"</strong> button.</li>
+                    <li><strong>2-Day Match:</strong> <span style="color:#b91c1c; font-weight:800;">* Important:</span> <strong>Ignore</strong> the export button at the bottom of Day 1. Wait until the Day 2 scores are fully entered, and then click the green <strong>"Export Master Scores for Excel"</strong> button located at the bottom of the Day 2 score screen.</li>
+                    <li><strong>What this does:</strong> The Hub copies all the calculated, formatted match records directly into your computer's temporary clipboard.</li>
+                </ul>
+                <div class="manual-box warning">
+                    <strong style="color: #b45309; font-size:16px;">2. PASTE INTO YOUR EXCEL HUB:</strong>
+                    <ol style="margin-top:8px; margin-bottom:0;">
+                        <li>Open your <strong>Competition Scorecard</strong> Excel workbook on your computer.</li>
+                        <li>Go to the <strong>RAW_SCORES</strong> tab.</li>
+                        <li>Click the glowing yellow <code style="background:#fde68a; padding:2px 4px; border-radius:4px; font-weight:900;">A2</code> cell directly under your blue instruction banner.</li>
+                        <li>Press <strong>Ctrl+V</strong> on your keyboard.</li>
+                        <li><strong>The Magic:</strong> You will see the columns populate instantly! Excel takes over from here and automatically calculates individual and team standings across the entire match.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- SLIDE 10 -->
+            <div class="manual-slide">
+                <div class="manual-slide-header">
+                    <h2>10. SECRET PAIRS (SIDE POOL)</h2>
+                    <span class="manual-badge">Slide 10 of 11</span>
+                </div>
+                <h3>Run an Automated Blind-Draw Side-Pool</h3>
+                <p>The Secret Pairs game is an optional, popular side-pool that pairs anglers up completely at random and gives the entire field a fair chance to win prize money.</p>
+                <ul>
+                    <li><strong>The "Target Length" Method:</strong> Instead of crowning the highest score, the computer randomly calculates a hidden <strong>Target Length</strong> that falls strictly between the lowest and highest possible combined scores. The pair whose combined length is <strong>closest</strong> to the target length wins the pool!</li>
+                    <li><strong>Pool Splits & Opt-Ins:</strong> Enter the pool entry fee. The computer instantly tallies the total pot and displays payouts automatically using a 50% / 30% / 20% split. To remove non-participants, click the green box beside their name to toggle them to <strong>"NO"</strong>.</li>
+                    <li><strong>The "Joe Average" Safeguard:</strong> If you have an uneven number of pool entries, the computer automatically generates a virtual angler named <strong>Joe Average</strong>. Joe is automatically assigned the exact mean (average) score of all competing anglers to complete the final pair flawlessly.</li>
+                    <li><strong>Execution & Tie Breaker:</strong> Click the draw button. The system locks the target length and displays the winning pairs after a dramatic 5-second countdown. If a tie occurs, the win goes to the pair with the <strong>highest combined catch length</strong>.</li>
+                </ul>
+            </div>
+
+            <!-- SLIDE 11 -->
+            <div class="manual-slide">
+                <div class="manual-slide-header">
+                    <h2>11. END OF COMPETITION & RESET</h2>
+                    <span class="manual-badge">Slide 11 of 11</span>
+                </div>
+                <h3>Cleaning the Slate for Your Next Match</h3>
+                <p>Once all the prizes have been awarded, the stewards have checked the gear, and everyone has headed home, you can safely reset the system for your next competition.</p>
+                <div class="manual-box danger">
+                    <strong style="color: #991b1b; font-size:18px;">The Finish and Reset Trigger</strong>
+                    <p style="margin-top:8px;">Look at the top right of the screen for the <strong>"Finish and Reset Competition"</strong> button. Clicking this button performs two actions simultaneously:</p>
+                    <ol>
+                        <li><strong>System Wipe:</strong> It clears all current data and temporary match records to ensure the Hub is perfectly clean for your next event.</li>
+                        <li><strong>Data Backup:</strong> It automatically downloads a secure, permanent file copy of the competition records directly into your computer's "Documents" folder for your archives.</li>
+                    </ol>
+                    <p style="margin-top:12px; font-weight:800; color:#b91c1c; margin-bottom:0;">⚠️ Caution: Once triggered, data is cleared from the active screen! Ensure you have successfully pasted your final results into the yellow A2 cell of your Excel Workbook before resetting!</p>
+                </div>
+            </div>
 
         </div>
 
@@ -2799,262 +3036,6 @@ function toggleEmbeddedManual() {
         document.getElementById('exportGuideModal').style.display = 'none';
     }
 </script>
-    <div id="embedded-manual" class="no-print">
-            <div class="no-print" style="display: flex; justify-content: flex-end; margin-bottom: 20px;">
-        <button onclick="toggleEmbeddedManual()" class="btn-action-outline btn-danger-outline" style="padding: 8px 16px; font-size: 12px; font-weight: 900; background: #fef2f2; color: #ef4444; border-color: #fca5a5;">❌ CLOSE MANUAL</button>
-    </div>
-            <h1>COMPETITION HUB MANUAL</h1>
-            <div class="manual-subtitle">Master Organiser's Companion Guide</div>
-
-            <!-- SLIDE 1 -->
-            <div class="manual-slide">
-                <div class="manual-slide-header">
-                    <h2>1. WELCOME & OVERVIEW</h2>
-                    <span class="manual-badge">Slide 1 of 11</span>
-                </div>
-                <h3>Getting Started with Your Match Software</h3>
-                <p>Welcome! This simple, interactive guide is designed to walk you through running a fishing competition step-by-step. The software does all the hard math for you behind the scenes, so you can focus entirely on running a smooth match.</p>
-                <div class="manual-grid">
-                    <div class="manual-card">
-                        <span class="manual-card-title">1. Set Up & Draw</span>
-                        <p style="font-size: 13px; margin:0;">Create your competitor draw list and generate the random peg draw instantly.</p>
-                    </div>
-                    <div class="manual-card">
-                        <span class="manual-card-title">2. Record & Export</span>
-                        <p style="font-size: 13px; margin:0;">Record the angler catches and easily copy-paste scores directly into Excel with a single click.</p>
-                    </div>
-                    <div class="manual-card">
-                        <span class="manual-card-title">3. Secret Pairs</span>
-                        <p style="font-size: 13px; margin:0;">Run an exciting, fully automated random pool competition on the side.</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- SLIDE 2 -->
-            <div class="manual-slide">
-                <div class="manual-slide-header">
-                    <h2>2. PRE-MATCH DAY PREPARATION</h2>
-                    <span class="manual-badge">Slide 2 of 11</span>
-                </div>
-                <h3>Setting Up Your Files and Names</h3>
-                <p>Before match day arrives, taking a few minutes to organise your spreadsheet ensures the entire automated process runs completely error-free.</p>
-                <div class="manual-box">
-                    <strong>1. Save a Fresh Workbook Copy</strong>
-                    <p style="margin-top:4px;">Always navigate to your computer storage, locate your master file, and save a clean, distinct copy of the <strong>Competition Scorecard</strong> Excel file specifically named for the upcoming match. This protects your historical archives.</p>
-                </div>
-                <div class="manual-box">
-                    <strong>2. Pre-Populate Competitor Names</strong>
-                    <p style="margin-top:4px;">Open your newly saved spreadsheet, click over to the <strong>Competitor list</strong> tab, and type or paste the names of all pre-registered anglers directly into the designated column. This fully prepares the sheet so you can effortlessly feed Option A during the morning check-in draw.</p>
-                </div>
-            </div>
-
-            <!-- SLIDE 3 -->
-            <div class="manual-slide">
-                <div class="manual-slide-header">
-                    <h2>3. COMPETITION SETUP (PART 1)</h2>
-                    <span class="manual-badge">Slide 3 of 11</span>
-                </div>
-                <h3>Basic Match Details & Accessibility Settings</h3>
-                <p>This is where you set up the basic structure of your match and prepare the parameters for your random peg draw.</p>
-                <ul>
-                    <li><strong>Match Name:</strong> Click the title area and type the official name of your competition.</li>
-                    <li><strong>Duration:</strong> Choose whether this is a <strong>1-Day</strong> or <strong>2-Day</strong> match.</li>
-                </ul>
-                <h3 style="margin-top:24px;">Accessibility Options (Optional)</h3>
-                <p>Toggle this <strong>"ON"</strong> if you have anglers who require flat, easy-to-reach beach pegs. Once the draw is performed, these specific anglers will automatically be allocated from your chosen easy-access pegs.</p>
-                <div class="manual-box">
-                    <strong>OPTION A: DISTRIBUTED PEGS</strong>
-                    <p style="margin-top:4px; margin-bottom:0;">Use if you have suitable, easy-access pegs scattered along the beach. Simply type specific peg numbers separated by commas (e.g., <code style="background:#e2e8f0; padding:2px 4px; border-radius:4px;">5, 12, 18</code>).</p>
-                </div>
-                <div class="manual-box">
-                    <strong>OPTION B: STATIC ZONES</strong>
-                    <p style="margin-top:4px; margin-bottom:0;">Use if beach access is highly restricted and only one specific zone is suitable. Simply assign which general zone they will fish in for each day of the match.</p>
-                </div>
-            </div>
-
-            <!-- SLIDE 4 -->
-            <div class="manual-slide">
-                <div class="manual-slide-header">
-                    <h2>4. COMPETITION SETUP (PART 2)</h2>
-                    <span class="manual-badge">Slide 4 of 11</span>
-                </div>
-                <h3>Entering the Anglers' Details</h3>
-                <p>There are two straightforward options to get your competitor names into the hub.</p>
-                <div class="manual-box">
-                    <strong style="color: #0369a1; font-size:16px;">OPTION A: COPY FROM EXCEL FILE (Recommended)</strong>
-                    <p style="margin-top:4px;">This is the fastest and most common way to get your draw list ready.</p>
-                    <ol>
-                        <li>Open your saved <strong>Competition Scorecard</strong> Excel sheet, and open the <strong>Competitor list</strong> tab.</li>
-                        <li>Highlight and <strong>Copy</strong> the pre-populated list of angler names.</li>
-                        <li>In Competition Hub, click <strong>"Quick Import"</strong>, paste the list, and hit <strong>Submit</strong>. The system builds your list instantly!</li>
-                    </ol>
-                </div>
-                <div class="manual-box">
-                    <strong style="color: #0f172a; font-size:16px;">OPTION B: MANUAL LIST ENTRY</strong>
-                    <p style="margin-top:4px;">Ideal for smaller matches, late entries, or organising individual teams on the spot.</p>
-                    <ol>
-                        <li>Use the simple controls to enter the total number of teams and solo anglers. The hub dynamically generates the exact number of input boxes you need.</li>
-                        <li>Type the names directly into the fields. You can also assign individual team affiliations on this screen.</li>
-                    </ol>
-                </div>
-            </div>
-
-            <!-- SLIDE 5 -->
-            <div class="manual-slide">
-                <div class="manual-slide-header">
-                    <h2>5. RUNNING THE LIVE DRAW</h2>
-                    <span class="manual-badge">Slide 5 of 11</span>
-                </div>
-                <h3>Mark Accessibility Requests & Process the Pegs</h3>
-                <p>Once your names are entered, you are ready to prepare your draw list and execute the peg assignments.</p>
-                <strong>1. PREPARE & CHECK DRAW LIST:</strong>
-                <ul>
-                    <li>Ensure all entered competitor names are fully visible in the draw list.</li>
-                    <li><strong>Identify Access Requests:</strong> Look down your draw list. Click the small <code style="background:#e2e8f0; padding:2px 4px; border-radius:4px;">[A]</code> button sitting right beside any angler who has requested an accessible beach peg.</li>
-                    <li><strong>Visual Confirmation:</strong> The button will highlight to verify that this angler is marked for automatic, priority peg placement.</li>
-                </ul>
-                <strong style="margin-top: 16px; display: inline-block;">2. PROCESS DRAW:</strong>
-                <ul>
-                    <li>Confirm the total number of selected accessible anglers matches your physical list.</li>
-                    <li>When you are confident, click the bright, primary <strong>"Process Draw"</strong> button.</li>
-                    <li><strong>The Magic:</strong> The system instantly assigns easy-access pegs first, and randomly distributes all remaining beach pegs in seconds.</li>
-                </ul>
-            </div>
-
-            <!-- SLIDE 6 -->
-            <div class="manual-slide">
-                <div class="manual-slide-header">
-                    <h2>6. UNDERSTANDING THE LIVE DRAW</h2>
-                    <span class="manual-badge">Slide 6 of 11</span>
-                </div>
-                <h3>Decoding the Peg Legends & the Smart Draw Rules</h3>
-                <p>Once you click "Process Draw", the system instantly presents your finalized match layout.</p>
-                <strong>1. THE GOLDEN RULES OF THE DRAW (The Math Engine):</strong>
-                <p style="margin-top:4px;">Behind the scenes, a clever algorithm automatically calculates your peg placements based on strict fairness rules:</p>
-                <ul>
-                    <li><strong>Separated Teams:</strong> Anglers from the same team are automatically split up so they never fish in the same zone.</li>
-                    <li><strong>No Repeat Zones:</strong> No angler will fish the same zone on both days.</li>
-                    <li><strong>The Only Exception:</strong> Accessible anglers may be allocated to the same zone on both days if choice is highly restricted.</li>
-                </ul>
-                <strong style="margin-top: 16px; display: inline-block;">2. THE DRAW LEGEND (Top of Screen):</strong>
-                <p style="margin-top:4px;">This bar shows the sequence of pegs for each day of the match, color-coded by zone:</p>
-                <ul>
-                    <li><strong>Zone Colour Blocks:</strong> Easily see which peg numbers belong to which coloured zones for Day 1 and Day 2.</li>
-                    <li><strong>Accessible Peg Markers:</strong> Any easy-access peg allocated to a registered angler is highlighted inside the colored zone bar.</li>
-                    <li><strong>Extended Pegs (e.g., 15A):</strong> If you add late entries after the initial draw is done, they are allocated as "extended" pegs. This squeezes them onto the beach without altering any of the already drawn pegs.</li>
-                </ul>
-            </div>
-
-            <!-- SLIDE 7 -->
-            <div class="manual-slide">
-                <div class="manual-slide-header">
-                    <h2>7. POST-DRAW MANAGEMENT & PRINTING</h2>
-                    <span class="manual-badge">Slide 7 of 11</span>
-                </div>
-                <h3>Making Adjustments and Printing Lists for Stewards</h3>
-                <p>After the draw is generated, two floating menus appear at the bottom of the screen, providing tools to handle last-minute adjustments.</p>
-                <div class="manual-box">
-                    <strong style="color: #0369a1; font-size:16px;">1. MANAGE DRAW (Floating Button)</strong>
-                    <ul style="margin-top:8px; margin-bottom:0;">
-                        <li><strong>Amend Names:</strong> Easily correct spelling mistakes directly without resetting the draw.</li>
-                        <li><strong>Delete Cancellations:</strong> Remove anglers who didn't turn up. <span style="color:#b45309; font-weight:800;">Important Team Rule:</span> If the no-show is part of a team, you must first click to <strong>unlink</strong> the remainder of that team into individual solo anglers before you can delete the missing person.</li>
-                        <li><strong>Add Teams or Solos Post-Draw:</strong> Add late entries on the fly. The system automatically places them on extended pegs (like 15A) to keep the initial draw safe.</li>
-                        <li><strong>Full Redraw:</strong> Use only as a last resort. This completely wipes the slate clean and generates a brand-new random draw.</li>
-                    </ul>
-                </div>
-                <div class="manual-box">
-                    <strong style="color: #0f172a; font-size:16px;">2. OUTPUT MENU (Floating Button)</strong>
-                    <ul style="margin-top:8px; margin-bottom:0;">
-                        <li><strong>Current Angler List:</strong> A complete master sheet of all competitors.</li>
-                        <li><strong>Individual Team Draws:</strong> Handy printouts grouped by team so captains can easily see positions.</li>
-                        <li><strong>Zone List for Stewards:</strong> A clean sequence of pegs broken down by zone, perfect for stewards physically pegging out the beach or checking in stations.</li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- SLIDE 8 -->
-            <div class="manual-slide">
-                <div class="manual-slide-header">
-                    <h2>8. RECORDING MATCH SCORES</h2>
-                    <span class="manual-badge">Slide 8 of 11</span>
-                </div>
-                <h3>Inputting the Stewards' Paper Catch Sheets</h3>
-                <p>Once the match has concluded and the stewards submit the physical scorecards, you are ready to input the data.</p>
-                <ul>
-                    <li>Click on the <strong>"Scorecards"</strong> tab in the Hub.</li>
-                    <li><strong>Select the Correct Day:</strong> The screen is split into Day 1 and Day 2 sub-screens. <span style="color:#b91c1c; font-weight:800;">Make sure you select the correct active day!</span></li>
-                    <li><strong>Input the Totals:</strong> Beside each pre-populated angler name, copy and type the totals directly from their paper scorecard:
-                        <ul style="margin-top: 8px;">
-                            <li><strong>Length:</strong> Total length of fish caught (in cm).</li>
-                            <li><strong>Fish Count:</strong> Total number of fish caught.</li>
-                            <li><strong>Biggest Fish:</strong> The length of their largest individual fish.</li>
-                            <li><strong>Species:</strong> The total number of different species caught.</li>
-                        </ul>
-                    </li>
-                    <li><strong>Handy Search Bar:</strong> With a long list of competitors, do not waste time scrolling! Simply type the first few letters of the angler's name into the search box at the top of the day card. The hub will instantly find them and bring their scorecard straight to the front.</li>
-                </ul>
-            </div>
-
-            <!-- SLIDE 9 -->
-            <div class="manual-slide">
-                <div class="manual-slide-header">
-                    <h2>9. EXPORTING & RE-ENTERING DATA</h2>
-                    <span class="manual-badge">Slide 9 of 11</span>
-                </div>
-                <h3>Transferring the Final Data Records to Excel</h3>
-                <p>This step explains how to securely copy your calculated match records into your main workbook computer terminal.</p>
-                <strong>1. TRIGGER THE EXPORT COPIER:</strong>
-                <ul>
-                    <li><strong>1-Day Match:</strong> Scroll to the bottom of the scoresheet and click the green <strong>"Export Master Scores for Excel"</strong> button.</li>
-                    <li><strong>2-Day Match:</strong> <span style="color:#b91c1c; font-weight:800;">* Important:</span> <strong>Ignore</strong> the export button at the bottom of Day 1. Wait until the Day 2 scores are fully entered, and then click the green <strong>"Export Master Scores for Excel"</strong> button located at the bottom of the Day 2 score screen.</li>
-                    <li><strong>What this does:</strong> The Hub copies all the calculated, formatted match records directly into your computer's temporary clipboard.</li>
-                </ul>
-                <div class="manual-box warning">
-                    <strong style="color: #b45309; font-size:16px;">2. PASTE INTO YOUR EXCEL HUB:</strong>
-                    <ol style="margin-top:8px; margin-bottom:0;">
-                        <li>Open your <strong>Competition Scorecard</strong> Excel workbook on your computer.</li>
-                        <li>Go to the <strong>RAW_SCORES</strong> tab.</li>
-                        <li>Click the glowing yellow <code style="background:#fde68a; padding:2px 4px; border-radius:4px; font-weight:900;">A2</code> cell directly under your blue instruction banner.</li>
-                        <li>Press <strong>Ctrl+V</strong> on your keyboard.</li>
-                        <li><strong>The Magic:</strong> You will see the columns populate instantly! Excel takes over from here and automatically calculates individual and team standings across the entire match.</li>
-                    </ol>
-                </div>
-            </div>
-
-            <!-- SLIDE 10 -->
-            <div class="manual-slide">
-                <div class="manual-slide-header">
-                    <h2>10. SECRET PAIRS (SIDE POOL)</h2>
-                    <span class="manual-badge">Slide 10 of 11</span>
-                </div>
-                <h3>Run an Automated Blind-Draw Side-Pool</h3>
-                <p>The Secret Pairs game is an optional, popular side-pool that pairs anglers up completely at random and gives the entire field a fair chance to win prize money.</p>
-                <ul>
-                    <li><strong>The "Target Length" Method:</strong> Instead of crowning the highest score, the computer randomly calculates a hidden <strong>Target Length</strong> that falls strictly between the lowest and highest possible combined scores. The pair whose combined length is <strong>closest</strong> to the target length wins the pool!</li>
-                    <li><strong>Pool Splits & Opt-Ins:</strong> Enter the pool entry fee. The computer instantly tallies the total pot and displays payouts automatically using a 50% / 30% / 20% split. To remove non-participants, click the green box beside their name to toggle them to <strong>"NO"</strong>.</li>
-                    <li><strong>The "Joe Average" Safeguard:</strong> If you have an uneven number of pool entries, the computer automatically generates a virtual angler named <strong>Joe Average</strong>. Joe is automatically assigned the exact mean (average) score of all competing anglers to complete the final pair flawlessly.</li>
-                    <li><strong>Execution & Tie Breaker:</strong> Click the draw button. The system locks the target length and displays the winning pairs after a dramatic 5-second countdown. If a tie occurs, the win goes to the pair with the <strong>highest combined catch length</strong>.</li>
-                </ul>
-            </div>
-
-            <!-- SLIDE 11 -->
-            <div class="manual-slide">
-                <div class="manual-slide-header">
-                    <h2>11. END OF COMPETITION & RESET</h2>
-                    <span class="manual-badge">Slide 11 of 11</span>
-                </div>
-                <h3>Cleaning the Slate for Your Next Match</h3>
-                <p>Once all the prizes have been awarded, the stewards have checked the gear, and everyone has headed home, you can safely reset the system for your next competition.</p>
-                <div class="manual-box danger">
-                    <strong style="color: #991b1b; font-size:18px;">The Finish and Reset Trigger</strong>
-                    <p style="margin-top:8px;">Look at the top right of the screen for the <strong>"Finish and Reset Competition"</strong> button. Clicking this button performs two actions simultaneously:</p>
-                    <ol>
-                        <li><strong>System Wipe:</strong> It clears all current data and temporary match records to ensure the Hub is perfectly clean for your next event.</li>
-                        <li><strong>Data Backup:</strong> It automatically downloads a secure, permanent file copy of the competition records directly into your computer's "Documents" folder for your archives.</li>
-                    </ol>
-                    <p style="margin-top:12px; font-weight:800; color:#b91c1c; margin-bottom:0;">⚠️ Caution: Once triggered, data is cleared from the active screen! Ensure you have successfully pasted your final results into the yellow A2 cell of your Excel Workbook before resetting!</p>
-                </div>
-            </div>
 <!-- Excel Export Infographic Modal -->
 <div id="exportGuideModal" class="export-modal" style="display: none;">
     <div class="export-modal-content">
