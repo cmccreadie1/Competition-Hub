@@ -489,8 +489,8 @@
     </div>
 </div>
 
-<div class="tab-nav no-print" style="margin-top: 65px;">
-    <button id="tabBtn-draw" class="tab-btn active" onclick="switchTab('draw')" style="color: #ffffff;">1. DRAW SETUP</button>
+<div class="tab-nav no-print">
+    <button id="tabBtn-draw" class="tab-btn active" onclick="switchTab('draw')">1. DRAW SETUP</button>
     <button id="tabBtn-score" class="tab-btn" onclick="switchTab('score')">2. SCORECARDS</button>
     <button id="tabBtn-pairs" class="tab-btn" onclick="switchTab('pairs')">3. SECRET PAIRS (Optional)</button>
 </div>
@@ -499,7 +499,11 @@
     </div>
 </div>
 
-
+<div class="tab-nav no-print">
+    <button id="tabBtn-draw" class="tab-btn active" onclick="switchTab('draw')">1. DRAW SETUP</button>
+    <button id="tabBtn-score" class="tab-btn" onclick="switchTab('score')">2. SCORECARDS</button>
+    <button id="tabBtn-pairs" class="tab-btn" onclick="switchTab('pairs')">3. SECRET PAIRS (Optional)</button>
+</div>
 
 <div id="drawTab" class="tab-content active">
 
@@ -938,41 +942,23 @@
         document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
         document.querySelectorAll('.tab-content').forEach(content => content.style.display = 'none');
         
-        function switchTab(tabId) {
-    // Reset all tabs to default state
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.remove('active');
-        btn.style.color = ''; 
-    });
-    document.querySelectorAll('.tab-content').forEach(content => content.style.display = 'none');
-
-    // Apply active state and white text to clicked tab
-    let activeTabBtn = document.getElementById(`tabBtn-${tabId}`);
-    if (activeTabBtn) {
+        let activeTabBtn = document.getElementById(`tabBtn-${tabId}`);
         activeTabBtn.classList.add('active');
-        activeTabBtn.style.color = '#ffffff';
-    }
-    
-    // Ensure content displays
-    let targetTab = document.getElementById(`${tabId}Tab`);
-    if (targetTab) {
-        targetTab.style.display = 'block';
+        document.getElementById(`${tabId}Tab`).style.display = 'block';
+        
+        if (tabId === 'draw') {
+            document.body.className = 'stage-draw';
+        } else if (tabId === 'pairs') {
+            document.body.className = 'stage-pairs';
+            renderOptInList();
+            updatePrizeFund();
+        } else {
+            document.body.className = 'stage-score';
+            document.getElementById('dayTabsContainer').style.display = matchDays === 2 ? 'flex' : 'none';
+            switchScoreDay(1);
+        }
     }
 
-    // Core app logic for switching stages
-    if (tabId === 'draw') {
-        document.body.className = 'stage-draw';
-    } else if (tabId === 'pairs') {
-        document.body.className = 'stage-pairs';
-        renderOptInList();
-        updatePrizeFund();
-    } else {
-        document.body.className = 'stage-score';
-        let dayTabs = document.getElementById('dayTabsContainer');
-        if (dayTabs) dayTabs.style.display = matchDays === 2 ? 'flex' : 'none';
-        switchScoreDay(1);
-    }
-}
    function switchScoreDay(day) {
         currentScoreDay = day;
         document.body.className = day === 1 ? 'stage-score-d1' : 'stage-score-d2';
