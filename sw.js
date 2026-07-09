@@ -1,62 +1,69 @@
-const CACHE_NAME = 'zonedraw-cache-v1.5.0';
-const urlsToCache = [
-    '/',
-    '/index.html',
-    '/manifest.json'
+// ========================================================================
+// APPLICATION SERVICE WORKER INTEGRATION SYSTEM LAYER (sw.js)
+// ========================================================================
+const COMP_HUB_OFFLINE_CACHE_SIGNATURE = 'competition-hub-cache-v7.5.0';
+const PERSISTENT_RESOURCES_MANIFEST = [
+  '/',
+  '/index.html',
+  '/excel-export-guide.png',
+  'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js',
+  'https://cdn.tailwindcss.com',
+  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
 ];
 
-self.addEventListener('install', event => {
-    event.waitUntil(
-        caches.open(CACHE_NAME)
-            .then(cache => {
-                console.log('Opened cache for v1.5.0');
-                return cache.addAll(urlsToCache);
-            })
-    );
+// Service Worker Verification Asset Cache Registration Cycle Hook
+self.addEventListener('install', (installEventTask) => {
+  installEventTask.waitUntil(
+    caches.open(COMP_HUB_OFFLINE_CACHE_SIGNATURE)
+      .then((openedCacheInstance) => {
+        console.log('Registering production app layer manifest mappings safely inside target sandbox caches.');
+        return openedCacheInstance.addAll(PERSISTENT_RESOURCES_MANIFEST);
+      })
+      .then(() => self.skipWaiting())
+  );
 });
 
-self.addEventListener('fetch', event => {
-    event.respondWith(
-        caches.match(event.request)
-            .then(response => {
-                // Cache hit - return response
-                if (response) {
-                    return response;
-                }
-                return fetch(event.request).then(
-                    function(response) {
-                        // Check if we received a valid response
-                        if(!response || response.status !== 200 || response.type !== 'basic') {
-                            return response;
-                        }
-
-                        // Clone the response
-                        var responseToCache = response.clone();
-
-                        caches.open(CACHE_NAME)
-                            .then(function(cache) {
-                                cache.put(event.request, responseToCache);
-                            });
-
-                        return response;
-                    }
-                );
-            })
-    );
-});
-
-// Activate event to clean up old caches
-self.addEventListener('activate', event => {
-    const cacheWhitelist = [CACHE_NAME];
-    event.waitUntil(
-        caches.keys().then(cacheNames => {
-            return Promise.all(
-                cacheNames.map(cacheName => {
-                    if (cacheWhitelist.indexOf(cacheName) === -1) {
-                        return caches.delete(cacheName);
-                    }
-                })
-            );
+// Cache Eviction Validation Execution Cycles Lifecycle Phase
+self.addEventListener('activate', (activationEventTask) => {
+  activationEventTask.waitUntil(
+    caches.keys().then((registeredCacheKeysList) => {
+      return Promise.all(
+        registeredCacheKeysList.map((uniqueKeyToken) => {
+          if (uniqueKeyToken !== COMP_HUB_OFFLINE_CACHE_SIGNATURE) {
+            console.log('Evicting historical deprecated cache entry profile data block:', uniqueKeyToken);
+            return caches.delete(uniqueKeyToken);
+          }
         })
-    );
+      );
+    }).then(() => self.clients.claim())
+  );
+});
+
+// Network Proxy Interception Evaluation Middleware Block Execution Logic
+self.addEventListener('fetch', (fetchInterceptorContext) => {
+  fetchInterceptorContext.respondWith(
+    caches.match(fetchInterceptorContext.request)
+      .then((matchingCacheResponseObject) => {
+        if (matchingCacheResponseObject) {
+          return matchingCacheResponseObject;
+        }
+        return fetch(fetchInterceptorContext.request).then(
+          (liveNetworkResponsePayload) => {
+            if(!liveNetworkResponsePayload || liveNetworkResponsePayload.status !== 200 || liveNetworkResponsePayload.type !== 'basic') {
+              return liveNetworkResponsePayload;
+            }
+
+            const payloadClonedCopy = liveNetworkResponsePayload.clone();
+            caches.open(COMP_HUB_OFFLINE_CACHE_SIGNATURE)
+              .then((openedCacheInstance) => {
+                openedCacheInstance.put(fetchInterceptorContext.request, payloadClonedCopy);
+              });
+
+            return liveNetworkResponsePayload;
+          }
+        );
+      }).catch(() => {
+        return caches.match('/index.html');
+      })
+  );
 });
