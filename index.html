@@ -518,6 +518,21 @@
     background: var(--red-color);
     color: white;
 }
+        /* --- All-In-One Data Entry Styles --- */
+.validation-dashboard { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 20px; }
+.stat-box { flex: 1; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 15px; text-align: center; }
+.stat-box.warning { background: var(--red-soft); border-color: var(--red-color); }
+.stat-value { display: block; font-size: 24px; font-weight: 900; color: var(--text-dark); }
+.stat-box.warning .stat-value { color: var(--red-color); }
+.stat-label { font-size: 11px; font-weight: 800; color: var(--text-light); text-transform: uppercase; }
+.input-row-container { display: flex; gap: 10px; margin-bottom: 20px; align-items: stretch; }
+.roster-list-container { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 10px; max-height: 400px; overflow-y: auto; margin-bottom: 20px; }
+.roster-header, .roster-row { display: grid; grid-template-columns: 2fr 2fr 50px; gap: 10px; align-items: center; padding: 10px; border-bottom: 1px solid #f1f5f9; }
+.roster-header { font-weight: 900; font-size: 11px; color: var(--text-light); border-bottom: 2px solid var(--border); }
+.r-name { font-weight: 800; font-size: 14px; }
+.r-team { font-weight: 800; font-size: 12px; color: var(--accent); }
+.r-team.solo-tag { color: var(--text-light); font-style: italic; }
+.btn-delete { background: var(--red-soft); color: var(--red-color); border: 1px solid var(--red-color); border-radius: 6px; cursor: pointer; font-weight: 900; padding: 5px; }
     </style>
 </head>
 <body class="stage-draw">
@@ -546,26 +561,7 @@
 
 <div id="drawTab" class="tab-content active">
 
-    <div id="entrySection" class="tab-content active">
     
-    <div class="validation-dashboard">
-        <div class="stat-box">
-            <span class="stat-value" id="stat-total">0</span>
-            <span class="stat-label">Total Anglers</span>
-        </div>
-        <div class="stat-box">
-            <span class="stat-value" id="stat-solo">0</span>
-            <span class="stat-label">Solo Anglers</span>
-        </div>
-        <div class="stat-box">
-            <span class="stat-value" id="stat-teams">0</span>
-            <span class="stat-label">Complete Teams</span>
-        </div>
-        <div class="stat-box warning" id="stat-incomplete-box" style="display:none;">
-            <span class="stat-value" id="stat-incomplete">0</span>
-            <span class="stat-label">Incomplete Teams</span>
-        </div>
-    </div>
 
     <div class="input-row-container">
         <input type="text" id="anglerNameInput" placeholder="Angler Name" autocomplete="off" />
@@ -652,37 +648,42 @@
                 </div>
             </div>
 
-            <div id="rosterEntryZone">
-                <div style="margin: 25px 0; border-bottom: 2px dashed var(--border);"></div>
-                <div class="entry-group-label" style="text-align: center; margin-bottom: 20px; color: var(--text-dark);">COMPETITOR ENTRY</div>
+            <!-- NEW ALL-IN-ONE DATA ENTRY HUB -->
+<div id="rosterEntryZone" class="control-panel" style="padding: 0; overflow: hidden; margin-top: 20px;">
+    <div style="background: #f8fafc; padding: 20px; border-bottom: 1px solid var(--border); text-align: left;">
+        <h3 style="margin: 0 0 8px 0; font-size: 15px; color: var(--text-dark);">COMPETITOR ROSTER</h3>
+        <p style="margin: 0; font-size: 12px; color: var(--text-light); font-weight: 600; text-transform: none;">
+            Add your competitors below. Enter their name and team—leave the team blank to register them as a solo angler. Toggle the <span style="color: var(--a-color); font-weight: 900;">{A}</span> button if they require an accessible peg. Your list saves automatically and can be prepared ahead of the competition.
+        </p>
+    </div>
 
-                <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; text-align: left;">
-                    <div style="flex: 1; min-width: 280px; max-width: 400px; background: #ffffff; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.05); border-radius: 20px; padding: 24px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
-                        <h4 style="margin: 0 0 6px 0; color: var(--text-dark); font-weight: 900; font-size: 15px;">OPTION 1: QUICK IMPORT</h4>
-                        <p style="margin: 0 0 20px 0; font-size: 12px; font-weight: 600; color: var(--text-light); text-transform: none;">Auto-calculates teams and solos from Excel data.</p>
-                        <button id="importExcelBtn" class="btn-action" style="width: 100%; padding: 14px 20px;" onclick="showImportModal()">📋 QUICK IMPORT EXCEL LIST</button>
-                    </div>
-
-                    <div style="flex: 1; min-width: 280px; max-width: 400px; background: #ffffff; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.05); border-radius: 20px; padding: 24px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
-                        <h4 style="margin: 0 0 6px 0; color: var(--text-dark); font-weight: 900; font-size: 15px;">OPTION 2: MANUAL SETUP</h4>
-                        <p style="margin: 0 0 20px 0; font-size: 12px; font-weight: 600; color: var(--text-light); text-transform: none;">Generate empty boxes to fill by hand.</p>
-                        <div style="display:flex; align-items:center; justify-content:center; gap:12px; width:100%;">
-                            <div style="display:flex; gap:8px;">
-                                <div style="display:flex; flex-direction:column; align-items:center;">
-                                    <label style="font-size: 10px; font-weight: 900; color: var(--text-light); margin-bottom: 4px;">TEAMS</label>
-                                    <input type="number" id="initTeams" value="0" style="width:60px; text-align:center; font-size: 14px; padding: 10px; background: #f8fafc; border: 1px solid var(--border);">
-                                </div>
-                                <div style="display:flex; flex-direction:column; align-items:center;">
-                                    <label style="font-size: 10px; font-weight: 900; color: var(--text-light); margin-bottom: 4px;">SOLOS</label>
-                                    <input type="number" id="initIndivs" value="0" style="width:60px; text-align:center; font-size: 14px; padding: 10px; background: #f8fafc; border: 1px solid var(--border);">
-                                </div>
-                            </div>
-                            <button id="initMatchBtn" class="btn-action-outline" style="padding: 10px 16px; height: 100%; flex: 1;" onclick="bulkInit()">CREATE</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <div style="padding: 20px;">
+        <div class="validation-dashboard">
+            <div class="stat-box"><span class="stat-value" id="stat-total">0</span><span class="stat-label">Total Anglers</span></div>
+            <div class="stat-box"><span class="stat-value" id="stat-solo">0</span><span class="stat-label">Solo</span></div>
+            <div class="stat-box"><span class="stat-value" id="stat-teams">0</span><span class="stat-label">Complete Teams</span></div>
+            <div class="stat-box warning" id="stat-incomplete-box" style="display:none;"><span class="stat-value" id="stat-incomplete">0</span><span class="stat-label">Partial Teams</span></div>
         </div>
+
+        <div class="input-row-container">
+            <input type="text" id="anglerNameInput" placeholder="Angler Name" autocomplete="off" style="flex: 2;" />
+            <input type="text" id="teamNameInput" placeholder="Team Name (Leave blank for Solo)" autocomplete="off" style="flex: 2;" />
+            <button id="accToggleBtn" class="btn-tool" style="flex: 0 0 auto; width: 60px; font-size: 16px;" onclick="toggleAccStatus()">
+                <span style="opacity: 0.3; color: var(--text-dark);">{A}</span>
+            </button>
+            <button id="addAnglerBtn" class="btn-action" onclick="addAnglerFromUI()" style="flex: 1;">ADD</button>
+        </div>
+
+        <div class="roster-list-container">
+            <div class="roster-header"><span>Name</span><span>Team / Status</span><span>Action</span></div>
+            <div id="liveRosterList"></div>
+        </div>
+
+        <div style="text-align: center; margin-top: 20px;">
+            <button class="btn-action" onclick="generateDraw()" style="width: 100%;">PROCEED TO DRAW</button>
+        </div>
+    </div>
+</div>
         
         <div id="entryList">
             <div id="entryTeamsContainer" style="display:none;">
@@ -1230,6 +1231,107 @@
 </div>
 
 <script>
+    // --- All-In-One Data Entry Logic ---
+let allAnglers = [];
+let currentAccStatus = false;
+
+document.addEventListener('DOMContentLoaded', () => {
+    const anglerNameInput = document.getElementById('anglerNameInput');
+    const teamNameInput = document.getElementById('teamNameInput');
+    if(anglerNameInput && teamNameInput) {
+        anglerNameInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') { e.preventDefault(); teamNameInput.focus(); }
+        });
+        teamNameInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') { e.preventDefault(); addAnglerFromUI(); }
+        });
+    }
+});
+
+function toggleAccStatus() {
+    currentAccStatus = !currentAccStatus;
+    const btn = document.getElementById('accToggleBtn');
+    if (currentAccStatus) {
+        btn.style.borderColor = 'var(--a-color)';
+        btn.style.background = 'var(--yellow-soft)';
+        btn.innerHTML = '<span style="color: var(--a-color); font-weight: 900; opacity: 1;">{A}</span>';
+    } else {
+        btn.style.borderColor = 'var(--border)';
+        btn.style.background = '#ffffff';
+        btn.innerHTML = '<span style="opacity: 0.3; color: var(--text-dark);">{A}</span>';
+    }
+}
+
+function addAnglerFromUI() {
+    const anglerNameInput = document.getElementById('anglerNameInput');
+    const teamNameInput = document.getElementById('teamNameInput');
+    let name = anglerNameInput.value.trim().toUpperCase();
+    let team = teamNameInput.value.trim().toUpperCase();
+    let isAccessible = currentAccStatus;
+
+    if (!name) { showToast("⚠️ Angler Name is required"); anglerNameInput.focus(); return; }
+    if (allAnglers.some(a => a.name === name)) { showToast("⚠️ Warning: Angler already exists"); return; }
+    
+    if (!team) team = "SOLO";
+    if (team !== "SOLO" && allAnglers.filter(a => a.team === team).length >= 4) {
+        showToast(`⚠️ Team ${team} already has 4 members!`); return;
+    }
+
+    allAnglers.push({ name: name, team: team, accessible: isAccessible });
+    anglerNameInput.value = ''; teamNameInput.value = ''; currentAccStatus = false;
+    
+    const btn = document.getElementById('accToggleBtn');
+    btn.style.borderColor = 'var(--border)'; btn.style.background = '#ffffff';
+    btn.innerHTML = '<span style="opacity: 0.3; color: var(--text-dark);">{A}</span>';
+
+    anglerNameInput.focus();
+    updateLiveRoster();
+}
+
+function removeAngler(index) {
+    allAnglers.splice(index, 1);
+    updateLiveRoster();
+}
+
+function updateLiveRoster() {
+    const listEl = document.getElementById('liveRosterList');
+    if(!listEl) return;
+    listEl.innerHTML = '';
+    
+    let soloCount = 0; let teamCounts = {};
+
+    allAnglers.forEach((angler, index) => {
+        if (angler.team === 'SOLO') soloCount++;
+        else teamCounts[angler.team] = (teamCounts[angler.team] || 0) + 1;
+
+        const row = document.createElement('div');
+        row.className = 'roster-row';
+        row.innerHTML = `
+            <span class="r-name">${angler.name} ${angler.accessible ? '<span class="a-tag">{A}</span>' : ''}</span>
+            <span class="r-team ${angler.team === 'SOLO' ? 'solo-tag' : ''}">${angler.team}</span>
+            <button class="btn-delete" onclick="removeAngler(${index})">X</button>
+        `;
+        listEl.appendChild(row);
+    });
+
+    let completeTeams = 0, incompleteTeams = 0;
+    for (let team in teamCounts) {
+        if (teamCounts[team] === 4) completeTeams++;
+        else incompleteTeams++;
+    }
+
+    document.getElementById('stat-total').innerText = allAnglers.length;
+    document.getElementById('stat-solo').innerText = soloCount;
+    document.getElementById('stat-teams').innerText = completeTeams;
+    
+    const incompleteBox = document.getElementById('stat-incomplete-box');
+    if (incompleteTeams > 0) {
+        document.getElementById('stat-incomplete').innerText = incompleteTeams;
+        incompleteBox.style.display = 'block';
+    } else {
+        incompleteBox.style.display = 'none';
+    }
+}
 
     // --- All-In-One Data Entry Logic ---
 let allAnglers = [];
