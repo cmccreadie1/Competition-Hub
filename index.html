@@ -433,6 +433,91 @@
         .btn-close-modal:active {
             opacity: 0.8;
         }
+        /* --- All-In-One Data Entry Styles --- */
+.validation-dashboard {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+.stat-box {
+    flex: 1;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+.stat-box.warning {
+    background: var(--red-soft);
+    border-color: var(--red-color);
+}
+.stat-value {
+    display: block;
+    font-size: 24px;
+    font-weight: 900;
+    color: var(--text-dark);
+}
+.stat-box.warning .stat-value {
+    color: var(--red-color);
+}
+.stat-label {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--text-light);
+    text-transform: uppercase;
+}
+.input-row-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+.input-row-container input {
+    flex: 2;
+}
+.input-row-container button {
+    flex: 1;
+}
+.roster-list-container {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 10px;
+    max-height: 400px;
+    overflow-y: auto;
+    margin-bottom: 20px;
+}
+.roster-header, .roster-row {
+    display: grid;
+    grid-template-columns: 2fr 2fr 50px;
+    gap: 10px;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #f1f5f9;
+}
+.roster-header {
+    font-weight: 900;
+    font-size: 11px;
+    color: var(--text-light);
+    border-bottom: 2px solid var(--border);
+}
+.r-name { font-weight: 800; font-size: 14px; }
+.r-team { font-weight: 800; font-size: 12px; color: var(--accent); }
+.r-team.solo-tag { color: var(--text-light); font-style: italic; }
+.btn-delete {
+    background: var(--red-soft);
+    color: var(--red-color);
+    border: 1px solid var(--red-color);
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 900;
+    padding: 5px;
+}
+.btn-delete:hover {
+    background: var(--red-color);
+    color: white;
+}
     </style>
 </head>
 <body class="stage-draw">
@@ -461,19 +546,46 @@
 
 <div id="drawTab" class="tab-content active">
 
-    <div id="entrySection" class="no-print">
-        
-        <div style="text-align: right; margin-bottom: 10px;">
-            <button onclick="openManualModal()" style="background: #e0f2fe; color: #0284c7; border: 1px solid #bae6fd; font-weight: 800; font-size: 12px; padding: 8px 16px; border-radius: 50px; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">📘 Need Help? View Manual ↓</button>
+    <div id="entrySection" class="tab-content active">
+    
+    <div class="validation-dashboard">
+        <div class="stat-box">
+            <span class="stat-value" id="stat-total">0</span>
+            <span class="stat-label">Total Anglers</span>
         </div>
-        
-        <div id="editDrawBanner" style="display:none; background:var(--green-soft); border: 1px solid var(--green-color); border-radius:16px; padding: 16px; margin-bottom: 20px; text-align: left; display: flex; align-items: center; gap: 15px;">
-            <span style="font-size: 24px;">✏️</span>
-            <div>
-                <h3 style="color:var(--green-color); margin:0 0 4px 0; font-size: 14px;">EDITING CURRENT DRAW</h3>
-                <p style="color:var(--text-dark); margin:0; font-size: 12px; text-transform: none; font-weight: 600;">You can safely change names, update mobility [A] tags, and link/unlink teams. Your existing peg numbers are locked.</p>
-            </div>
+        <div class="stat-box">
+            <span class="stat-value" id="stat-solo">0</span>
+            <span class="stat-label">Solo Anglers</span>
         </div>
+        <div class="stat-box">
+            <span class="stat-value" id="stat-teams">0</span>
+            <span class="stat-label">Complete Teams</span>
+        </div>
+        <div class="stat-box warning" id="stat-incomplete-box" style="display:none;">
+            <span class="stat-value" id="stat-incomplete">0</span>
+            <span class="stat-label">Incomplete Teams</span>
+        </div>
+    </div>
+
+    <div class="input-row-container">
+        <input type="text" id="anglerNameInput" placeholder="Angler Name" autocomplete="off" />
+        <input type="text" id="teamNameInput" placeholder="Team Name (Leave blank for Solo)" autocomplete="off" />
+        <button id="addAnglerBtn" class="btn-action" onclick="addAnglerFromUI()">ADD</button>
+    </div>
+
+    <div class="roster-list-container">
+        <div class="roster-header">
+            <span>Name</span>
+            <span>Team / Status</span>
+            <span>Action</span>
+        </div>
+        <div id="liveRosterList"></div>
+    </div>
+
+    <div class="action-bar" style="text-align: center; margin-top: 20px;">
+        <button class="btn-action" onclick="generateDraw()">PROCEED TO DRAW</button>
+    </div>
+</div>
 
         <div class="control-panel" id="setupPanel">
             <input type="text" id="matchTitle" placeholder="[ TYPE COMPETITION NAME HERE ]">
@@ -1118,6 +1230,135 @@
 </div>
 
 <script>
+
+    // --- All-In-One Data Entry Logic ---
+let allAnglers = [];
+
+// Keyboard Listener for Rapid-Fire Entry
+document.addEventListener('DOMContentLoaded', () => {
+    const anglerNameInput = document.getElementById('anglerNameInput');
+    const teamNameInput = document.getElementById('teamNameInput');
+
+    if(anglerNameInput && teamNameInput) {
+        anglerNameInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                teamNameInput.focus();
+            }
+        });
+
+        teamNameInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addAnglerFromUI();
+            }
+        });
+    }
+});
+
+function addAnglerFromUI() {
+    const anglerNameInput = document.getElementById('anglerNameInput');
+    const teamNameInput = document.getElementById('teamNameInput');
+    
+    let name = anglerNameInput.value.trim().toUpperCase();
+    let team = teamNameInput.value.trim().toUpperCase();
+
+    if (!name) {
+        showToast("⚠️ Angler Name is required");
+        anglerNameInput.focus();
+        return;
+    }
+
+    // Duplicate Check
+    if (checkDuplicate(name)) {
+        showToast("⚠️ Warning: Angler already exists");
+        return;
+    }
+
+    // Auto-Solo Assignment
+    if (!team) {
+        team = "SOLO";
+    }
+
+    // Team Cap Enforcement
+    if (team !== "SOLO" && !checkTeamSize(team)) {
+        showToast(`⚠️ Team ${team} already has 4 members!`);
+        return;
+    }
+
+    // Add and clear for next entry
+    allAnglers.push({ name: name, team: team });
+    anglerNameInput.value = '';
+    teamNameInput.value = '';
+    anglerNameInput.focus();
+
+    updateLiveRoster();
+}
+
+function checkDuplicate(name) {
+    return allAnglers.some(a => a.name === name);
+}
+
+function checkTeamSize(teamName) {
+    let count = allAnglers.filter(a => a.team === teamName).length;
+    return count < 4;
+}
+
+function removeAngler(index) {
+    allAnglers.splice(index, 1);
+    updateLiveRoster();
+}
+
+function updateLiveRoster() {
+    const listEl = document.getElementById('liveRosterList');
+    if(!listEl) return;
+    listEl.innerHTML = '';
+    
+    let total = allAnglers.length;
+    let soloCount = 0;
+    let teamCounts = {};
+
+    allAnglers.forEach((angler, index) => {
+        if (angler.team === 'SOLO') {
+            soloCount++;
+        } else {
+            teamCounts[angler.team] = (teamCounts[angler.team] || 0) + 1;
+        }
+
+        const row = document.createElement('div');
+        row.className = 'roster-row';
+        row.innerHTML = `
+            <span class="r-name">${angler.name}</span>
+            <span class="r-team ${angler.team === 'SOLO' ? 'solo-tag' : ''}">${angler.team}</span>
+            <button class="btn-delete" onclick="removeAngler(${index})">X</button>
+        `;
+        listEl.appendChild(row);
+    });
+
+    let completeTeams = 0;
+    let incompleteTeams = 0;
+
+    for (let team in teamCounts) {
+        if (teamCounts[team] === 4) {
+            completeTeams++;
+        } else {
+            incompleteTeams++;
+        }
+    }
+
+    // Update Live Dashboard
+    document.getElementById('stat-total').innerText = total;
+    document.getElementById('stat-solo').innerText = soloCount;
+    document.getElementById('stat-teams').innerText = completeTeams;
+    
+    const incompleteBox = document.getElementById('stat-incomplete-box');
+    if (incompleteTeams > 0) {
+        document.getElementById('stat-incomplete').innerText = incompleteTeams;
+        incompleteBox.style.display = 'block';
+    } else {
+        incompleteBox.style.display = 'none';
+    }
+}
     const APP_VERSION = "v7.5.0"; // Version update for Embedded Manual
     document.getElementById('vTag').innerText = APP_VERSION;
 
