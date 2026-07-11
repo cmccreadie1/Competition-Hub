@@ -1948,35 +1948,13 @@ function switchLeaderboardSubTab(subTabId) {
     }
 }
 // CORE MATH ENGINE: CALCULATES AND RENDERS ZONE LEADERBOARDS FOR DAY 1 OR DAY 2
+// CORE MATH ENGINE: CALCULATES AND RENDERS ZONE LEADERBOARDS FOR DAY 1 OR DAY 2
 function calculateAndRenderZoneLeaderboard(dayNum, containerId) {
     const container = document.getElementById(containerId);
     if (!container) return;
     
-    // SMART AUTO-DETECT: Find where the app stores the live competitor list
-    let liveAnglers = null;
-    
-    if (window.matchState && window.matchState.anglers) liveAnglers = window.matchState.anglers;
-    else if (window.gameState && window.gameState.anglers) liveAnglers = window.gameState.anglers;
-    else if (window.matchData && window.matchData.anglers) liveAnglers = window.matchData.anglers;
-    else if (window.currentMatch && window.currentMatch.anglers) liveAnglers = window.currentMatch.anglers;
-    else if (typeof anglers !== 'undefined') liveAnglers = anglers;
-    
-    // If global variables are isolated, check local storage backup keys
-    if (!liveAnglers) {
-        const storageKeys = ['matchState', 'gameState', 'competitionHub_data', 'matchData', 'hubData'];
-        for (let key of storageKeys) {
-            try {
-                const localData = JSON.parse(localStorage.getItem(key));
-                if (localData && (localData.anglers || Array.isArray(localData))) {
-                    liveAnglers = localData.anglers || localData;
-                    break;
-                }
-            } catch(e) {}
-        }
-    }
-
-    // Fallback error if completely missing
-    if (!liveAnglers || liveAnglers.length === 0) {
+    // Ensure core application data structures exist
+    if (typeof appState === 'undefined' || !appState || appState.length === 0) {
         container.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding: 40px; color: #94a3b8; font-weight:800;">NO LIVE TOURNAMENT DATA FOUND. RUN DRAW SETUP FIRST.</div>`;
         return;
     }
@@ -1986,23 +1964,48 @@ function calculateAndRenderZoneLeaderboard(dayNum, containerId) {
 
     // Process each color-coded zone individually
     zones.forEach(zoneName => {
-        // 1. Isolate all anglers assigned to this specific zone on this day
-        let zoneAnglers = liveAnglers.filter(a => {
-            const assignment = dayNum === 1 ? a.day1 : a.day2;
-            return assignment && assignment.zone === zoneName;
-        }).map(a => {
-            // Extract catch metrics safely from scorecards data arrays
-            const scoreRecord = a.scores && a.scores[dayNum] ? a.scores[dayNum] : { length: 0, count: 0, max: 0, species: 0 };
-            return {
-                name: a.name,
-                team: a.team || 'SOLO',
-                peg: dayNum === 1 ? (a.day1 ? a.day1.peg : '-') : (a.day2 ? a.day2.peg : '-'),
-                length: Number(scoreRecord.length) || 0,
-                count: Number(scoreRecord.count) || 0,
-                max: Number(scoreRecord.max) || 0,
-                species: Number(scoreRecord.species) || 0,
-                zonePoints: 0
-            };
+        let zoneAnglers = [];
+
+        // 1. Loop through appState structures matching your exact scorecard render loops
+        appState.forEach(teamEntry => {
+            teamEntry.anglers.forEach((angler, aIdx) => {
+                // Determine targeted zone and peg assignments based on the active day choice
+                const targetZone = dayNum === 1 ? angler.z1 : angler.z2;
+                const targetPeg = dayNum === 1 ? angler.p1 : angler.p2;
+
+                // Only include the angler if they have a valid name and are assigned to this specific zone
+                if (!angler.name || targetZone !== zoneName) return;
+
+                // Construct the exact composite lookup key used by scoreState
+                const scoreKey = `${teamEntry.id}_${aIdx}_${dayNum}`;
+                const rawScore = (typeof scoreState !== 'undefined' && scoreState[scoreKey]) 
+                    ? scoreState[scoreKey] 
+                    : { len: '', count: '', big: '', spec: '' };
+
+                // Handle string entries and species conversions cleanly
+                let rawSpecies = String(rawScore.spec || '').trim();
+                let computedSpecies = 0;
+                if (rawSpecies !== '') {
+                    // Try parsing as number; if string list, count comma-separated items
+                    if (!isNaN(rawSpecies)) {
+                        computedSpecies = Number(rawSpecies);
+                    } else {
+                        computedSpecies = rawSpecies.split(',').filter(item => item.trim().length > 0).length;
+                    }
+                }
+
+                // Append resolved profile metrics into the processing collection array
+                zoneAnglers.push({
+                    name: angler.name,
+                    team: (teamEntry.isTeam && teamEntry.tName && teamEntry.tName.trim().toUpperCase() !== 'SOLO') ? teamEntry.tName.trim() : 'SOLO',
+                    peg: targetPeg || '-',
+                    length: Number(rawScore.len) || 0,
+                    count: Number(rawScore.count) || 0,
+                    max: Number(rawScore.big) || 0,
+                    species: computedSpecies,
+                    zonePoints: 0
+                });
+            });
         });
 
         // 2. Sort Anglers based on the strict Tie-Breaker Hierarchy
@@ -2059,7 +2062,7 @@ function calculateAndRenderZoneLeaderboard(dayNum, containerId) {
         const activeColor = zoneColors[zoneName] || '#64748b';
 
         htmlOutput += `
-        <div style="background: rgba(30, 41, 59, 0.7); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
+        <div style="background: rgba(30, 41, 59, 0.7); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.15); margin-bottom: 20px;">
             <div style="background: ${activeColor}; color: #ffffff; padding: 12px; text-align: center; font-size: 14px; font-weight: 900; letter-spacing: 1px;">
                 ZONE ${zoneName}
             </div>
@@ -2067,8 +2070,8 @@ function calculateAndRenderZoneLeaderboard(dayNum, containerId) {
                 <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 12px; color: #ffffff;">
                     <thead>
                         <tr style="border-bottom: 2px solid rgba(255,255,255,0.1); color: #94a3b8; font-weight: 800; font-size: 10px;">
-                            <th style="padding: 6px 4px; text-align: center;">PTS</th>
-                            <th style="padding: 6px 4px; text-align: center;">PEG</th>
+                            <th style="padding: 6px 4px; text-align: center; width: 50px;">PTS</th>
+                            <th style="padding: 6px 4px; text-align: center; width: 50px;">PEG</th>
                             <th style="padding: 6px 4px;">ANGLER</th>
                             <th style="padding: 6px 4px; text-align: right;">DATA MATRIX (L/F/B/S)</th>
                         </tr>
@@ -2077,20 +2080,20 @@ function calculateAndRenderZoneLeaderboard(dayNum, containerId) {
         `;
 
         if (zoneAnglers.length === 0) {
-            htmlOutput += `<tr><td colspan="4" style="text-align:center; padding:20px; color:#64748b;">No anglers assigned</td></tr>`;
+            htmlOutput += `<tr><td colspan="4" style="text-align:center; padding:20px; color:#64748b; font-weight:700;">No anglers assigned to this zone</td></tr>`;
         } else {
             zoneAnglers.forEach(angler => {
                 // Construct clean unified Excel format string representation
                 const dataString = `${angler.length} / ${angler.count} / ${angler.max} / ${angler.species}`;
                 htmlOutput += `
                     <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); font-weight: 600;">
-                        <td style="padding: 8px 4px; text-align: center; color: var(--accent); font-weight: 900; font-size: 13px;">${angler.zonePoints}</td>
-                        <td style="padding: 8px 4px; text-align: center; opacity: 0.7;">${angler.peg}</td>
+                        <td style="padding: 8px 4px; text-align: center; color: var(--accent); font-weight: 900; font-size: 14px;">${angler.zonePoints}</td>
+                        <td style="padding: 8px 4px; text-align: center; opacity: 0.8; font-weight: 800;">${angler.peg}</td>
                         <td style="padding: 8px 4px; text-transform: uppercase;">
-                            <div style="font-weight: 800;">${angler.name}</div>
-                            <div style="font-size: 9px; color: #94a3b8; font-weight: 500;">${angler.team}</div>
+                            <div style="font-weight: 800; color: #ffffff;">${angler.name}</div>
+                            <div style="font-size: 9px; color: #94a3b8; font-weight: 600;">${angler.team}</div>
                         </td>
-                        <td style="padding: 8px 4px; text-align: right; font-family: monospace; font-size: 11px; letter-spacing: 0.5px; color: #cbd5e1;">${dataString}</td>
+                        <td style="padding: 8px 4px; text-align: right; font-family: monospace; font-size: 12px; letter-spacing: 0.5px; color: #e2e8f0;">${dataString}</td>
                     </tr>
                 `;
             });
