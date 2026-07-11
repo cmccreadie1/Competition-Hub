@@ -1951,8 +1951,31 @@ function calculateAndRenderZoneLeaderboard(dayNum, containerId) {
     const container = document.getElementById(containerId);
     if (!container) return;
     
-    // Ensure tournament data exists to process
-    if (!window.matchState || !window.matchState.anglers) {
+    // SMART AUTO-DETECT: Find where the app stores the live competitor list
+    let liveAnglers = null;
+    
+    if (window.matchState && window.matchState.anglers) liveAnglers = window.matchState.anglers;
+    else if (window.gameState && window.gameState.anglers) liveAnglers = window.gameState.anglers;
+    else if (window.matchData && window.matchData.anglers) liveAnglers = window.matchData.anglers;
+    else if (window.currentMatch && window.currentMatch.anglers) liveAnglers = window.currentMatch.anglers;
+    else if (typeof anglers !== 'undefined') liveAnglers = anglers;
+    
+    // If global variables are isolated, check local storage backup keys
+    if (!liveAnglers) {
+        const storageKeys = ['matchState', 'gameState', 'competitionHub_data', 'matchData', 'hubData'];
+        for (let key of storageKeys) {
+            try {
+                const localData = JSON.parse(localStorage.getItem(key));
+                if (localData && (localData.anglers || Array.isArray(localData))) {
+                    liveAnglers = localData.anglers || localData;
+                    break;
+                }
+            } catch(e) {}
+        }
+    }
+
+    // Fallback error if completely missing
+    if (!liveAnglers || liveAnglers.length === 0) {
         container.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding: 40px; color: #94a3b8; font-weight:800;">NO LIVE TOURNAMENT DATA FOUND. RUN DRAW SETUP FIRST.</div>`;
         return;
     }
@@ -1963,7 +1986,7 @@ function calculateAndRenderZoneLeaderboard(dayNum, containerId) {
     // Process each color-coded zone individually
     zones.forEach(zoneName => {
         // 1. Isolate all anglers assigned to this specific zone on this day
-        let zoneAnglers = window.matchState.anglers.filter(a => {
+        let zoneAnglers = liveAnglers.filter(a => {
             const assignment = dayNum === 1 ? a.day1 : a.day2;
             return assignment && assignment.zone === zoneName;
         }).map(a => {
