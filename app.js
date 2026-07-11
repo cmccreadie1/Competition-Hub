@@ -2501,18 +2501,19 @@ function calculateAndRenderTeamLeaderboard(containerId) {
         return b.cnt - a.cnt;                     // 2nd Tie-Breaker: Highest Combined Team Fish Count
     });
 
-    // 3. Render Dashboard Interface Layout Mapping (MAX READABILITY UPGRADE)
+    // 3. Render Dashboard Interface Layout Mapping (OPTIMIZED COLUMN SPACE)
     let html = `
     <div style="background: rgba(30, 41, 59, 0.7); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
         <div style="overflow-x: auto;">
             <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 16px; color: #ffffff; white-space: nowrap;">
                 <thead>
+                    <!-- Master Header Deck Category Columns -->
                     <tr style="background: rgba(15, 23, 42, 0.6); color: #e2e8f0; font-weight: 900; font-size: 16px; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                        <th style="padding: 16px 14px; text-align: left; width: 300px;">RANK / TEAM NAME</th>
-                        <th style="padding: 16px 10px; background: rgba(59, 130, 246, 0.15); width: 80px; color: var(--accent);">PTS</th>
-                        <th style="padding: 16px 10px; background: rgba(16, 185, 129, 0.15); width: 90px;">CM</th>
-                        <th style="padding: 16px 10px; background: rgba(234, 179, 8, 0.15); width: 90px;">FISH CT</th>
-                        <th style="padding: 16px 14px; text-align: left; background: rgba(15, 23, 42, 0.4);">TEAM CATCH BREAKDOWN (BEST TO LEAST PERFORMING)</th>
+                        <th style="padding: 16px 14px; text-align: left; width: 220px;">RANK / TEAM NAME</th>
+                        <th style="padding: 16px 4px; background: rgba(59, 130, 246, 0.15); width: 45px; color: var(--accent);">PTS</th>
+                        <th style="padding: 16px 4px; background: rgba(16, 185, 129, 0.15); width: 55px;">CM</th>
+                        <th style="padding: 16px 4px; background: rgba(234, 179, 8, 0.15); width: 55px;">FISH CT</th>
+                        <th style="padding: 16px 14px; text-align: left; background: rgba(15, 23, 42, 0.4);">TEAM CATCH BREAKDOWN</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -2528,7 +2529,7 @@ function calculateAndRenderTeamLeaderboard(containerId) {
             let breakdownHTML = '';
             team.members.forEach((m, idx) => {
                 breakdownHTML += `
-                    <div style="display: inline-block; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 6px; margin-right: 8px; font-size: 13px;">
+                    <div style="display: inline-block; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 6px; margin-right: 6px; font-size: 13px; white-space: nowrap;">
                         <span style="font-weight: 800; color: #ffffff;">${m.name}</span> 
                         <span style="color: #94a3b8; font-family: monospace; font-size: 12px; margin-left: 4px;">(${m.pts}pts / ${m.len}cm / ${m.cnt}f)</span>
                     </div>
@@ -2537,20 +2538,25 @@ function calculateAndRenderTeamLeaderboard(containerId) {
 
             html += `
                 <tr style="border-bottom: 1px solid rgba(255,255,255,0.07); font-weight: 600; height: 56px;">
+                    <!-- Rank & Team Name Details -->
                     <td style="padding: 12px 14px; text-align: left; text-transform: uppercase;">
-                        <span style="color: var(--accent); font-weight: 900; font-size: 18px; margin-right: 14px;">${currentRank}</span>
+                        <span style="color: var(--accent); font-weight: 900; font-size: 18px; margin-right: 12px;">${currentRank}</span>
                         <span style="font-weight: 900; color: #ffffff; font-size: 17px; letter-spacing: 0.5px;">${team.name}</span>
                     </td>
-                    <td style="padding: 12px 10px; font-size: 18px; font-weight: 900; color: var(--accent); background: rgba(59, 130, 246, 0.02); border-left: 1px solid rgba(255,255,255,0.03); border-right: 1px solid rgba(255,255,255,0.03); font-family: monospace;">
+                    <!-- Cumulative Team Points Column -->
+                    <td style="padding: 12px 4px; font-size: 17px; font-weight: 900; color: var(--accent); background: rgba(59, 130, 246, 0.02); border-left: 1px solid rgba(255,255,255,0.03); border-right: 1px solid rgba(255,255,255,0.03); font-family: monospace;">
                         ${team.pts}
                     </td>
-                    <td style="padding: 12px 10px; font-size: 17px; font-weight: 800; color: #ffffff; background: rgba(16, 185, 129, 0.02); border-right: 1px solid rgba(255,255,255,0.03); font-family: monospace;">
+                    <!-- Cumulative Team Length Column -->
+                    <td style="padding: 12px 4px; font-size: 16px; font-weight: 800; color: #ffffff; background: rgba(16, 185, 129, 0.02); border-right: 1px solid rgba(255,255,255,0.03); font-family: monospace;">
                         ${team.len}
                     </td>
-                    <td style="padding: 12px 10px; font-size: 17px; font-weight: 800; color: #e2e8f0; background: rgba(234, 179, 8, 0.02); border-right: 1px solid rgba(255,255,255,0.03); font-family: monospace;">
+                    <!-- Cumulative Team Fish Count Column -->
+                    <td style="padding: 12px 4px; font-size: 16px; font-weight: 800; color: #e2e8f0; background: rgba(234, 179, 8, 0.02); border-right: 1px solid rgba(255,255,255,0.03); font-family: monospace;">
                         ${team.cnt}
                     </td>
-                    <td style="padding: 12px 14px; text-align: left; background: rgba(15, 23, 42, 0.1); white-space: normal;">
+                    <!-- Dynamic Catch Contribution Blocks -->
+                    <td style="padding: 12px 14px; text-align: left; background: rgba(15, 23, 42, 0.1); white-space: nowrap;">
                         ${breakdownHTML}
                     </td>
                 </tr>
