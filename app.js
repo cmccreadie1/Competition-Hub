@@ -1,6 +1,6 @@
-
-    const APP_VERSION = "v7.5.0"; // Version update for Embedded Manual
-    document.getElementById('vTag').innerText = APP_VERSION;
+const APP_VERSION = "v7.5.0"; 
+    const vTag = document.getElementById('vTag');
+    if (vTag) vTag.innerText = APP_VERSION;
 
     const zones = ['RED', 'YELLOW', 'GREEN', 'BLUE'];
     
@@ -20,9 +20,12 @@
     let swapObj1 = null; 
     let mobilityMode = 'A'; 
     let accEnabled = false; 
-    let trashCan = null;
     let currentScoreDay = 1;
     let sweepstakeOptIns = {}; // Track secret pairs opt in logic
+
+    // NEW UI STATE VARIABLES
+    let isNextAnglerAcc = false;
+    let lastDeletedAngler = null; // For the 5-second undo
 
     const genId = () => {
         return 'id_' + Math.random().toString(36).substr(2, 9);
@@ -30,6 +33,7 @@
 
     function showToast(msg) {
         const t = document.getElementById('toastBanner');
+        if (!t) return;
         t.innerHTML = msg;
         t.style.top = '25px';
         setTimeout(() => { t.style.top = '-100px'; }, 3000);
@@ -156,6 +160,7 @@
 
     function renderScorecards() {
         const container = document.getElementById('scoreListContainer');
+        if (!container) return;
         container.innerHTML = '';
         
         let hasDrawnData = false;
@@ -170,7 +175,6 @@
             <div style="text-align:center;">FISH CT</div>
             <div style="text-align:center;">BIGGEST</div>
             <div style="text-align:center;">SPECIES</div>
-        
         `;
         container.appendChild(headerRow);
 
@@ -222,7 +226,6 @@
                         onchange="saveScore('${key}', 'spec', this.value)" 
                         onkeydown="handleScoreEnter(event)"
                         onfocus="highlightRow(this)" onblur="unhighlightRow(this)">
-                   
                 `;
                 container.appendChild(row);
             });
@@ -290,12 +293,14 @@
     
     function toggleAccordion() {
         const accordion = document.getElementById('roster-accordion');
+        if (!accordion) return;
         accordion.classList.toggle('collapsed');
         document.getElementById('accordion-icon').innerText = accordion.classList.contains('collapsed') ? '▶' : '▼';
     }
 
     function renderOptInList() {
         const grid = document.getElementById('opt-in-list');
+        if (!grid) return;
         grid.innerHTML = '';
         
         let pool = [];
@@ -337,7 +342,8 @@
     }
 
     function updatePrizeFund() {
-        const fee = parseInt(document.getElementById('entry-fee').value) || 0;
+        const feeEl = document.getElementById('entry-fee');
+        const fee = feeEl ? parseInt(feeEl.value) || 0 : 0;
         let optedInCount = 0;
         appState.forEach(e => {
             e.anglers.forEach((a, aIdx) => {
@@ -352,10 +358,10 @@
         const second = Math.round(totalFund * 0.30);
         const third = Math.round(totalFund * 0.20);
         
-        document.getElementById('prize-fund-display').innerText = totalFund;
-        document.getElementById('prize-1st').innerText = first;
-        document.getElementById('prize-2nd').innerText = second;
-        document.getElementById('prize-3rd').innerText = third;
+        if (document.getElementById('prize-fund-display')) document.getElementById('prize-fund-display').innerText = totalFund;
+        if (document.getElementById('prize-1st')) document.getElementById('prize-1st').innerText = first;
+        if (document.getElementById('prize-2nd')) document.getElementById('prize-2nd').innerText = second;
+        if (document.getElementById('prize-3rd')) document.getElementById('prize-3rd').innerText = third;
 
         const titleSpan = document.getElementById('accordion-title');
         if (titleSpan) titleSpan.innerText = `${optedInCount} ANGLERS OPTED IN - CLICK TO MANAGE`;
@@ -395,11 +401,9 @@
             return;
         }
 
-        // Collapse Roster to save screen space
         const accordion = document.getElementById('roster-accordion');
-        if (!accordion.classList.contains('collapsed')) toggleAccordion();
+        if (accordion && !accordion.classList.contains('collapsed')) toggleAccordion();
 
-        // Ghost Angler Calculations
         if (activePairsPool.length % 2 !== 0) {
             const sortedLengths = activePairsPool.map(a => a.totalLength).sort((a,b) => a-b);
             const sortedCounts = activePairsPool.map(a => a.fishCount).sort((a,b) => a-b);
@@ -416,7 +420,6 @@
             });
         }
 
-        // Shuffle and Build Random Pairs
         activePairsPool.sort(() => Math.random() - 0.5);
         let secretPairs = [];
         for (let i = 0; i < activePairsPool.length; i += 2) {
@@ -428,25 +431,21 @@
             });
         }
 
-        // Generate Random Target between actual range extremes
         let lengthsArray = secretPairs.map(p => p.combinedLength);
         let minLength = Math.min(...lengthsArray);
         let maxLength = Math.max(...lengthsArray);
         const targetScore = Math.floor(Math.random() * (maxLength - minLength + 1)) + minLength;
 
-        // UI Progression
         document.getElementById('reveal-area').style.display = 'block';
         document.getElementById('winners-podium').style.display = 'none';
         document.getElementById('pairs-results').style.display = 'none';
         document.getElementById('target-score-banner').innerText = `TARGET COMBINED LENGTH: ${targetScore}cm`;
         
-        // Suspense Pause (5-Second Countdown)
         let timeLeft = 5;
         const countdownEl = document.getElementById('countdown-display');
         countdownEl.style.display = 'block';
         countdownEl.innerText = timeLeft;
 
-        // Process Rankings with Tie-Breaker Priority (Closest Proximity -> Total Fish Count)
         let rankedPairs = secretPairs.map(pair => {
             pair.diff = Math.abs(pair.combinedLength - targetScore);
             return pair;
@@ -455,7 +454,6 @@
             return b.combinedCount - a.combinedCount;
         });
 
-        // Process Absolute Ties (Split the Pot Logic)
         let finalStandings = [];
         let i = 0;
         while (i < rankedPairs.length) {
@@ -498,7 +496,6 @@
         const basePrizes = [funds.first, funds.second, funds.third];
         let assignedPrizes = [0, 0, 0];
 
-        // Calculate Prize Multipliers for Ties
         let idx = 0;
         while (idx < Math.min(3, standings.length)) {
             let item = standings[idx];
@@ -522,7 +519,6 @@
             }
         }
 
-        // Output Top 3 to Podium
         for (let i = 0; i < Math.min(3, standings.length); i++) {
             const pair = standings[i];
             const tieClass = pair.isTie ? "shared-tie" : "";
@@ -546,7 +542,6 @@
             `;
         }
 
-        // Output the rest to the High Density Grid
         for (let i = 3; i < standings.length; i++) {
             const pair = standings[i];
             grid.innerHTML += `
@@ -568,7 +563,213 @@
     }
 
     // ====================================================
-    // --- ORIGINAL ZONEDRAW APP ENGINE (UNEDITED) ---
+    // --- NEW "BUILD COMPETITOR LIST" ENGINE ---
+    // ====================================================
+
+    function toggleAccStatus() {
+        isNextAnglerAcc = !isNextAnglerAcc;
+        const btn = document.getElementById('accToggleBtn');
+        if (isNextAnglerAcc) {
+            btn.style.background = 'var(--text-dark)';
+            btn.querySelector('span').style.opacity = '1';
+            btn.querySelector('span').style.color = 'white';
+        } else {
+            btn.style.background = '#ffffff';
+            btn.querySelector('span').style.opacity = '0.3';
+            btn.querySelector('span').style.color = 'var(--text-dark)';
+        }
+    }
+
+    function addAnglerFromUI() {
+        const nameInput = document.getElementById('anglerNameInput');
+        const teamInput = document.getElementById('teamNameInput');
+        
+        let aName = nameInput.value.trim().toUpperCase();
+        let tName = teamInput.value.trim().toUpperCase();
+
+        if (!aName) {
+            alert("Please enter an Angler Name.");
+            return;
+        }
+
+        // Duplicate Sentinel
+        let isDup = false;
+        appState.forEach(e => {
+            e.anglers.forEach(a => {
+                if (a.name === aName) isDup = true;
+            });
+        });
+        
+        if (isDup) {
+            alert(`Duplicate Alert: Angler '${aName}' is already on the draw list.`);
+            return;
+        }
+
+        let isTeam = (tName !== '' && tName !== 'SOLO');
+        let mobility = isNextAnglerAcc ? 1 : 0;
+
+        if (isTeam) {
+            let existingTeam = appState.find(e => e.isTeam && e.tName === tName);
+            if (existingTeam) {
+                // Team Size Sentinel
+                if (existingTeam.anglers.length >= 4) {
+                    alert(`Team ${tName} is already full (Max 4 members). Cannot add ${aName}.`);
+                    return;
+                }
+                existingTeam.anglers.push({ name: aName, mobility: mobility });
+            } else {
+                appState.push({ id: genId(), isTeam: true, tName: tName, anglers: [{ name: aName, mobility: mobility }] });
+            }
+        } else {
+            appState.push({ id: genId(), isTeam: false, tName: '', anglers: [{ name: aName, mobility: mobility }] });
+        }
+
+        // Rapid Fire Flow
+        nameInput.value = '';
+        if (isNextAnglerAcc) toggleAccStatus(); // reset toggle
+        nameInput.focus();
+
+        renderStateToScreen();
+    }
+
+    function removeAnglerFromState(eId, aIdx) {
+        let eIndex = appState.findIndex(e => e.id === eId);
+        if (eIndex > -1) {
+            // Save for Undo
+            lastDeletedAngler = { 
+                eIndex: eIndex, 
+                aIdx: aIdx, 
+                eId: eId, 
+                team: appState[eIndex].isTeam, 
+                tName: appState[eIndex].tName, 
+                data: appState[eIndex].anglers[aIdx] 
+            };
+            
+            appState[eIndex].anglers.splice(aIdx, 1);
+            if (appState[eIndex].anglers.length === 0) {
+                appState.splice(eIndex, 1);
+            }
+            
+            renderStateToScreen();
+            showToast("Entry removed. <button onclick='restoreAngler()' style='margin-left:10px; padding:4px 10px; background:white; color:var(--text-dark); border-radius:4px; border:none; font-weight:900; cursor:pointer;'>UNDO</button>");
+        }
+    }
+
+    function restoreAngler() {
+        if (!lastDeletedAngler) return;
+        
+        let e = appState.find(x => x.id === lastDeletedAngler.eId);
+        if (e) {
+            e.anglers.splice(lastDeletedAngler.aIdx, 0, lastDeletedAngler.data);
+        } else {
+            appState.splice(lastDeletedAngler.eIndex, 0, {
+                id: lastDeletedAngler.eId,
+                isTeam: lastDeletedAngler.team,
+                tName: lastDeletedAngler.tName,
+                anglers: [lastDeletedAngler.data]
+            });
+        }
+        
+        lastDeletedAngler = null;
+        renderStateToScreen();
+    }
+
+    function renderStateToScreen() {
+        const listDiv = document.getElementById('liveRosterList');
+        if (!listDiv) return;
+        listDiv.innerHTML = '';
+
+        let totalAnglers = 0;
+        let solos = 0;
+        let completeTeams = 0;
+        let incompleteTeams = 0;
+
+        appState.forEach(e => {
+            if (e.isTeam) {
+                totalAnglers += e.anglers.length;
+                if (e.anglers.length === 4) completeTeams++;
+                else incompleteTeams++;
+            } else {
+                totalAnglers += e.anglers.length;
+                solos += e.anglers.length;
+            }
+
+            e.anglers.forEach((a, aIdx) => {
+                let statusStr = e.isTeam ? `${e.tName} (${e.anglers.length}/4)` : 'SOLO';
+                let tagColor = e.isTeam ? (e.anglers.length === 4 ? 'var(--green-color)' : 'var(--yellow-color)') : 'var(--text-light)';
+                let accStr = a.mobility ? '<span style="color:var(--text-dark); font-weight:900; margin-left:8px;">{A}</span>' : '';
+
+                let row = document.createElement('div');
+                row.style.display = 'grid';
+                row.style.gridTemplateColumns = '2fr 2fr 50px';
+                row.style.gap = '10px';
+                row.style.alignItems = 'center';
+                row.style.padding = '10px';
+                row.style.borderBottom = '1px solid var(--border)';
+                row.style.fontSize = '12px';
+                row.style.fontWeight = '800';
+                row.style.color = 'var(--text-dark)';
+
+                row.innerHTML = `
+                    <div style="text-transform: uppercase;">${a.name} ${accStr}</div>
+                    <div style="color: ${tagColor};">${statusStr}</div>
+                    <button onclick="removeAnglerFromState('${e.id}', ${aIdx})" style="background:var(--red-soft); border:1px solid var(--red-color); color:var(--red-color); font-weight:900; border-radius:6px; cursor:pointer; padding:6px; transition:0.2s;">X</button>
+                `;
+                listDiv.appendChild(row);
+            });
+        });
+
+        // Update Dynamic Dashboard
+        if (document.getElementById('stat-total')) document.getElementById('stat-total').innerText = totalAnglers;
+        if (document.getElementById('stat-solo')) document.getElementById('stat-solo').innerText = solos;
+        if (document.getElementById('stat-teams')) document.getElementById('stat-teams').innerText = completeTeams;
+        if (document.getElementById('stat-incomplete')) document.getElementById('stat-incomplete').innerText = incompleteTeams;
+
+        const incBox = document.getElementById('stat-incomplete-box');
+        if (incBox) incBox.style.display = incompleteTeams > 0 ? 'block' : 'none';
+
+        checkTeamClash();
+        persistState();
+    }
+
+    function generateDraw() {
+        let hasIncomplete = false;
+        let total = 0;
+        
+        appState.forEach(e => {
+            total += e.anglers.length;
+            if (e.isTeam && e.anglers.length !== 4) hasIncomplete = true;
+        });
+
+        if (total === 0) {
+            alert("The draw list is empty. Add anglers before proceeding.");
+            return;
+        }
+
+        if (hasIncomplete) {
+            let conf = confirm("WARNING: You have partial teams detected. Generating the draw now will lock these teams as incomplete. Proceed anyway?");
+            if (!conf) return;
+        }
+
+        // Initialize empty pegs to ensure clean engine logic
+        appState.forEach(e => {
+            e.anglers.forEach(a => {
+                a.z1 = undefined; a.p1 = undefined; a.z2 = undefined; a.p2 = undefined;
+            });
+            
+            // Engine Padder: The old algorithms expect a team object to iterate 4 times
+            if (e.isTeam) {
+                while (e.anglers.length < 4) {
+                    e.anglers.push({ name: '', mobility: 0 });
+                }
+            }
+        });
+
+        initiateShuffle();
+    }
+
+    // ====================================================
+    // --- ORIGINAL APP ENGINE FUNCTIONS ---
     // ====================================================
 
     function persistState() {
@@ -581,10 +782,10 @@
             zoneSize: currentZoneSize, 
             mobilityMode: mobilityMode,
             accEnabled: accEnabled,
-            safePegs1_a: document.getElementById('accPegs1_a').value,
-            safePegs2_a: document.getElementById('accPegs2_a').value,
-            anchorZone: document.getElementById('anchorZoneSelect').value,
-            anchorZone2: document.getElementById('anchorZoneSelect2').value,
+            safePegs1_a: document.getElementById('accPegs1_a') ? document.getElementById('accPegs1_a').value : '',
+            safePegs2_a: document.getElementById('accPegs2_a') ? document.getElementById('accPegs2_a').value : '',
+            anchorZone: document.getElementById('anchorZoneSelect') ? document.getElementById('anchorZoneSelect').value : 'RED',
+            anchorZone2: document.getElementById('anchorZoneSelect2') ? document.getElementById('anchorZoneSelect2').value : 'RED',
             sweepstakeOptIns: sweepstakeOptIns 
         };
         localStorage.setItem('zonedraw_current_state_v1', JSON.stringify(stateObj));
@@ -604,37 +805,44 @@
 
     function applyAccToggleUI() {
         const panel = document.getElementById('accPanelWrapper');
-        const btn = document.getElementById('accToggleBtn');
+        const btn = document.getElementById('accToggleBtnUI');
         const title = document.getElementById('accToggleTitle');
         const sub = document.getElementById('accToggleSub');
+        
+        if (!panel) return;
+
         if (accEnabled) {
             panel.style.display = 'flex';
-            title.innerText = 'ACCESSIBLE PEGS: ON';
-            sub.innerText = 'Routing enabled. Configure safe nodes below.';
-            btn.style.background = 'var(--text-dark)';
-            btn.style.color = 'white';
-            btn.style.borderColor = 'var(--text-dark)';
+            if(title) title.innerText = 'ACCESSIBLE PEGS: ON';
+            if(sub) sub.innerText = 'Routing enabled. Configure safe nodes below.';
+            if(btn) {
+                btn.style.background = 'var(--text-dark)';
+                btn.style.color = 'white';
+                btn.style.borderColor = 'var(--text-dark)';
+            }
         } else {
             panel.style.display = 'none';
-            title.innerText = 'ACCESSIBLE PEGS: OFF';
-            sub.innerText = 'Tap to enable safe zone and peg assignments.';
-            btn.style.background = 'transparent';
-            btn.style.color = 'var(--text-dark)';
-            btn.style.borderColor = 'var(--border)';
+            if(title) title.innerText = 'ACCESSIBLE PEGS: OFF';
+            if(sub) sub.innerText = 'Tap to enable safe zone and peg assignments.';
+            if(btn) {
+                btn.style.background = 'transparent';
+                btn.style.color = 'var(--text-dark)';
+                btn.style.borderColor = 'var(--border)';
+            }
         }
     }
 
     function setMobilityMode(m) {
         mobilityMode = m;
-        document.getElementById('mobModeA').classList.toggle('active', m === 'A');
-        document.getElementById('mobModeB').classList.toggle('active', m === 'B');
+        if(document.getElementById('mobModeA')) document.getElementById('mobModeA').classList.toggle('active', m === 'A');
+        if(document.getElementById('mobModeB')) document.getElementById('mobModeB').classList.toggle('active', m === 'B');
         
         if (m === 'A') {
-            document.getElementById('modeASetup').style.display = 'flex';
-            document.getElementById('modeBSetup').style.display = 'none';
+            if(document.getElementById('modeASetup')) document.getElementById('modeASetup').style.display = 'flex';
+            if(document.getElementById('modeBSetup')) document.getElementById('modeBSetup').style.display = 'none';
         } else {
-            document.getElementById('modeASetup').style.display = 'none';
-            document.getElementById('modeBSetup').style.display = 'flex';
+            if(document.getElementById('modeASetup')) document.getElementById('modeASetup').style.display = 'none';
+            if(document.getElementById('modeBSetup')) document.getElementById('modeBSetup').style.display = 'flex';
         }
         checkTeamClash();
     }
@@ -682,15 +890,14 @@
                 tempSolos.push(anglerObj);
             }
         });
+        
         appState = [];
         scoreState = {}; 
-        trashCan = null;
-        document.getElementById('undoBtn').style.display = 'none';
+        
         Object.keys(tempTeams).forEach(tName => {
             let members = tempTeams[tName];
             for (let i = 0; i < members.length; i += 4) {
                 let chunk = members.slice(i, i + 4);
-                while (chunk.length < 4) { chunk.push({}); }
                 appState.push({ id: genId(), isTeam: true, tName: tName, anglers: chunk });
             }
         });
@@ -699,11 +906,7 @@
         });
         closeImportModal();
         
-        document.getElementById('rosterEntryZone').style.display = 'none';
-        document.getElementById('commandBar').style.display = 'flex';
-        document.getElementById('masterActionBar').style.display = 'none';
-        document.getElementById('amendTools').style.display = 'flex'; 
-        document.getElementById('actionBtnArea').style.display = 'flex';
+        if(document.getElementById('rosterEntryZone')) document.getElementById('rosterEntryZone').style.display = 'block';
         
         renderStateToScreen();
         showToast("✅ COMPETITORS IMPORTED SUCCESSFULLY");
@@ -770,24 +973,22 @@
 
     function setDays(d) {
         matchDays = d;
-        document.getElementById('dayOpt1').classList.toggle('active', d === 1);
-        document.getElementById('dayOpt2').classList.toggle('active', d === 2);
+        if(document.getElementById('dayOpt1')) document.getElementById('dayOpt1').classList.toggle('active', d === 1);
+        if(document.getElementById('dayOpt2')) document.getElementById('dayOpt2').classList.toggle('active', d === 2);
         
         if (d === 2) {
-            document.getElementById('day2PegsContainer').style.display = 'flex';
+            if(document.getElementById('day2PegsContainer')) document.getElementById('day2PegsContainer').style.display = 'flex';
             if (document.getElementById('day2AnchorContainer')) document.getElementById('day2AnchorContainer').style.display = 'flex';
         } else {
-            document.getElementById('day2PegsContainer').style.display = 'none';
+            if(document.getElementById('day2PegsContainer')) document.getElementById('day2PegsContainer').style.display = 'none';
             if (document.getElementById('day2AnchorContainer')) document.getElementById('day2AnchorContainer').style.display = 'none';
         }
     }
 
     function startNewDraw() {
-        document.getElementById('matchTitle').value = '';
-        document.getElementById('initTeams').value = 0;
-        document.getElementById('initIndivs').value = 0;
-        document.getElementById('accPegs1_a').value = '';
-        document.getElementById('accPegs2_a').value = '';
+        if(document.getElementById('matchTitle')) document.getElementById('matchTitle').value = '';
+        if(document.getElementById('accPegs1_a')) document.getElementById('accPegs1_a').value = '';
+        if(document.getElementById('accPegs2_a')) document.getElementById('accPegs2_a').value = '';
         
         appState = []; 
         scoreState = {};
@@ -796,306 +997,29 @@
         setMobilityMode('A'); 
         setDays(2);
         accEnabled = false;
-        trashCan = null;
         applyAccToggleUI();
         
         document.querySelectorAll('.tab-content').forEach(s => s.style.display = 'none');
-        document.getElementById('drawTab').style.display = 'block';
+        if(document.getElementById('drawTab')) document.getElementById('drawTab').style.display = 'block';
         document.body.className = 'stage-draw';
 
-        document.getElementById('entrySection').style.display = 'block';
-        document.getElementById('resultsSection').style.display = 'none';
-        document.getElementById('setupPanel').style.display = 'block';
-        document.getElementById('editDrawBanner').style.display = 'none';
-        document.getElementById('rosterEntryZone').style.display = 'block';
-        document.getElementById('commandBar').style.display = 'none';
-        document.getElementById('masterActionBar').style.display = 'none';
-        document.getElementById('undoBtn').style.display = 'none';
-        
-        document.getElementById('accToggleBtn').style.display = 'flex';
-        
-        updateTicker();
-        renderStateToScreen();
-    }
-
-    function bulkInit() {
-        appState = [];
-        scoreState = {};
-        sweepstakeOptIns = {};
-        trashCan = null;
-        document.getElementById('undoBtn').style.display = 'none';
-        
-        let tVal = document.getElementById('initTeams').value;
-        let iVal = document.getElementById('initIndivs').value;
-        const t = parseInt(tVal) || 0;
-        const i = parseInt(iVal) || 0;
-        for(let x = 0; x < t; x++) appState.push({ id: genId(), isTeam: true, tName: '', anglers: [{},{},{},{}] });
-        for(let y = 0; y < i; y++) appState.push({ id: genId(), isTeam: false, tName: '', anglers: [{}] });
-        document.getElementById('rosterEntryZone').style.display = 'none';
-        document.getElementById('commandBar').style.display = 'flex';
-        document.getElementById('masterActionBar').style.display = 'none';
-        document.getElementById('amendTools').style.display = 'flex'; 
-        document.getElementById('actionBtnArea').style.display = 'flex';
+        if(document.getElementById('resultsSection')) document.getElementById('resultsSection').style.display = 'none';
+        if(document.getElementById('rosterEntryZone')) document.getElementById('rosterEntryZone').style.display = 'block';
         
         renderStateToScreen();
-        setTimeout(() => {
-            const firstInput = document.querySelector('#entryList input[type="text"]');
-            if (firstInput) firstInput.focus(); 
-        }, 50);
     }
 
-    function addNewStateItem(isTeam) {
-        if (isTeam) appState.push({ id: genId(), isTeam: true, tName: '', anglers: [{},{},{},{}] });
-        else appState.push({ id: genId(), isTeam: false, tName: '', anglers: [{}] });
-        renderStateToScreen();
-    }
-
-    function toggleMobility(eId, aIdx) {
-        const entry = appState.find(e => e.id === eId);
-        if (entry) { 
-            entry.anglers[aIdx].mobility = entry.anglers[aIdx].mobility ? 0 : 1;
-            renderStateToScreen(); 
-        }
-    }
-
-    function updateTeamName(id, val) {
-        let entry = appState.find(e => e.id === id);
-        if (entry) entry.tName = val.trim().toUpperCase(); 
-    }
-
-    function updateAnglerName(id, aIdx, val) {
-        let entry = appState.find(e => e.id === id);
-        if (entry && entry.anglers[aIdx]) {
-            entry.anglers[aIdx].name = val.trim().toUpperCase();
-            updateTicker();
-        }
-    }
-
-    function updateDrawButtons() {
-        const hasDraw = appState.some(e => e.anglers.some(a => a.z1));
-        const viewCont = document.getElementById('viewDrawContainer');
-        const processCont = document.getElementById('processDrawContainer');
-        
-        if (hasDraw) {
-            viewCont.style.display = 'flex';
-            processCont.style.display = 'none';
-        } else {
-            viewCont.style.display = 'none';
-            processCont.style.display = 'flex';
-        }
-    }
-
-    function runEntryValidation() {
-        if (document.getElementById('entrySection').style.display !== 'block') return;
-        let errors = [];
-        let severeErrors = false;
-        let anglerNames = {};
-        let teamNames = {};
-
-        document.querySelectorAll('.a-name-input, .t-name').forEach(el => el.classList.remove('input-error'));
-        appState.forEach((entry) => {
-            if (entry.isTeam) {
-                let tName = (entry.tName || '').trim();
-                let filledAnglers = entry.anglers.filter(a => (a.name || '').trim() !== '').length;
-
-                if (filledAnglers > 0 && tName === '') {
-                    errors.push(`MISSING TEAM NAME: A team with anglers has no team name.`);
-                    severeErrors = true;
-                    let tInputs = document.querySelectorAll(`.zone-card[data-id="${entry.id}"] .t-name`);
-                    tInputs.forEach(el => el.classList.add('input-error'));
-                }
-
-                if (tName !== '') {
-                    if (teamNames[tName]) {
-                        errors.push(`DUPLICATE TEAM: '${tName}' is used more than once.`);
-                        severeErrors = true;
-                        document.querySelectorAll('.t-name').forEach(el => {
-                            if(el.value.trim().toUpperCase() === tName) el.classList.add('input-error');
-                        });
-                    } else {
-                        teamNames[tName] = true;
-                    }
-                }
-
-                if (filledAnglers > 0 && filledAnglers < 4) {
-                    let tDisp = tName !== '' ? `'${tName}'` : 'An unnamed team';
-                    errors.push(`INCOMPLETE TEAM: ${tDisp} only has ${filledAnglers} out of 4 anglers.`);
-                }
-            }
-
-            entry.anglers.forEach((a) => {
-                let aName = (a.name || '').trim();
-                if (aName !== '') {
-                    if (anglerNames[aName]) {
-                        if (!errors.includes(`DUPLICATE ANGLER: '${aName}' is listed multiple times.`)) {
-                            errors.push(`DUPLICATE ANGLER: '${aName}' is listed multiple times.`);
-                        }
-                        severeErrors = true;
-                        document.querySelectorAll('.a-name-input').forEach(el => {
-                            if(el.value.trim().toUpperCase() === aName) el.classList.add('input-error');
-                        });
-                    } else {
-                        anglerNames[aName] = true;
-                    }
-                }
-            });
-        });
-
-        const banner = document.getElementById('entryAnomalyBanner');
-        const list = document.getElementById('entryAnomalyList');
-        
-        if (errors.length > 0) {
-            banner.style.display = 'block';
-            list.innerHTML = errors.map(err => `<li>${err}</li>`).join('');
-        } else {
-            banner.style.display = 'none';
-        }
-
-        window.currentSevereErrors = severeErrors;
-        checkTeamClash();
-    }
-
-    function renderStateToScreen() {
-        const tb = document.getElementById('entryTeamsBucket');
-        tb.innerHTML = '';
-        const sb = document.getElementById('entrySolosBucket'); sb.innerHTML = '';
-        appState.forEach(entry => {
-            const div = document.createElement('div');
-            div.className = !entry.isTeam ? 'zone-card solo-card' : 'zone-card';
-            div.dataset.id = entry.id;
-            
-            let typeStr = entry.isTeam ? 'TEAM' : 'SOLO';
-            let h = `<div class="zone-header"><span>${typeStr}</span><div style="display:flex; align-items:center;">`;
-            
-            if (!entry.isTeam) h += `<input type="checkbox" class="merge-cb" onchange="checkMerge()" tabindex="-1" style="width:18px; height:18px;">`; 
-            if (entry.isTeam) h += `<button class="btn-tool" onclick="breakStateTeam('${entry.id}')" tabindex="-1" style="margin-left:12px;">🔗 UNLINK</button>`; 
-            else h += `<button onclick="deleteStateEntry('${entry.id}')" tabindex="-1" style="background:none; border:none; color:var(--red-color); font-weight:900; font-size:22px; cursor:pointer; margin-left:12px; transition: 0.2s;">×</button>`; 
-            
-            h += `</div></div>`;
-            if (entry.isTeam) {
-                h += `<div style="padding: 0 16px;"><label style="font-size:10px; font-weight:800; color:var(--text-light); letter-spacing:0.5px;">TEAM NAME</label>
-                      <input type="text" class="t-name" value="${entry.tName}" oninput="updateTeamName('${entry.id}', this.value)" style="margin-bottom:12px; margin-top:4px;">`;
-                for (let i = 0; i < 4; i++) {
-                    let mBg = entry.anglers[i].mobility ? 'var(--text-dark)' : '#f1f5f9';
-                    let mColor = entry.anglers[i].mobility ? 'white' : 'var(--text-dark)';
-                    let aName = entry.anglers[i].name || '';
-                    h += `<div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
-                            <input type="text" class="a-name-input" value="${aName}" placeholder="ANGLER ${i+1}" oninput="updateAnglerName('${entry.id}', ${i}, this.value)">
-                            <button class="btn-tool" onclick="toggleMobility('${entry.id}', ${i})" tabindex="-1" style="padding:10px 14px; background:${mBg}; color:${mColor};">[A]</button>
-                          </div>`;
-                }
-                h += `</div>`;
-            } else {
-                h += `<div style="padding: 0 16px;"><label style="font-size:10px; font-weight:800; color:var(--text-light); letter-spacing:0.5px;">SOLO NAME</label>`;
-                let mBg = entry.anglers[0].mobility ? 'var(--text-dark)' : '#f1f5f9';
-                let mColor = entry.anglers[0].mobility ? 'white' : 'var(--text-dark)';
-                let aName = entry.anglers[0].name || '';
-                
-                h += `<div style="display:flex; align-items:center; gap:8px; margin-top:4px; margin-bottom:6px;">
-                        <input type="text" class="a-name-input" value="${aName}" oninput="updateAnglerName('${entry.id}', 0, this.value)">
-                        <button class="btn-tool" onclick="toggleMobility('${entry.id}', 0)" tabindex="-1" style="padding:10px 14px; background:${mBg}; color:${mColor};">[A]</button>
-                      </div></div>`;
-            }
-            
-            div.innerHTML = h;
-            if (entry.isTeam) tb.appendChild(div); else sb.appendChild(div);
-        });
-        
-        document.getElementById('entryTeamsContainer').style.display = tb.innerHTML !== '' ? 'block' : 'none';
-        document.getElementById('entrySolosContainer').style.display = sb.innerHTML !== '' ? 'block' : 'none';
-        
-        updateTicker(); checkMerge(); updateDrawButtons(); runEntryValidation(); persistState();
-    }
-
-    function deleteStateEntry(id) { 
-        const idx = appState.findIndex(e => e.id === id);
-        if (idx > -1) { 
-            trashCan = { action: 'delete', data: appState[idx], index: idx };
-            document.getElementById('undoBtn').style.display = 'inline-block';
-            appState.splice(idx, 1); 
-            renderStateToScreen(); 
-        } 
-    }
-    
-    function breakStateTeam(id) { 
-        const idx = appState.findIndex(e => e.id === id);
-        if (idx > -1) { 
-            const t = appState.splice(idx, 1)[0];
-            let nIds = [];
-            t.anglers.forEach(a => { 
-                let nId = genId(); nIds.push(nId);
-                appState.push({ id: nId, isTeam: false, tName: '', anglers: [{...a}] }); 
-            });
-            trashCan = { action: 'break', originalTeam: t, index: idx, newIds: nIds };
-            document.getElementById('undoBtn').style.display = 'inline-block';
-            renderStateToScreen();
-        } 
-    }
-
-    function undoLastAction() {
-        if (!trashCan) return;
-        if (trashCan.action === 'delete') {
-            appState.splice(trashCan.index, 0, trashCan.data);
-        } else if (trashCan.action === 'break') {
-            appState = appState.filter(e => !trashCan.newIds.includes(e.id));
-            appState.splice(trashCan.index, 0, trashCan.originalTeam);
-        }
-        trashCan = null;
-        document.getElementById('undoBtn').style.display = 'none';
-        renderStateToScreen();
-    }
-    
-    function mergeSelected() { 
-        const sel = document.querySelectorAll('.merge-cb:checked');
-        if (sel.length !== 4) return; 
-        const ids = Array.from(sel).map(cb => cb.closest('.zone-card').dataset.id); 
-        const angs = [];
-        ids.forEach(id => { 
-            const idx = appState.findIndex(e => e.id === id); 
-            if (idx > -1) {
-                let removed = appState.splice(idx, 1)[0];
-                angs.push(removed.anglers[0]); 
-            }
-        });
-        appState.push({ id: genId(), isTeam: true, tName: '', anglers: angs }); 
-        renderStateToScreen();
-    }
-    
-    function checkMerge() { 
-        let checkedBoxes = document.querySelectorAll('.merge-cb:checked');
-        document.getElementById('mergeBtn').style.display = checkedBoxes.length === 4 ? 'inline-block' : 'none';
-    }
-    
     function checkTeamClash() {
-        let clash = false;
         if (mobilityMode === 'B') {
+            let clash = false;
             appState.forEach(e => { 
                 if (e.isTeam) {
                     let mobCount = e.anglers.filter(a => a.mobility).length;
                     if (mobCount > 1) clash = true;
                 } 
             });
+            if(document.getElementById('teamClashWarning')) document.getElementById('teamClashWarning').style.display = clash ? 'block' : 'none';
         }
-        document.getElementById('teamClashWarning').style.display = clash ? 'block' : 'none';
-        
-        let severeErrs = window.currentSevereErrors || false;
-        let processBtn = document.getElementById('mainActionBtn');
-        
-        if (clash || severeErrs) {
-            processBtn.disabled = true;
-            processBtn.style.opacity = '0.5';
-            processBtn.innerText = 'FIX ERRORS';
-        } else {
-            processBtn.disabled = false;
-            processBtn.style.opacity = '1';
-            processBtn.innerText = 'PROCESS DRAW';
-        }
-    }
-    
-    function updateTicker() { 
-        let ent = 0;
-        appState.forEach(e => { e.anglers.forEach(a => { if (a.name && a.name.trim() !== '') ent++; }); });
-        document.getElementById('tkAnglers').innerText = ent;
     }
 
     function initiateShuffle() {
@@ -1103,23 +1027,24 @@
         appState.forEach(e => {
             if (e.isTeam) {
                 let hasNames = e.anglers.some(a => (a.name || '').trim() !== '');
-                let hasTeamName = (e.tName || '').trim() !== '';
-                if (hasNames || hasTeamName) filteredState.push(e);
+                if (hasNames) filteredState.push(e);
             } else {
                 if ((e.anglers[0].name || '').trim() !== '') filteredState.push(e);
             }
         });
         appState = filteredState;
+        
         appState.forEach(e => { e.anglers.forEach(a => { a.z1 = undefined; a.p1 = undefined; a.z2 = undefined; a.p2 = undefined; }); });
         renderStateToScreen();
         
         const over = document.getElementById('shuffleOverlay'); 
         const pBar = document.getElementById('pBar');
-        over.style.display = 'flex'; 
+        if(over) over.style.display = 'flex'; 
         let p = 0;
         const inv = setInterval(() => { 
-            p += 5; pBar.style.width = p + '%'; 
-            if (p >= 100) { clearInterval(inv); over.style.display = 'none'; runDraw(); } 
+            p += 5; 
+            if(pBar) pBar.style.width = p + '%'; 
+            if (p >= 100) { clearInterval(inv); if(over) over.style.display = 'none'; runDraw(); } 
         }, 30);
     }
 
@@ -1148,12 +1073,14 @@
             };
             return getPriority(b) - getPriority(a);
         });
-        let s1A_str = document.getElementById('accPegs1_a').value || '';
-        let s2A_str = document.getElementById('accPegs2_a').value || '';
+        
+        let s1A_str = document.getElementById('accPegs1_a') ? document.getElementById('accPegs1_a').value : '';
+        let s2A_str = document.getElementById('accPegs2_a') ? document.getElementById('accPegs2_a').value : '';
         let s1A = s1A_str.match(/\d+/g) ? s1A_str.match(/\d+/g).map(Number) : [];
         let s2A = s2A_str.match(/\d+/g) ? s2A_str.match(/\d+/g).map(Number) : [];
-        const ancZ1 = document.getElementById('anchorZoneSelect').value;
-        const ancZ2 = document.getElementById('anchorZoneSelect2').value;
+        const ancZ1 = document.getElementById('anchorZoneSelect') ? document.getElementById('anchorZoneSelect').value : 'RED';
+        const ancZ2 = document.getElementById('anchorZoneSelect2') ? document.getElementById('anchorZoneSelect2').value : 'RED';
+        
         if (currentZoneSize === 0) {
             let tot = 0;
             appState.forEach(e => { if (e.isTeam) tot += 4; else tot += 1; });
@@ -1206,12 +1133,17 @@
             }
             aEntries.forEach((e, idx) => {
                 let a = e.anglers.find(ang => ang.mobility);
-                a.preZ1 = bestPairing[idx].z1; a.preZ2 = bestPairing[idx].z2;
+                if (a && bestPairing[idx]) {
+                    a.preZ1 = bestPairing[idx].z1; a.preZ2 = bestPairing[idx].z2;
+                }
             });
         }
         
         const pull = (z, d2, mob) => {
+            if(!z) return 9999;
             const pools = d2 ? p2 : p1; const zI = zones.indexOf(z);
+            if(zI === -1) return 9999;
+            
             if (accEnabled && mobilityMode === 'A') {
                 const sL = d2 ? s2A : s1A;
                 if (mob) { 
@@ -1348,7 +1280,7 @@
     function toggleSwapMode() { 
         isSwapMode = !isSwapMode;
         swapObj1 = null; 
-        document.getElementById('swapPrompt').style.display = isSwapMode ? 'block' : 'none';
+        if(document.getElementById('swapPrompt')) document.getElementById('swapPrompt').style.display = isSwapMode ? 'block' : 'none';
         displayDraw();
     }
 
@@ -1409,6 +1341,8 @@
             
             team.anglers.forEach((a, aI) => {
                 let aN = a.name || 'UNNAMED';
+                if (!a.name || a.name.trim() === '') return; // Skip engine blanks
+
                if (!a.z1 || a.p1 === undefined || a.p1 === 9999) {
                     errors.push(`Missing Peg: '${aN}' invalid allocation [DAY 1].`);
                     clashMap.push({eId: team.id, aI: aI, day: 1});
@@ -1484,7 +1418,7 @@
                     if(avail2[d2Z[i]].length > 0) p2_val = avail2[d2Z[i]].splice(Math.floor(Math.random() * avail2[d2Z[i]].length), 1)[0];
                     else p2_val = getAlphaPeg(d2Z[i], 2, used2);
                 }
-                newEntry.anglers.push({ name: '', z1: d1Z[i], p1: p1_val, z2: matchDays === 2 ? d2Z[i] : undefined, p2: p2_val });
+                newEntry.anglers.push({ name: 'LATECOMER', z1: d1Z[i], p1: p1_val, z2: matchDays === 2 ? d2Z[i] : undefined, p2: p2_val });
             }
         } else {
             let flat1 = [];
@@ -1505,19 +1439,18 @@
                 if(avail2[picked2Z] && avail2[picked2Z].length > 0) p2_val = avail2[picked2Z].splice(Math.floor(Math.random() * avail2[picked2Z].length), 1)[0];
                 else p2_val = getAlphaPeg(picked2Z, 2, used2);
             }
-            newEntry.anglers.push({ name: '', z1: picked1Z, p1: p1_val, z2: matchDays === 2 ? picked2Z : undefined, p2: p2_val });
+            newEntry.anglers.push({ name: 'LATECOMER', z1: picked1Z, p1: p1_val, z2: matchDays === 2 ? picked2Z : undefined, p2: p2_val });
         }
         
         appState.push(newEntry);
         displayDraw();
         showToast("✅ LATECOMER ADDED SUCCESSFULLY");
-        setTimeout(() => { handleAmend(true); }, 800);
     }
 
     function isPegSafe(p, d) { 
         if (!accEnabled) return false;
         if (mobilityMode === 'A') {
-            let safeStr = d === 1 ? document.getElementById('accPegs1_a').value : document.getElementById('accPegs2_a').value;
+            let safeStr = d === 1 ? (document.getElementById('accPegs1_a') ? document.getElementById('accPegs1_a').value : '') : (document.getElementById('accPegs2_a') ? document.getElementById('accPegs2_a').value : '');
             let safeArr = safeStr.match(/\d+/g) || [];
             return safeArr.includes(String(p).replace(/[a-zA-Z]/g, ''));
         }
@@ -1528,6 +1461,7 @@
         let tsv = matchDays === 2 ? "NAME\tTEAM\tDAY 1 ZONE\tDAY 2 ZONE\n" : "NAME\tTEAM\tDAY 1 ZONE\n";
         appState.forEach(g => { 
             g.anglers.forEach(a => { 
+                if(!a.name || a.name.trim()==='') return;
                 let tName = g.isTeam ? (g.tName || '') : '';
                 if (matchDays === 2) tsv += `${a.name || ''}\t${tName}\t${a.z1}\t${a.z2}\n`; 
                 else tsv += `${a.name || ''}\t${tName}\t${a.z1}\n`;
@@ -1594,17 +1528,15 @@
 
     function displayDraw() {
         document.querySelectorAll('.tab-content').forEach(s => s.style.display = 'none');
-        document.getElementById('drawTab').style.display = 'block';
+        if(document.getElementById('drawTab')) document.getElementById('drawTab').style.display = 'block';
 
-        document.getElementById('entrySection').style.display = 'none';
-        document.getElementById('resultsSection').style.display = 'block';
+        if(document.getElementById('rosterEntryZone')) document.getElementById('rosterEntryZone').style.display = 'none';
+        if(document.getElementById('resultsSection')) document.getElementById('resultsSection').style.display = 'block';
         
-        let titleVal = document.getElementById('matchTitle').value;
+        let titleVal = document.getElementById('matchTitle') ? document.getElementById('matchTitle').value : '';
         let titleStr = titleVal ? `LIVE: ${titleVal}` : "LIVE DRAW";
-        document.getElementById('resTitle').innerHTML = `<span class="live-dot">🔴</span> ${titleStr}`;
+        if(document.getElementById('resTitle')) document.getElementById('resTitle').innerHTML = `<span class="live-dot">🔴</span> ${titleStr}`;
         
-        document.getElementById('commandBar').style.display = 'none';
-        document.getElementById('masterActionBar').style.display = 'flex';
         if (currentZoneSize === 0) {
             let totAnglers = 0;
             appState.forEach(e => { if (e.isTeam) totAnglers += 4; else totAnglers += 1; });
@@ -1626,19 +1558,20 @@
         }
         
         const beachContainer = document.getElementById('beachMapContainer');
-        beachContainer.innerHTML = mapHtml;
+        if(beachContainer) beachContainer.innerHTML = mapHtml;
 
         const validation = runValidator(); 
         const banner = document.getElementById('anomalyBanner'); 
         const list = document.getElementById('anomalyList');
-        if (validation.list.length > 0) { 
+        if (validation.list.length > 0 && banner && list) { 
             banner.style.display = 'block';
             list.innerHTML = validation.list.map(err => `<li>${err}</li>`).join('');
-        } else { banner.style.display = 'none'; }
+        } else if(banner) { banner.style.display = 'none'; }
 
-        const tb = document.getElementById('teamsBucket'); tb.innerHTML = ''; 
+        const tb = document.getElementById('teamsBucket'); 
+        if(tb) tb.innerHTML = ''; 
         const sb = document.getElementById('solosBucket');
-        sb.innerHTML = '';
+        if(sb) sb.innerHTML = '';
         
         appState.forEach(g => {
             const div = document.createElement('div'); div.className = 'zone-card';
@@ -1648,6 +1581,8 @@
             h += `<div class="res-row" style="font-size:11px; color:var(--text-light); padding-bottom: 2px;"><span></span><span style="text-align:center;">DAY 1</span><span style="text-align:center;">DAY 2</span></div>`;
             
             g.anglers.forEach((a, aI) => {
+                if(!a.name || a.name.trim() === '') return;
+
                 let p1C = isSwapMode ? ' swap-active' : '';
                 if (swapObj1 && swapObj1.eId === g.id && swapObj1.aI === aI && swapObj1.day === 1) p1C += ' swap-selected';
                 if (validation.markers.find(m => m.eId === g.id && m.aI === aI && m.day === 1)) p1C += ' clash-glow';
@@ -1671,43 +1606,27 @@
                       </div>`;
             });
             div.innerHTML = h; 
-            if (g.isTeam) tb.appendChild(div); else sb.appendChild(div);
+            if (g.isTeam && tb) tb.appendChild(div); else if(sb) sb.appendChild(div);
         });
         
-        document.getElementById('teamsBucketContainer').style.display = tb.innerHTML !== '' ? 'block' : 'none';
-        document.getElementById('solosBucketContainer').style.display = sb.innerHTML !== '' ? 'block' : 'none';
+        if(document.getElementById('teamsBucketContainer')) document.getElementById('teamsBucketContainer').style.display = (tb && tb.innerHTML !== '') ? 'block' : 'none';
+        if(document.getElementById('solosBucketContainer')) document.getElementById('solosBucketContainer').style.display = (sb && sb.innerHTML !== '') ? 'block' : 'none';
         
         persistState();
     }
 
     function handleAmend(isSafe) { 
         switchTab('draw');
-        document.getElementById('resultsSection').style.display = 'none';
-        document.getElementById('entrySection').style.display = 'block'; 
-        document.getElementById('commandBar').style.display = 'flex'; 
-        document.getElementById('masterActionBar').style.display = 'none';
-        if (appState.length > 0) { 
-            document.getElementById('rosterEntryZone').style.display = 'none';
-            document.getElementById('commandBar').style.display = 'flex'; 
-            document.getElementById('amendTools').style.display = 'flex'; 
-            document.getElementById('actionBtnArea').style.display = 'flex'; 
-        }
+        if(document.getElementById('resultsSection')) document.getElementById('resultsSection').style.display = 'none';
+        if(document.getElementById('rosterEntryZone')) document.getElementById('rosterEntryZone').style.display = 'block'; 
         
-        if (isSafe) {
-            document.getElementById('setupPanel').style.display = 'none';
-            document.getElementById('editDrawBanner').style.display = 'flex';
-            document.getElementById('accToggleBtn').style.display = 'none';
-            document.getElementById('accPanelWrapper').style.display = 'none';
-            document.getElementById('addAmendTeamBtn').style.display = 'none';
-            document.getElementById('addAmendSoloBtn').style.display = 'none';
-        } else {
-            document.getElementById('setupPanel').style.display = 'block';
-            document.getElementById('editDrawBanner').style.display = 'none';
-            document.getElementById('accToggleBtn').style.display = 'flex';
-            document.getElementById('accPanelWrapper').style.display = accEnabled ? 'flex' : 'none';
-            document.getElementById('addAmendTeamBtn').style.display = 'inline-block';
-            document.getElementById('addAmendSoloBtn').style.display = 'inline-block';
-        }
+        // Failsafe padding cleanup if they amended a team to incomplete, removing ghost anglers
+        appState.forEach(e => {
+            if(e.isTeam) {
+                e.anglers = e.anglers.filter(a => a.name && a.name.trim() !== '');
+            }
+        });
+        
         renderStateToScreen(); 
     }
 
@@ -1720,6 +1639,7 @@
         let sortedState = [...appState].sort((a,b) => (a.tName || "SOLO").localeCompare(b.tName || "SOLO"));
         sortedState.forEach(e => { 
             e.anglers.forEach(a => { 
+                if(!a.name || a.name.trim()==='') return;
                 let aName = a.name || ''; let mobStr = (accEnabled && a.mobility) ? ' [A]' : '';
                 let tName = e.tName || 'SOLO';
                 h += `<tr><td>${aName}${mobStr}</td><td>${tName}</td><td><div class="print-checkbox"></div></td><td><div class="print-checkbox"></div></td><td><div class="print-checkbox"></div></td></tr>`; 
@@ -1739,6 +1659,7 @@
                 let list = []; 
                 appState.forEach(e => { 
                     e.anglers.forEach(a => { 
+                        if(!a.name || a.name.trim()==='') return;
                         let targetZ = d === 1 ? a.z1 : a.z2;
                         if (targetZ === z) {
                             let targetP = d === 1 ? a.p1 : a.p2;
@@ -1771,6 +1692,7 @@
                         <table class="print-table"><thead><tr><th>ANGLER</th><th>DAY 1</th>${matchDays === 2 ? '<th>DAY 2</th>' : ''}
                         <th style="width:100px;">POT (£)</th><th style="width:120px;">PAIRS (£)</th><th style="width:120px;">TOTAL</th></tr></thead><tbody>`;
             e.anglers.forEach(a => { 
+                if(!a.name || a.name.trim()==='') return;
                 h += `<tr><td>${a.name || ''} ${(accEnabled && a.mobility) ? '[A]' : ''}</td>
                         <td>${a.z1} ${a.p1}</td>${matchDays === 2 ? `<td>${a.z2} ${a.p2}</td>` : ''}<td></td><td></td><td></td></tr>`; 
             });
@@ -1786,6 +1708,7 @@
             const page = document.createElement('div'); page.style.pageBreakAfter = 'always';
             batch.forEach(e => { 
                 const a = e.anglers[0]; 
+                if(!a.name || a.name.trim()==='') return;
                 let h = `<div class="dispatch-slip"><div class="dispatch-header"><h1>SOLO: ${a.name || 'UNNAMED'} ${(accEnabled && a.mobility) ? '[A]' : ''}</h1></div>
                             <table class="print-table"><thead><tr><th>DAY 1</th>${matchDays === 2 ? '<th>DAY 2</th>' : ''}
                             <th style="width:100px;">POT (£)</th><th style="width:120px;">PAIRS (£)</th><th style="width:120px;">TOTAL</th></tr></thead><tbody>
@@ -1809,9 +1732,6 @@
     document.addEventListener('input', function(e) {
         if (isAppReady && (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA')) {
             persistState();
-            if (e.target.id !== 'importRawData' && e.target.closest('#entrySection')) {
-                runEntryValidation();
-            }
             
             const ind = document.getElementById('saveIndicator');
             if (ind) {
@@ -1822,24 +1742,19 @@
     });
 
     // MANUAL MODAL TOGGLE LOGIC
-    function openManualModal() {
-        document.getElementById('manualModal').style.display = 'flex';
-    }
-    
-    function closeManualModal() {
-        document.getElementById('manualModal').style.display = 'none';
-    }
+    function openManualModal() { document.getElementById('manualModal').style.display = 'flex'; }
+    function closeManualModal() { document.getElementById('manualModal').style.display = 'none'; }
 
     window.onload = () => {
         isAppReady = false; 
         let saved = localStorage.getItem('zonedraw_current_state_v1');
         if (saved) {
             let e = JSON.parse(saved);
-            document.getElementById('matchTitle').value = e.title || '';
-            document.getElementById('accPegs1_a').value = e.safePegs1_a || ''; 
-            document.getElementById('accPegs2_a').value = e.safePegs2_a || '';
-            if (e.anchorZone) document.getElementById('anchorZoneSelect').value = e.anchorZone;
-            if (e.anchorZone2) document.getElementById('anchorZoneSelect2').value = e.anchorZone2;
+            if(document.getElementById('matchTitle')) document.getElementById('matchTitle').value = e.title || '';
+            if(document.getElementById('accPegs1_a')) document.getElementById('accPegs1_a').value = e.safePegs1_a || ''; 
+            if(document.getElementById('accPegs2_a')) document.getElementById('accPegs2_a').value = e.safePegs2_a || '';
+            if (e.anchorZone && document.getElementById('anchorZoneSelect')) document.getElementById('anchorZoneSelect').value = e.anchorZone;
+            if (e.anchorZone2 && document.getElementById('anchorZoneSelect2')) document.getElementById('anchorZoneSelect2').value = e.anchorZone2;
             
             setMobilityMode(e.mobilityMode || 'A'); setDays(e.days || 2); 
             appState = e.data || []; 
@@ -1850,18 +1765,25 @@
             applyAccToggleUI();
             
             if (appState.length > 0) { 
-                document.getElementById('rosterEntryZone').style.display = 'none';
-                document.getElementById('commandBar').style.display = 'flex'; 
-                document.getElementById('amendTools').style.display = 'flex';
-                let tCount = 0, iCount = 0;
-                appState.forEach(item => { if (item.isTeam) tCount++; else iCount++; });
-                document.getElementById('initTeams').value = tCount; document.getElementById('initIndivs').value = iCount;
+                // Ensure data structure cleanup from old padder objects when reloading
+                appState.forEach(team => {
+                    team.anglers = team.anglers.filter(a => a.name && a.name.trim() !== '');
+                });
+
+                let hasDraw = false;
+                appState.forEach(x => { x.anglers.forEach(a => { if (a.z1) hasDraw = true; }); });
+                
+                if (hasDraw) {
+                    displayDraw();
+                } else {
+                    handleAmend(false);
+                }
+            } else { 
+                startNewDraw(); 
             }
-            
-            let hasDraw = false;
-            appState.forEach(x => { x.anglers.forEach(a => { if (a.z1) hasDraw = true; }); });
-            if (hasDraw) displayDraw(); else handleAmend(false);
-        } else { startNewDraw(); }
+        } else { 
+            startNewDraw(); 
+        }
         setTimeout(() => { isAppReady = true; }, 500);
     };
 
@@ -1875,33 +1797,11 @@
     
     function clearSearch() {
         const input = document.getElementById('scoreSearch');
+        if(!input) return;
         input.value = '';
         filterScorecards(); 
         input.focus();      
     }
     
-    // --- SCROLL AUTO-HIDE FOR ACTION BAR ---
-    let lastScrollY = window.scrollY;
-    window.addEventListener('scroll', () => {
-        const actionBar = document.getElementById('masterActionBar');
-        
-        if (!actionBar || actionBar.style.display === 'none') return;
-        
-        let currentScrollY = window.scrollY;
-        
-        if (currentScrollY > lastScrollY && currentScrollY > 50) {
-            actionBar.style.transform = 'translateY(150%)'; 
-        } else {
-            actionBar.style.transform = 'translateY(0)';
-        }
-        
-        lastScrollY = currentScrollY;
-    });
-
-    function showExportModal() {
-        document.getElementById('exportGuideModal').style.display = 'flex';
-    }
-
-    function closeExportModal() {
-        document.getElementById('exportGuideModal').style.display = 'none';
-    }
+    function showExportModal() { document.getElementById('exportGuideModal').style.display = 'flex'; }
+    function closeExportModal() { document.getElementById('exportGuideModal').style.display = 'none'; }
