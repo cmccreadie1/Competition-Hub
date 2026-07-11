@@ -1,4 +1,4 @@
-const APP_VERSION = "v7.5.0"; 
+const APP_VERSION = "v1.6.0"; 
     const vTag = document.getElementById('vTag');
     if (vTag) vTag.innerText = APP_VERSION;
 
@@ -57,8 +57,10 @@ const APP_VERSION = "v7.5.0";
         document.querySelectorAll('.tab-content').forEach(content => content.style.display = 'none');
         
         let activeTabBtn = document.getElementById(`tabBtn-${tabId}`);
-        activeTabBtn.classList.add('active');
-        document.getElementById(`${tabId}Tab`).style.display = 'block';
+        if (activeTabBtn) activeTabBtn.classList.add('active');
+        
+        const targetTab = document.getElementById(`${tabId}Tab`);
+        if (targetTab) targetTab.style.display = 'block';
         
         if (tabId === 'draw') {
             document.body.className = 'stage-draw';
@@ -68,7 +70,8 @@ const APP_VERSION = "v7.5.0";
             updatePrizeFund();
         } else {
             document.body.className = 'stage-score';
-            document.getElementById('dayTabsContainer').style.display = matchDays === 2 ? 'flex' : 'none';
+            const dayTabs = document.getElementById('dayTabsContainer');
+            if (dayTabs) dayTabs.style.display = matchDays === 2 ? 'flex' : 'none';
             switchScoreDay(1);
         }
     }
@@ -76,13 +79,15 @@ const APP_VERSION = "v7.5.0";
    function switchScoreDay(day) {
         currentScoreDay = day;
         document.body.className = day === 1 ? 'stage-score-d1' : 'stage-score-d2';
-        document.getElementById('dayWatermark').innerText = 'DAY ' + day;
+        const watermark = document.getElementById('dayWatermark');
+        if (watermark) watermark.innerText = 'DAY ' + day;
         
         document.querySelectorAll('.day-tab-btn').forEach(btn => btn.classList.remove('active'));
         let activeSubBtn = document.getElementById(`subBtn-${day}`);
         if(activeSubBtn) activeSubBtn.classList.add('active');
         
-        document.getElementById('scoreSearch').value = ''; 
+        const searchInput = document.getElementById('scoreSearch');
+        if (searchInput) searchInput.value = ''; 
         renderScorecards();
     }
 
@@ -288,7 +293,7 @@ const APP_VERSION = "v7.5.0";
     }
 
     // ====================================================
-    // --- V7.4.0 SECRET PAIRS ENGINE LOGIC ---
+    // --- SECRET PAIRS ENGINE LOGIC ---
     // ====================================================
     
     function toggleAccordion() {
@@ -563,12 +568,13 @@ const APP_VERSION = "v7.5.0";
     }
 
     // ====================================================
-    // --- NEW "BUILD COMPETITOR LIST" ENGINE ---
+    // --- BUILD COMPETITOR LIST ENGINE ---
     // ====================================================
 
     function toggleAccStatus() {
         isNextAnglerAcc = !isNextAnglerAcc;
         const btn = document.getElementById('accToggleBtn');
+        if (!btn) return;
         if (isNextAnglerAcc) {
             btn.style.background = 'var(--text-dark)';
             btn.querySelector('span').style.opacity = '1';
@@ -583,6 +589,7 @@ const APP_VERSION = "v7.5.0";
     function addAnglerFromUI() {
         const nameInput = document.getElementById('anglerNameInput');
         const teamInput = document.getElementById('teamNameInput');
+        if (!nameInput || !teamInput) return;
         
         let aName = nameInput.value.trim().toUpperCase();
         let tName = teamInput.value.trim().toUpperCase();
@@ -769,13 +776,13 @@ const APP_VERSION = "v7.5.0";
     }
 
     // ====================================================
-    // --- ORIGINAL APP ENGINE FUNCTIONS ---
+    // --- APP ENGINE AUXILIARY FUNCTIONS ---
     // ====================================================
 
     function persistState() {
         if (!isAppReady) return;
         const stateObj = { 
-            title: document.getElementById('matchTitle').value || '',
+            title: document.getElementById('matchTitle') ? document.getElementById('matchTitle').value : '',
             data: appState, 
             scores: scoreState, 
             days: matchDays, 
@@ -789,13 +796,6 @@ const APP_VERSION = "v7.5.0";
             sweepstakeOptIns: sweepstakeOptIns 
         };
         localStorage.setItem('zonedraw_current_state_v1', JSON.stringify(stateObj));
-    }
-
-    function formatPegs(el) {
-        let val = el.value;
-        let nums = val.match(/\d+/g);
-        if (nums) el.value = nums.join(', ');
-        else el.value = '';
     }
 
     function toggleAccPanel() {
@@ -905,8 +905,6 @@ const APP_VERSION = "v7.5.0";
             appState.push({ id: genId(), isTeam: false, tName: '', anglers: [solo] });
         });
         closeImportModal();
-        
-        if(document.getElementById('rosterEntryZone')) document.getElementById('rosterEntryZone').style.display = 'block';
         
         renderStateToScreen();
         showToast("✅ COMPETITORS IMPORTED SUCCESSFULLY");
@@ -1341,7 +1339,7 @@ const APP_VERSION = "v7.5.0";
             
             team.anglers.forEach((a, aI) => {
                 let aN = a.name || 'UNNAMED';
-                if (!a.name || a.name.trim() === '') return; // Skip engine blanks
+                if (!a.name || a.name.trim() === '') return; 
 
                if (!a.z1 || a.p1 === undefined || a.p1 === 9999) {
                     errors.push(`Missing Peg: '${aN}' invalid allocation [DAY 1].`);
@@ -1620,7 +1618,6 @@ const APP_VERSION = "v7.5.0";
         if(document.getElementById('resultsSection')) document.getElementById('resultsSection').style.display = 'none';
         if(document.getElementById('rosterEntryZone')) document.getElementById('rosterEntryZone').style.display = 'block'; 
         
-        // Failsafe padding cleanup if they amended a team to incomplete, removing ghost anglers
         appState.forEach(e => {
             if(e.isTeam) {
                 e.anglers = e.anglers.filter(a => a.name && a.name.trim() !== '');
@@ -1745,7 +1742,29 @@ const APP_VERSION = "v7.5.0";
     function openManualModal() { document.getElementById('manualModal').style.display = 'flex'; }
     function closeManualModal() { document.getElementById('manualModal').style.display = 'none'; }
 
-    window.onload = () => {
+    function handleScoreEnter(event) {
+        if (event.key === 'Enter') {
+            event.target.blur();
+            showToast("✅ SCORE SAVED");
+            clearSearch();
+        }
+    }
+    
+    function clearSearch() {
+        const input = document.getElementById('scoreSearch');
+        if(!input) return;
+        input.value = '';
+        filterScorecards(); 
+        input.focus();      
+    }
+    
+    function showExportModal() { document.getElementById('exportGuideModal').style.display = 'flex'; }
+    function closeExportModal() { document.getElementById('exportGuideModal').style.display = 'none'; }
+
+    // ====================================================
+    // --- IMMEDIATE APP INITIALIZATION ENGINE ---
+    // ====================================================
+    function initCompetitionHub() {
         isAppReady = false; 
         let saved = localStorage.getItem('zonedraw_current_state_v1');
         if (saved) {
@@ -1765,7 +1784,6 @@ const APP_VERSION = "v7.5.0";
             applyAccToggleUI();
             
             if (appState.length > 0) { 
-                // Ensure data structure cleanup from old padder objects when reloading
                 appState.forEach(team => {
                     team.anglers = team.anglers.filter(a => a.name && a.name.trim() !== '');
                 });
@@ -1784,24 +1802,26 @@ const APP_VERSION = "v7.5.0";
         } else { 
             startNewDraw(); 
         }
-        setTimeout(() => { isAppReady = true; }, 500);
-    };
+        
+        // Expose functions explicitly to DOM navigation context
+        window.switchTab = switchTab;
+        window.switchScoreDay = switchScoreDay;
+        window.toggleAccStatus = toggleAccStatus;
+        window.addAnglerFromUI = addAnglerFromUI;
+        window.removeAnglerFromState = removeAnglerFromState;
+        window.restoreAngler = restoreAngler;
+        window.generateDraw = generateDraw;
+        window.runSecretPairsSequence = runSecretPairsSequence;
+        window.toggleAccordion = toggleAccordion;
+        window.toggleOptIn = toggleOptIn;
+        window.openManualModal = openManualModal;
+        window.closeManualModal = closeManualModal;
+        window.openManageMenu = openManageMenu;
+        window.openOutputMenu = openOutputMenu;
+        window.closePopups = closePopups;
 
-    function handleScoreEnter(event) {
-        if (event.key === 'Enter') {
-            event.target.blur();
-            showToast("✅ SCORE SAVED");
-            clearSearch();
-        }
+        setTimeout(() => { isAppReady = true; }, 500);
     }
-    
-    function clearSearch() {
-        const input = document.getElementById('scoreSearch');
-        if(!input) return;
-        input.value = '';
-        filterScorecards(); 
-        input.focus();      
-    }
-    
-    function showExportModal() { document.getElementById('exportGuideModal').style.display = 'flex'; }
-    function closeExportModal() { document.getElementById('exportGuideModal').style.display = 'none'; }
+
+    // Run immediately since window environment is primed
+    initCompetitionHub();
