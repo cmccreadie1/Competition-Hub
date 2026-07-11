@@ -1911,9 +1911,12 @@
 
 // CONTROLLER FOR SWITCHING BETWEEN THE 5 LEADERBOARD PANELS
 function switchLeaderboardSubTab(subTabId) {
-    // 1. Remove active state styling from all leaderboard sub-tab buttons
+    // 1. Reset all leaderboard sub-tab pills back to the default dark inactive layout
     document.querySelectorAll('#leaderboardTab button').forEach(btn => {
         btn.classList.remove('active');
+        btn.style.background = '#1e293b';
+        btn.style.color = '#94a3b8';
+        btn.style.borderColor = 'rgba(255,255,255,0.05)';
     });
     
     // 2. Hide all leaderboard sub-content panels
@@ -1921,13 +1924,16 @@ function switchLeaderboardSubTab(subTabId) {
         content.style.display = 'none';
     });
     
-    // 3. Highlight the clicked button
+    // 3. Dynamic High-Contrast Style Assignment for Active Pill
     const targetBtn = document.getElementById(`subBtn-${subTabId}`);
     if (targetBtn) {
         targetBtn.classList.add('active');
+        targetBtn.style.background = '#ffffff';
+        targetBtn.style.color = '#0f172a';
+        targetBtn.style.borderColor = 'transparent';
     }
     
-    // 4. Unroll the corresponding result container screen
+    // 4. Reveal the corresponding results layout container
     const targetContent = document.getElementById(`subTab-${subTabId}`);
     if (targetContent) {
         targetContent.style.display = 'block';
