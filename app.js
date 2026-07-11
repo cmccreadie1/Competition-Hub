@@ -57,16 +57,19 @@
         document.getElementById(`${tabId}Tab`).style.display = 'block';
         
         if (tabId === 'draw') {
-            document.body.className = 'stage-draw';
-        } else if (tabId === 'pairs') {
-            document.body.className = 'stage-pairs';
-            renderOptInList();
-            updatePrizeFund();
-        } else {
-            document.body.className = 'stage-score';
-            document.getElementById('dayTabsContainer').style.display = matchDays === 2 ? 'flex' : 'none';
-            switchScoreDay(1);
-        }
+        document.body.className = 'stage-draw';
+    } else if (tabId === 'pairs') {
+        document.body.className = 'stage-pairs';
+        renderOptInList();
+        updatePrizeFund();
+    } else if (tabId === 'leaderboard') {
+        document.body.className = 'stage-leaderboard';
+    } else {
+        document.body.className = 'stage-score';
+        const dayTabs = document.getElementById('dayTabsContainer');
+        if (dayTabs) dayTabs.style.display = matchDays === 2 ? 'flex' : 'none';
+        switchScoreDay(1);
+    }
     }
 
    function switchScoreDay(day) {
@@ -1905,3 +1908,28 @@
     function closeExportModal() {
         document.getElementById('exportGuideModal').style.display = 'none';
     }
+
+// CONTROLLER FOR SWITCHING BETWEEN THE 5 LEADERBOARD PANELS
+function switchLeaderboardSubTab(subTabId) {
+    // 1. Remove active state styling from all leaderboard sub-tab buttons
+    document.querySelectorAll('#leaderboardTab button').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // 2. Hide all leaderboard sub-content panels
+    document.querySelectorAll('.sub-leaderboard-content').forEach(content => {
+        content.style.display = 'none';
+    });
+    
+    // 3. Highlight the clicked button
+    const targetBtn = document.getElementById(`subBtn-${subTabId}`);
+    if (targetBtn) {
+        targetBtn.classList.add('active');
+    }
+    
+    // 4. Unroll the corresponding result container screen
+    const targetContent = document.getElementById(`subTab-${subTabId}`);
+    if (targetContent) {
+        targetContent.style.display = 'block';
+    }
+}
