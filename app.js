@@ -2251,42 +2251,42 @@ function calculateAndRenderIndividualLeaderboard(containerId) {
         return targetB.spc - targetA.spc;
     });
 
-    // 3. Render Dashboard Interface layout mapping
+    // 3. Render Dashboard Interface layout mapping (MAX READABILITY UPGRADE)
     let html = `
     <div style="background: rgba(30, 41, 59, 0.7); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
         <div style="overflow-x: auto;">
-            <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 13px; color: #ffffff; white-space: nowrap;">
+            <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 14px; color: #ffffff; white-space: nowrap;">
                 <thead>
-                    <tr style="background: rgba(15, 23, 42, 0.6); color: #94a3b8; font-weight: 900; font-size: 11px; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                        <th style="padding: 10px; text-align: left;">RANK / ANGLER DETAILS</th>
-                        <th style="padding: 10px; background: rgba(59, 130, 246, 0.15); border-left: 1px solid rgba(255,255,255,0.05); border-right: 1px solid rgba(255,255,255,0.05);">DAY 1 PERFORMANCE</th>
+                    <tr style="background: rgba(15, 23, 42, 0.6); color: #e2e8f0; font-weight: 900; font-size: 14px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                        <th style="padding: 14px 12px; text-align: left; font-size: 14px;">RANK / ANGLER DETAILS</th>
+                        <th style="padding: 14px 6px; background: rgba(59, 130, 246, 0.15); border-left: 1px solid rgba(255,255,255,0.05); border-right: 1px solid rgba(255,255,255,0.05);">DAY 1 PERFORMANCE</th>
                         ${isTwoDayMatch ? `
-                        <th style="padding: 10px; background: rgba(16, 185, 129, 0.15); border-right: 1px solid rgba(255,255,255,0.05);">DAY 2 PERFORMANCE</th>
-                        <th style="padding: 10px; background: rgba(234, 179, 8, 0.15);">COMBINED MATCH TOTALS</th>` : ''}
+                        <th style="padding: 14px 6px; background: rgba(16, 185, 129, 0.15); border-right: 1px solid rgba(255,255,255,0.05);">DAY 2 PERFORMANCE</th>
+                        <th style="padding: 14px 6px; background: rgba(234, 179, 8, 0.15);">COMBINED MATCH TOTALS</th>` : ''}
                     </tr>
-                    <tr style="border-bottom: 2px solid rgba(255,255,255,0.1); color: #cbd5e1; font-weight: 800; font-size: 11px; background: rgba(15, 23, 42, 0.3);">
-                        <th style="padding: 8px 12px; text-align: left;">POS & ANGLER (TEAM)</th>
-                        <th style="padding: 8px 4px; background: rgba(59, 130, 246, 0.05); border-left: 1px solid rgba(255,255,255,0.05); border-right: 1px solid rgba(255,255,255,0.05);">
-                            <span style="display:inline-block; width:35px; color:var(--accent);">PTS</span>|
-                            <span style="display:inline-block; width:45px;">CM</span>|
-                            <span style="display:inline-block; width:30px;">CT</span>|
-                            <span style="display:inline-block; width:35px;">BIG</span>|
-                            <span style="display:inline-block; width:30px;">SPC</span>
+                    <tr style="border-bottom: 2px solid rgba(255,255,255,0.1); color: #cbd5e1; font-weight: 800; font-size: 13px; background: rgba(15, 23, 42, 0.3);">
+                        <th style="padding: 10px 12px; text-align: left;">POS & ANGLER (TEAM)</th>
+                        <th style="padding: 10px 6px; background: rgba(59, 130, 246, 0.05); border-left: 1px solid rgba(255,255,255,0.05); border-right: 1px solid rgba(255,255,255,0.05); letter-spacing: 1px;">
+                            <span style="display:inline-block; width:45px; color:var(--accent); font-weight: 900;">PTS</span>|
+                            <span style="display:inline-block; width:55px;">CM</span>|
+                            <span style="display:inline-block; width:40px;">CT</span>|
+                            <span style="display:inline-block; width:45px;">BIG</span>|
+                            <span style="display:inline-block; width:40px;">SPC</span>
                         </th>
                         ${isTwoDayMatch ? `
-                        <th style="padding: 8px 4px; background: rgba(16, 185, 129, 0.05); border-right: 1px solid rgba(255,255,255,0.05);">
-                            <span style="display:inline-block; width:35px; color:var(--accent);">PTS</span>|
-                            <span style="display:inline-block; width:45px;">CM</span>|
-                            <span style="display:inline-block; width:30px;">CT</span>|
-                            <span style="display:inline-block; width:35px;">BIG</span>|
-                            <span style="display:inline-block; width:30px;">SPC</span>
+                        <th style="padding: 10px 6px; background: rgba(16, 185, 129, 0.05); border-right: 1px solid rgba(255,255,255,0.05); letter-spacing: 1px;">
+                            <span style="display:inline-block; width:45px; color:var(--accent); font-weight: 900;">PTS</span>|
+                            <span style="display:inline-block; width:55px;">CM</span>|
+                            <span style="display:inline-block; width:40px;">CT</span>|
+                            <span style="display:inline-block; width:45px;">BIG</span>|
+                            <span style="display:inline-block; width:40px;">SPC</span>
                         </th>
-                        <th style="padding: 8px 4px; background: rgba(234, 179, 8, 0.05);">
-                            <span style="display:inline-block; width:35px; color:var(--accent); font-weight:900;">PTS</span>|
-                            <span style="display:inline-block; width:45px; font-weight:800;">CM</span>|
-                            <span style="display:inline-block; width:30px;">CT</span>|
-                            <span style="display:inline-block; width:35px;">BIG</span>|
-                            <span style="display:inline-block; width:30px;">SPC</span>
+                        <th style="padding: 10px 6px; background: rgba(234, 179, 8, 0.05); letter-spacing: 1px;">
+                            <span style="display:inline-block; width:45px; color:var(--accent); font-weight:900;">PTS</span>|
+                            <span style="display:inline-block; width:55px; font-weight:900;">CM</span>|
+                            <span style="display:inline-block; width:40px; font-weight:800;">CT</span>|
+                            <span style="display:inline-block; width:45px; font-weight:800;">BIG</span>|
+                            <span style="display:inline-block; width:40px; font-weight:800;">SPC</span>
                         </th>` : ''}
                     </tr>
                 </thead>
@@ -2294,38 +2294,38 @@ function calculateAndRenderIndividualLeaderboard(containerId) {
     `;
 
     if (masterList.length === 0) {
-        html += `<tr><td colspan="${isTwoDayMatch ? 4 : 2}" style="padding:30px; color:#64748b;">No competitor score matrices compiled.</td></tr>`;
+        html += `<tr><td colspan="${isTwoDayMatch ? 4 : 2}" style="padding:40px; color:#64748b; font-weight:800; font-size:15px;">No competitor score matrices compiled.</td></tr>`;
     } else {
         masterList.forEach((row, index) => {
             const currentRank = index + 1;
             html += `
-                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); font-weight:600; height:38px;">
-                    <td style="padding: 8px 12px; text-align: left; text-transform: uppercase;">
-                        <span style="color:var(--accent); font-weight:900; font-size:14px; margin-right:10px;">${currentRank}</span>
-                        <span style="font-weight:800; color:#ffffff; font-size:13px;">${row.name}</span>
-                        <span style="font-size:10px; color:#94a3b8; font-weight:600; margin-left:6px;">(${row.team})</span>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.07); font-weight:600; height:45px;">
+                    <td style="padding: 10px 12px; text-align: left; text-transform: uppercase;">
+                        <span style="color:var(--accent); font-weight:900; font-size:16px; margin-right:12px;">${currentRank}</span>
+                        <span style="font-weight:800; color:#ffffff; font-size:15px; letter-spacing: 0.3px;">${row.name}</span>
+                        <span style="font-size:11px; color:#a3a3a3; font-weight:700; margin-left:8px; opacity:0.9;">(${row.team})</span>
                     </td>
-                    <td style="padding: 8px 4px; font-family:monospace; font-size:12px; background: rgba(59, 130, 246, 0.02); border-left: 1px solid rgba(255,255,255,0.05); border-right: 1px solid rgba(255,255,255,0.05);">
-                        <span style="display:inline-block; width:35px; color:var(--accent); font-weight:900; font-size:13px;">${row.d1.pts}</span> 
-                        <span style="display:inline-block; width:45px; color:#cbd5e1;">${row.d1.len}</span> 
-                        <span style="display:inline-block; width:30px; opacity:0.8;">${row.d1.cnt}</span> 
-                        <span style="display:inline-block; width:35px; color:#e2e8f0;">${row.d1.big}</span> 
-                        <span style="display:inline-block; width:30px; opacity:0.8;">${row.d1.spc}</span>
+                    <td style="padding: 10px 6px; font-family:monospace; font-size:14px; background: rgba(59, 130, 246, 0.02); border-left: 1px solid rgba(255,255,255,0.05); border-right: 1px solid rgba(255,255,255,0.05); letter-spacing: 0.5px;">
+                        <span style="display:inline-block; width:45px; color:var(--accent); font-weight:900; font-size:15px;">${row.d1.pts}</span> 
+                        <span style="display:inline-block; width:55px; color:#ffffff; font-weight:700;">${row.d1.len}</span> 
+                        <span style="display:inline-block; width:40px; color:#cbd5e1;">${row.d1.cnt}</span> 
+                        <span style="display:inline-block; width:45px; color:#cbd5e1;">${row.d1.big}</span> 
+                        <span style="display:inline-block; width:40px; color:#94a3b8;">${row.d1.spc}</span>
                     </td>
                     ${isTwoDayMatch ? `
-                    <td style="padding: 8px 4px; font-family:monospace; font-size:12px; background: rgba(16, 185, 129, 0.02); border-right: 1px solid rgba(255,255,255,0.05);">
-                        <span style="display:inline-block; width:35px; color:var(--accent); font-weight:900; font-size:13px;">${row.d2.pts}</span> 
-                        <span style="display:inline-block; width:45px; color:#cbd5e1;">${row.d2.len}</span> 
-                        <span style="display:inline-block; width:30px; opacity:0.8;">${row.d2.cnt}</span> 
-                        <span style="display:inline-block; width:35px; color:#e2e8f0;">${row.d2.big}</span> 
-                        <span style="display:inline-block; width:30px; opacity:0.8;">${row.d2.spc}</span>
+                    <td style="padding: 10px 6px; font-family:monospace; font-size:14px; background: rgba(16, 185, 129, 0.02); border-right: 1px solid rgba(255,255,255,0.05); letter-spacing: 0.5px;">
+                        <span style="display:inline-block; width:45px; color:var(--accent); font-weight:900; font-size:15px;">${row.d2.pts}</span> 
+                        <span style="display:inline-block; width:55px; color:#ffffff; font-weight:700;">${row.d2.len}</span> 
+                        <span style="display:inline-block; width:40px; color:#cbd5e1;">${row.d2.cnt}</span> 
+                        <span style="display:inline-block; width:45px; color:#cbd5e1;">${row.d2.big}</span> 
+                        <span style="display:inline-block; width:40px; color:#94a3b8;">${row.d2.spc}</span>
                     </td>
-                    <td style="padding: 8px 4px; font-family:monospace; font-size:12px; background: rgba(234, 179, 8, 0.03);">
-                        <span style="display:inline-block; width:35px; color:#ffffff; font-weight:900; font-size:13px;">${row.comb.pts}</span> 
-                        <span style="display:inline-block; width:45px; color:var(--accent); font-weight:800;">${row.comb.len}</span> 
-                        <span style="display:inline-block; width:30px; font-weight:700;">${row.comb.cnt}</span> 
-                        <span style="display:inline-block; width:35px; color:#ffffff; font-weight:700;">${row.comb.big}</span> 
-                        <span style="display:inline-block; width:30px; opacity:0.9;">${row.comb.spc}</span>
+                    <td style="padding: 10px 6px; font-family:monospace; font-size:14px; background: rgba(234, 179, 8, 0.04); letter-spacing: 0.5px;">
+                        <span style="display:inline-block; width:45px; color:#ffffff; font-weight:900; font-size:15px;">${row.comb.pts}</span> 
+                        <span style="display:inline-block; width:55px; color:var(--accent); font-weight:900; font-size:15px;">${row.comb.len}</span> 
+                        <span style="display:inline-block; width:40px; color:#ffffff; font-weight:800;">${row.comb.cnt}</span> 
+                        <span style="display:inline-block; width:45px; color:#ffffff; font-weight:800;">${row.comb.big}</span> 
+                        <span style="display:inline-block; width:40px; color:#cbd5e1; font-weight:700;">${row.comb.spc}</span>
                     </td>` : ''}
                 </tr>
             `;
