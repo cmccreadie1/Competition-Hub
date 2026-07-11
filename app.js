@@ -1941,10 +1941,13 @@ function switchLeaderboardSubTab(subTabId) {
     }
 
     // 5. Automated Leaderboard Calculation Data Hooks
+    // 5. Automated Leaderboard Calculation Data Hooks
     if (subTabId === 'lbd1') {
         calculateAndRenderZoneLeaderboard(1, 'day1ZonesContainer');
     } else if (subTabId === 'lbd2') {
         calculateAndRenderZoneLeaderboard(2, 'day2ZonesContainer');
+    } else if (subTabId === 'lbind') {
+        calculateAndRenderIndividualLeaderboard('individualLeaderboardContainer');
     }
 }
 // CORE MATH ENGINE: CALCULATES AND RENDERS ZONE LEADERBOARDS FOR DAY 1 OR DAY 2
@@ -2103,4 +2106,238 @@ function calculateAndRenderZoneLeaderboard(dayNum, containerId) {
     });
 
     container.innerHTML = htmlOutput;
+}
+
+// INDIVIDUAL CHAMPION MASTER LEADERBOARD MATH ENGINE
+function calculateAndRenderIndividualLeaderboard(containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    if (typeof appState === 'undefined' || !appState || appState.length === 0) {
+        container.innerHTML = `<div style="text-align:center; padding: 40px; color: #94a3b8; font-weight:800;">NO LIVE TOURNAMENT DATA FOUND. RUN DRAW SETUP FIRST.</div>`;
+        return;
+    }
+
+    // Determine if this competition is configured for 1 Day or 2 Days
+    const isTwoDayMatch = (typeof matchDays !== 'undefined' && matchDays === 2);
+    let masterList = [];
+
+    // Auxiliary sub-routine to process zone ranks & scores for point calculations
+    function getDayZonePointsMap(dayNum) {
+        let zonePointsMap = {};
+        const zones = ['RED', 'YELLOW', 'GREEN', 'BLUE'];
+
+        zones.forEach(zoneName => {
+            let zoneAnglers = [];
+            appState.forEach(teamEntry => {
+                teamEntry.anglers.forEach((angler, aIdx) => {
+                    const targetZone = dayNum === 1 ? angler.z1 : angler.z2;
+                    if (!angler.name || targetZone !== zoneName) return;
+
+                    const scoreKey = `${teamEntry.id}_${aIdx}_${dayNum}`;
+                    const rawScore = (typeof scoreState !== 'undefined' && scoreState[scoreKey]) ? scoreState[scoreKey] : { len:'', count:'', big:'', spec:'' };
+                    
+                    let rawSpec = String(rawScore.spec || '').trim();
+                    let compSpec = (rawSpec !== '') ? (!isNaN(rawSpec) ? Number(rawSpec) : rawSpec.split(',').filter(i => i.trim().length > 0).length) : 0;
+
+                    zoneAnglers.push({
+                        key: scoreKey,
+                        length: Number(rawScore.len) || 0,
+                        count: Number(rawScore.count) || 0,
+                        max: Number(rawScore.big) || 0,
+                        species: compSpec
+                    });
+                });
+            });
+
+            // Rank hierarchy sort within zone
+            zoneAnglers.sort((a, b) => {
+                if (b.length !== a.length) return b.length - a.length;
+                if (b.count !== a.count) return b.count - a.count;
+                if (b.max !== a.max) return b.max - a.max;
+                return b.species - a.species;
+            });
+
+            // Calculate zone ranks and assign points
+            let currentRank = 1;
+            while (currentRank <= zoneAnglers.length) {
+                let tieGroup = [zoneAnglers[currentRank - 1]];
+                let nextIdx = currentRank;
+                while (nextIdx < zoneAnglers.length && 
+                       zoneAnglers[nextIdx].length === tieGroup[0].length &&
+                       zoneAnglers[nextIdx].count === tieGroup[0].count &&
+                       zoneAnglers[nextIdx].max === tieGroup[0].max &&
+                       zoneAnglers[nextIdx].species === tieGroup[0].species) {
+                    tieGroup.push(zoneAnglers[nextIdx]);
+                    nextIdx++;
+                }
+
+                let pointsToAssign = 0;
+                if (tieGroup[0].length === 0) {
+                    pointsToAssign = zoneAnglers.length;
+                } else {
+                    let sumRanks = 0;
+                    for (let r = currentRank; r <= nextIdx; r++) sumRanks += r;
+                    pointsToAssign = sumRanks / tieGroup.length;
+                }
+
+                tieGroup.forEach(item => { zonePointsMap[item.key] = pointsToAssign; });
+                currentRank = nextIdx + 1;
+            }
+        });
+        return zonePointsMap;
+    }
+
+    // Pull calculations maps for both days
+    const day1Points = getDayZonePointsMap(1);
+    const day2Points = getDayZonePointsMap(2);
+
+    // 1. Gather stats and map combined totals matrices
+    appState.forEach(teamEntry => {
+        teamEntry.anglers.forEach((angler, aIdx) => {
+            if (!angler.name || !angler.z1) return;
+
+            const k1 = `${teamEntry.id}_${aIdx}_1`;
+            const k2 = `${teamEntry.id}_${aIdx}_2`;
+
+            const s1 = (typeof scoreState !== 'undefined' && scoreState[k1]) ? scoreState[k1] : { len:'', count:'', big:'', spec:'' };
+            const s2 = (typeof scoreState !== 'undefined' && scoreState[k2]) ? scoreState[k2] : { len:'', count:'', big:'', spec:'' };
+
+            let specRaw1 = String(s1.spec || '').trim();
+            let sp1 = (specRaw1 !== '') ? (!isNaN(specRaw1) ? Number(specRaw1) : specRaw1.split(',').filter(i => i.trim().length > 0).length) : 0;
+
+            let specRaw2 = String(s2.spec || '').trim();
+            let sp2 = (specRaw2 !== '') ? (!isNaN(specRaw2) ? Number(specRaw2) : specRaw2.split(',').filter(i => i.trim().length > 0).length) : 0;
+
+            // Individual component extractions
+            let d1Pts = day1Points[k1] !== undefined ? day1Points[k1] : (angler.z1 ? 0 : 0);
+            let d1Len = Number(s1.len) || 0;
+            let d1Cnt = Number(s1.count) || 0;
+            let d1Big = Number(s1.big) || 0;
+            let d1Spc = sp1;
+
+            let d2Pts = isTwoDayMatch && day2Points[k2] !== undefined ? day2Points[k2] : 0;
+            let d2Len = isTwoDayMatch ? (Number(s2.len) || 0) : 0;
+            let d2Cnt = isTwoDayMatch ? (Number(s2.count) || 0) : 0;
+            let d2Big = isTwoDayMatch ? (Number(s2.big) || 0) : 0;
+            let d2Spc = isTwoDayMatch ? sp2 : 0;
+
+            // Combined calculation processing
+            let combPts = d1Pts + d2Pts;
+            let combLen = d1Len + d2Len;
+            let combCnt = d1Cnt + d2Cnt;
+            let combBig = Math.max(d1Big, d2Big); // Dynamic check: Largest fish overall wins tie-breaker
+            let combSpc = d1Spc + d2Spc;
+
+            masterList.push({
+                name: angler.name,
+                team: (teamEntry.isTeam && teamEntry.tName && teamEntry.tName.trim().toUpperCase() !== 'SOLO') ? teamEntry.tName.trim() : 'SOLO',
+                d1: { pts: d1Pts, len: d1Len, cnt: d1Cnt, big: d1Big, spc: d1Spc },
+                d2: { pts: d2Pts, len: d2Len, cnt: d2Cnt, big: d2Big, spc: d2Spc },
+                comb: { pts: combPts, len: combLen, cnt: combCnt, big: combBig, spc: combSpc }
+            });
+        });
+    });
+
+    // 2. Global Leaderboard Sorting Engine (Hierarchy: Points -> Length -> Count -> Biggest -> Species)
+    masterList.sort((a, b) => {
+        const targetA = isTwoDayMatch ? a.comb : a.d1;
+        const targetB = isTwoDayMatch ? b.comb : b.d1;
+
+        if (targetA.pts !== targetB.pts) return targetA.pts - targetB.pts; // Lower points wins match
+        if (targetB.len !== targetA.len) return targetB.len - targetA.len;
+        if (targetB.cnt !== targetA.cnt) return targetB.cnt - targetA.cnt;
+        if (targetB.big !== targetA.big) return targetB.big - targetA.big;
+        return targetB.spc - targetA.spc;
+    });
+
+    // 3. Render Dashboard Interface layout mapping
+    let html = `
+    <div style="background: rgba(30, 41, 59, 0.7); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 13px; color: #ffffff; white-space: nowrap;">
+                <thead>
+                    <tr style="background: rgba(15, 23, 42, 0.6); color: #94a3b8; font-weight: 900; font-size: 11px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                        <th style="padding: 10px; text-align: left;">RANK / ANGLER DETAILS</th>
+                        <th style="padding: 10px; background: rgba(59, 130, 246, 0.15); border-left: 1px solid rgba(255,255,255,0.05); border-right: 1px solid rgba(255,255,255,0.05);">DAY 1 PERFORMANCE</th>
+                        ${isTwoDayMatch ? `
+                        <th style="padding: 10px; background: rgba(16, 185, 129, 0.15); border-right: 1px solid rgba(255,255,255,0.05);">DAY 2 PERFORMANCE</th>
+                        <th style="padding: 10px; background: rgba(234, 179, 8, 0.15);">COMBINED MATCH TOTALS</th>` : ''}
+                    </tr>
+                    <tr style="border-bottom: 2px solid rgba(255,255,255,0.1); color: #cbd5e1; font-weight: 800; font-size: 11px; background: rgba(15, 23, 42, 0.3);">
+                        <th style="padding: 8px 12px; text-align: left;">POS & ANGLER (TEAM)</th>
+                        <th style="padding: 8px 4px; background: rgba(59, 130, 246, 0.05); border-left: 1px solid rgba(255,255,255,0.05); border-right: 1px solid rgba(255,255,255,0.05);">
+                            <span style="display:inline-block; width:35px; color:var(--accent);">PTS</span>|
+                            <span style="display:inline-block; width:45px;">CM</span>|
+                            <span style="display:inline-block; width:30px;">CT</span>|
+                            <span style="display:inline-block; width:35px;">BIG</span>|
+                            <span style="display:inline-block; width:30px;">SPC</span>
+                        </th>
+                        ${isTwoDayMatch ? `
+                        <th style="padding: 8px 4px; background: rgba(16, 185, 129, 0.05); border-right: 1px solid rgba(255,255,255,0.05);">
+                            <span style="display:inline-block; width:35px; color:var(--accent);">PTS</span>|
+                            <span style="display:inline-block; width:45px;">CM</span>|
+                            <span style="display:inline-block; width:30px;">CT</span>|
+                            <span style="display:inline-block; width:35px;">BIG</span>|
+                            <span style="display:inline-block; width:30px;">SPC</span>
+                        </th>
+                        <th style="padding: 8px 4px; background: rgba(234, 179, 8, 0.05);">
+                            <span style="display:inline-block; width:35px; color:var(--accent); font-weight:900;">PTS</span>|
+                            <span style="display:inline-block; width:45px; font-weight:800;">CM</span>|
+                            <span style="display:inline-block; width:30px;">CT</span>|
+                            <span style="display:inline-block; width:35px;">BIG</span>|
+                            <span style="display:inline-block; width:30px;">SPC</span>
+                        </th>` : ''}
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+
+    if (masterList.length === 0) {
+        html += `<tr><td colspan="${isTwoDayMatch ? 4 : 2}" style="padding:30px; color:#64748b;">No competitor score matrices compiled.</td></tr>`;
+    } else {
+        masterList.forEach((row, index) => {
+            const currentRank = index + 1;
+            html += `
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); font-weight:600; height:38px;">
+                    <td style="padding: 8px 12px; text-align: left; text-transform: uppercase;">
+                        <span style="color:var(--accent); font-weight:900; font-size:14px; margin-right:10px;">${currentRank}</span>
+                        <span style="font-weight:800; color:#ffffff; font-size:13px;">${row.name}</span>
+                        <span style="font-size:10px; color:#94a3b8; font-weight:600; margin-left:6px;">(${row.team})</span>
+                    </td>
+                    <td style="padding: 8px 4px; font-family:monospace; font-size:12px; background: rgba(59, 130, 246, 0.02); border-left: 1px solid rgba(255,255,255,0.05); border-right: 1px solid rgba(255,255,255,0.05);">
+                        <span style="display:inline-block; width:35px; color:var(--accent); font-weight:900; font-size:13px;">${row.d1.pts}</span> 
+                        <span style="display:inline-block; width:45px; color:#cbd5e1;">${row.d1.len}</span> 
+                        <span style="display:inline-block; width:30px; opacity:0.8;">${row.d1.cnt}</span> 
+                        <span style="display:inline-block; width:35px; color:#e2e8f0;">${row.d1.big}</span> 
+                        <span style="display:inline-block; width:30px; opacity:0.8;">${row.d1.spc}</span>
+                    </td>
+                    ${isTwoDayMatch ? `
+                    <td style="padding: 8px 4px; font-family:monospace; font-size:12px; background: rgba(16, 185, 129, 0.02); border-right: 1px solid rgba(255,255,255,0.05);">
+                        <span style="display:inline-block; width:35px; color:var(--accent); font-weight:900; font-size:13px;">${row.d2.pts}</span> 
+                        <span style="display:inline-block; width:45px; color:#cbd5e1;">${row.d2.len}</span> 
+                        <span style="display:inline-block; width:30px; opacity:0.8;">${row.d2.cnt}</span> 
+                        <span style="display:inline-block; width:35px; color:#e2e8f0;">${row.d2.big}</span> 
+                        <span style="display:inline-block; width:30px; opacity:0.8;">${row.d2.spc}</span>
+                    </td>
+                    <td style="padding: 8px 4px; font-family:monospace; font-size:12px; background: rgba(234, 179, 8, 0.03);">
+                        <span style="display:inline-block; width:35px; color:#ffffff; font-weight:900; font-size:13px;">${row.comb.pts}</span> 
+                        <span style="display:inline-block; width:45px; color:var(--accent); font-weight:800;">${row.comb.len}</span> 
+                        <span style="display:inline-block; width:30px; font-weight:700;">${row.comb.cnt}</span> 
+                        <span style="display:inline-block; width:35px; color:#ffffff; font-weight:700;">${row.comb.big}</span> 
+                        <span style="display:inline-block; width:30px; opacity:0.9;">${row.comb.spc}</span>
+                    </td>` : ''}
+                </tr>
+            `;
+        });
+    }
+
+    html += `
+                </tbody>
+            </table>
+        </div>
+    </div>
+    `;
+
+    container.innerHTML = html;
 }
