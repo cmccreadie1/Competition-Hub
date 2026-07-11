@@ -116,60 +116,50 @@
                 </div>
             </div>
 
-            <div id="rosterEntryZone" class="control-panel" style="padding: 0; overflow: hidden; margin-top: 20px;">
-    <div style="background: #f8fafc; padding: 20px; border-bottom: 1px solid var(--border); text-align: left;">
-        <h3 style="margin: 0 0 8px 0; font-size: 15px; color: var(--text-dark);">BUILD COMPETITOR LIST</h3>
-        <p style="margin: 0; font-size: 12px; color: var(--text-light); font-weight: 600; text-transform: none;">
-            Add anglers to your <strong>Draw List</strong>. Enter their name and team (leave blank for Solo). Toggle the <span style="color: var(--a-color); font-weight: 900;">{A}</span> button for accessible pegs.
-        </p>
+            <div id="rosterEntryZone">
+                <div style="margin: 25px 0; border-bottom: 2px dashed var(--border);"></div>
+                <div class="entry-group-label" style="text-align: center; margin-bottom: 20px; color: var(--text-dark);">COMPETITOR ENTRY</div>
+
+                <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; text-align: left;">
+                    <div style="flex: 1; min-width: 280px; max-width: 400px; background: #ffffff; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.05); border-radius: 20px; padding: 24px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
+                        <h4 style="margin: 0 0 6px 0; color: var(--text-dark); font-weight: 900; font-size: 15px;">OPTION 1: QUICK IMPORT</h4>
+                        <p style="margin: 0 0 20px 0; font-size: 12px; font-weight: 600; color: var(--text-light); text-transform: none;">Auto-calculates teams and solos from Excel data.</p>
+                        <button id="importExcelBtn" class="btn-action" style="width: 100%; padding: 14px 20px;" onclick="showImportModal()">📋 QUICK IMPORT EXCEL LIST</button>
+                    </div>
+
+                    <div style="flex: 1; min-width: 280px; max-width: 400px; background: #ffffff; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.05); border-radius: 20px; padding: 24px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
+                        <h4 style="margin: 0 0 6px 0; color: var(--text-dark); font-weight: 900; font-size: 15px;">OPTION 2: MANUAL SETUP</h4>
+                        <p style="margin: 0 0 20px 0; font-size: 12px; font-weight: 600; color: var(--text-light); text-transform: none;">Generate empty boxes to fill by hand.</p>
+                        <div style="display:flex; align-items:center; justify-content:center; gap:12px; width:100%;">
+                            <div style="display:flex; gap:8px;">
+                                <div style="display:flex; flex-direction:column; align-items:center;">
+                                    <label style="font-size: 10px; font-weight: 900; color: var(--text-light); margin-bottom: 4px;">TEAMS</label>
+                                    <input type="number" id="initTeams" value="0" style="width:60px; text-align:center; font-size: 14px; padding: 10px; background: #f8fafc; border: 1px solid var(--border);">
+                                </div>
+                                <div style="display:flex; flex-direction:column; align-items:center;">
+                                    <label style="font-size: 10px; font-weight: 900; color: var(--text-light); margin-bottom: 4px;">SOLOS</label>
+                                    <input type="number" id="initIndivs" value="0" style="width:60px; text-align:center; font-size: 14px; padding: 10px; background: #f8fafc; border: 1px solid var(--border);">
+                                </div>
+                            </div>
+                            <button id="initMatchBtn" class="btn-action-outline" style="padding: 10px 16px; height: 100%; flex: 1;" onclick="bulkInit()">CREATE</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="entryList">
+            <div id="entryTeamsContainer" style="display:none;">
+                <div class="entry-group-label">TEAMS</div>
+                <div id="entryTeamsBucket" class="bucket-grid"></div>
+            </div>
+            <div id="entrySolosContainer" style="display:none;">
+                <div class="entry-group-label" style="margin-top: 30px;">SOLO ANGLERS</div>
+                <div id="entrySolosBucket" class="bucket-grid"></div>
+            </div>
+        </div>
+
     </div>
-
-    <div style="padding: 20px;">
-        <div style="display: flex; justify-content: space-between; gap: 10px; margin-bottom: 20px;">
-            <div style="flex: 1; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 15px; text-align: center;">
-                <span id="stat-total" style="display: block; font-size: 24px; font-weight: 900; color: var(--text-dark);">0</span>
-                <span style="font-size: 11px; font-weight: 800; color: var(--text-light); text-transform: uppercase;">Total Anglers</span>
-            </div>
-            <div style="flex: 1; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 15px; text-align: center;">
-                <span id="stat-solo" style="display: block; font-size: 24px; font-weight: 900; color: var(--text-dark);">0</span>
-                <span style="font-size: 11px; font-weight: 800; color: var(--text-light); text-transform: uppercase;">Solo</span>
-            </div>
-            <div style="flex: 1; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 15px; text-align: center;">
-                <span id="stat-teams" style="display: block; font-size: 24px; font-weight: 900; color: var(--text-dark);">0</span>
-                <span style="font-size: 11px; font-weight: 800; color: var(--text-light); text-transform: uppercase;">Complete Teams</span>
-            </div>
-            <div id="stat-incomplete-box" style="display:none; flex: 1; background: var(--red-soft); border: 1px solid var(--red-color); border-radius: 12px; padding: 15px; text-align: center;">
-                <span id="stat-incomplete" style="display: block; font-size: 24px; font-weight: 900; color: var(--red-color);">0</span>
-                <span style="font-size: 11px; font-weight: 800; color: var(--red-color); text-transform: uppercase;">Partial Teams</span>
-            </div>
-        </div>
-
-        <div style="display: flex; gap: 10px; margin-bottom: 20px; align-items: stretch;">
-            <input type="text" id="anglerNameInput" placeholder="Angler Name" autocomplete="off" style="flex: 2; padding: 12px 16px; border-radius: 12px; border: 2px solid var(--border); font-size: 14px; font-weight: 800; text-transform: uppercase; outline: none;" />
-            <input type="text" id="teamNameInput" placeholder="Team Name (Blank for Solo)" autocomplete="off" style="flex: 2; padding: 12px 16px; border-radius: 12px; border: 2px solid var(--border); font-size: 14px; font-weight: 800; text-transform: uppercase; outline: none;" />
-            <button id="accToggleBtn" style="flex: 0 0 auto; width: 60px; font-size: 16px; border: 2px solid var(--border); background: #ffffff; border-radius: 12px; cursor: pointer; transition: 0.2s;" onclick="toggleAccStatus()">
-                <span style="opacity: 0.3; color: var(--text-dark); font-weight: 900;">{A}</span>
-            </button>
-            <button id="addAnglerBtn" onclick="addAnglerFromUI()" style="flex: 1; background: var(--accent); border: none; color: white; font-weight: 800; padding: 16px 32px; border-radius: 50px; cursor: pointer;">ADD</button>
-        </div>
-
-        <div style="margin-bottom: 10px; text-align: left;">
-            <h4 style="margin: 0; font-size: 14px; font-weight: 900; color: var(--text-dark);">DRAW LIST</h4>
-        </div>
-        <div style="background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 10px; max-height: 400px; overflow-y: auto;">
-            <div style="display: grid; grid-template-columns: 2fr 2fr 50px; gap: 10px; align-items: center; padding: 10px; border-bottom: 2px solid var(--border); font-weight: 900; font-size: 11px; color: var(--text-light);">
-                <span>NAME</span>
-                <span>TEAM / STATUS</span>
-                <span>ACTION</span>
-            </div>
-            <div id="liveRosterList"></div>
-        </div>
-
-        <div style="text-align: center; margin-top: 20px;">
-            <button onclick="generateDraw()" style="width: 100%; background: var(--accent); border: none; color: white; font-weight: 800; padding: 16px 32px; border-radius: 50px; cursor: pointer; text-transform: uppercase;">PROCEED TO DRAW</button>
-        </div>
-    </div>
-</div>
 
     <div id="resultsSection">
         <div id="swapPrompt" class="no-print" style="display:none; text-align:center; background:var(--text-dark); color:white; border: 2px solid var(--border); padding:16px; font-weight:800; font-size: 13px; margin-bottom:20px; border-radius:16px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">SWAP MODE ACTIVE (Select a specific day peg to swap)</div>
