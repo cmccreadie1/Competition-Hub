@@ -437,12 +437,12 @@
     left: 50%;
     transform: translate(-50%, -50%);
     font-family: inherit;
-    font-size: 12vw;
+    font-size: 25vw;
     font-weight: 900;
-    color: rgba(255, 255, 255, 0.03);
+    color: rgba(255, 255, 255, 0.25);
     z-index: 0;
     pointer-events: none;
-    letter-spacing: 4px;
+    letter-spacing: 6px;
     text-transform: uppercase;
     text-align: center;
     width: 100%;
