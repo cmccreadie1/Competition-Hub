@@ -422,4 +422,31 @@
         .btn-close-modal:active {
             opacity: 0.8;
         }
-   
+   /* ====================================================
+   LEADERBOARD TAB BACKGROUND & WATERMARK RULES 
+   ==================================================== */
+.stage-leaderboard {
+    background: #334155 !important; /* Uniform Slate Blue */
+}
+
+/* Renders the custom matching watermark layout natively */
+.stage-leaderboard::before {
+    content: "RESULTS";
+    position: fixed;
+    top: 52%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-12deg);
+    font-size: 14vw;
+    font-weight: 900;
+    color: rgba(255, 255, 255, 0.03);
+    z-index: 0;
+    pointer-events: none;
+    letter-spacing: 12px;
+}
+
+/* Smoothly hides default day watermarks when Results are active */
+.stage-leaderboard #dayWatermark,
+.stage-leaderboard .draw-watermark,
+.stage-leaderboard .pairs-watermark {
+    display: none !important;
+}
