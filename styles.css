@@ -1,4 +1,4 @@
-<style>
+
         :root {
             /* Stage Backgrounds */
             --bg-base: #334155;
@@ -422,4 +422,4 @@
         .btn-close-modal:active {
             opacity: 0.8;
         }
-    </style>
+   
