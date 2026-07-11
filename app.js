@@ -1938,4 +1938,147 @@ function switchLeaderboardSubTab(subTabId) {
     if (targetContent) {
         targetContent.style.display = 'block';
     }
+
+    // 5. Automated Leaderboard Calculation Data Hooks
+    if (subTabId === 'lbd1') {
+        calculateAndRenderZoneLeaderboard(1, 'day1ZonesContainer');
+    } else if (subTabId === 'lbd2') {
+        calculateAndRenderZoneLeaderboard(2, 'day2ZonesContainer');
+    }
+}
+// CORE MATH ENGINE: CALCULATES AND RENDERS ZONE LEADERBOARDS FOR DAY 1 OR DAY 2
+function calculateAndRenderZoneLeaderboard(dayNum, containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    
+    // Ensure tournament data exists to process
+    if (!window.matchState || !window.matchState.anglers) {
+        container.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding: 40px; color: #94a3b8; font-weight:800;">NO LIVE TOURNAMENT DATA FOUND. RUN DRAW SETUP FIRST.</div>`;
+        return;
+    }
+
+    const zones = ['RED', 'YELLOW', 'GREEN', 'BLUE'];
+    let htmlOutput = '';
+
+    // Process each color-coded zone individually
+    zones.forEach(zoneName => {
+        // 1. Isolate all anglers assigned to this specific zone on this day
+        let zoneAnglers = window.matchState.anglers.filter(a => {
+            const assignment = dayNum === 1 ? a.day1 : a.day2;
+            return assignment && assignment.zone === zoneName;
+        }).map(a => {
+            // Extract catch metrics safely from scorecards data arrays
+            const scoreRecord = a.scores && a.scores[dayNum] ? a.scores[dayNum] : { length: 0, count: 0, max: 0, species: 0 };
+            return {
+                name: a.name,
+                team: a.team || 'SOLO',
+                peg: dayNum === 1 ? (a.day1 ? a.day1.peg : '-') : (a.day2 ? a.day2.peg : '-'),
+                length: Number(scoreRecord.length) || 0,
+                count: Number(scoreRecord.count) || 0,
+                max: Number(scoreRecord.max) || 0,
+                species: Number(scoreRecord.species) || 0,
+                zonePoints: 0
+            };
+        });
+
+        // 2. Sort Anglers based on the strict Tie-Breaker Hierarchy
+        zoneAnglers.sort((a, b) => {
+            if (b.length !== a.length) return b.length - a.length; // Main: Total Length
+            if (b.count !== a.count) return b.count - a.count;     // 1st Tie-Breaker: Fish Count
+            if (b.max !== a.max) return b.max - a.max;             // 2nd Tie-Breaker: Biggest Fish
+            return b.species - a.species;                          // 3rd Tie-Breaker: Species Count
+        });
+
+        // 3. Enforce Zone Points and handling for Blanks/No-Shows
+        let currentRank = 1;
+        while (currentRank <= zoneAnglers.length) {
+            let tieGroup = [zoneAnglers[currentRank - 1]];
+            let nextIdx = currentRank;
+            
+            // Look ahead to group identical ties together
+            while (nextIdx < zoneAnglers.length && 
+                   zoneAnglers[nextIdx].length === tieGroup[0].length &&
+                   zoneAnglers[nextIdx].count === tieGroup[0].count &&
+                   zoneAnglers[nextIdx].max === tieGroup[0].max &&
+                   zoneAnglers[nextIdx].species === tieGroup[0].species) {
+                tieGroup.push(zoneAnglers[nextIdx]);
+                nextIdx++;
+            }
+
+            // Calculate score points (Blanks get max zone points, active ties split average)
+            let pointsToAssign = 0;
+            if (tieGroup[0].length === 0) {
+                // If they caught nothing, they are assigned maximum points for the group size
+                pointsToAssign = zoneAnglers.length;
+            } else {
+                // Active catch ties inherit the average of the rank span they cover
+                let sumRanks = 0;
+                for (let r = currentRank; r <= nextIdx; r++) {
+                    sumRanks += r;
+                }
+                pointsToAssign = sumRanks / tieGroup.length;
+            }
+
+            // Lock points into the data profile entries
+            tieGroup.forEach(angler => {
+                angler.zonePoints = pointsToAssign;
+            });
+
+            currentRank = nextIdx + 1;
+        }
+
+        // Re-sort cleanly by points to keep list layout immaculate
+        zoneAnglers.sort((a, b) => a.zonePoints - b.zonePoints);
+
+        // 4. Construct Color-Coded Dashboard UI Table Layout
+        const zoneColors = { RED: '#ef4444', YELLOW: '#eab308', GREEN: '#10b981', BLUE: '#3b82f6' };
+        const activeColor = zoneColors[zoneName] || '#64748b';
+
+        htmlOutput += `
+        <div style="background: rgba(30, 41, 59, 0.7); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
+            <div style="background: ${activeColor}; color: #ffffff; padding: 12px; text-align: center; font-size: 14px; font-weight: 900; letter-spacing: 1px;">
+                ZONE ${zoneName}
+            </div>
+            <div style="padding: 8px; overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 12px; color: #ffffff;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid rgba(255,255,255,0.1); color: #94a3b8; font-weight: 800; font-size: 10px;">
+                            <th style="padding: 6px 4px; text-align: center;">PTS</th>
+                            <th style="padding: 6px 4px; text-align: center;">PEG</th>
+                            <th style="padding: 6px 4px;">ANGLER</th>
+                            <th style="padding: 6px 4px; text-align: right;">DATA MATRIX (L/F/B/S)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+
+        if (zoneAnglers.length === 0) {
+            htmlOutput += `<tr><td colspan="4" style="text-align:center; padding:20px; color:#64748b;">No anglers assigned</td></tr>`;
+        } else {
+            zoneAnglers.forEach(angler => {
+                // Construct clean unified Excel format string representation
+                const dataString = `${angler.length} / ${angler.count} / ${angler.max} / ${angler.species}`;
+                htmlOutput += `
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); font-weight: 600;">
+                        <td style="padding: 8px 4px; text-align: center; color: var(--accent); font-weight: 900; font-size: 13px;">${angler.zonePoints}</td>
+                        <td style="padding: 8px 4px; text-align: center; opacity: 0.7;">${angler.peg}</td>
+                        <td style="padding: 8px 4px; text-transform: uppercase;">
+                            <div style="font-weight: 800;">${angler.name}</div>
+                            <div style="font-size: 9px; color: #94a3b8; font-weight: 500;">${angler.team}</div>
+                        </td>
+                        <td style="padding: 8px 4px; text-align: right; font-family: monospace; font-size: 11px; letter-spacing: 0.5px; color: #cbd5e1;">${dataString}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        htmlOutput += `
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        `;
+    });
+
+    container.innerHTML = htmlOutput;
 }
