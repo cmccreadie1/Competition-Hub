@@ -64,6 +64,7 @@
         updatePrizeFund();
     } else if (tabId === 'leaderboard') {
         document.body.className = 'stage-leaderboard';
+        switchLeaderboardSubTab('lbd1'); // Forces the active pill to calculate and draw Day 1 immediately
     } else {
         document.body.className = 'stage-score';
         const dayTabs = document.getElementById('dayTabsContainer');
