@@ -368,14 +368,18 @@
     </div>
 </div>
 
-<div id="leaderboardTab" class="tab-content" style="display: none; padding: 80px 20px 20px 20px; position: relative; z-index: 10;">
+<div id="leaderboardTab" class="tab-content" style="display: none; padding: 75px 20px 20px 20px; position: relative; z-index: 10;">
     
-    <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center;">
-        <button id="subBtn-lbd1" class="tab-btn active" style="padding: 10px 16px; font-size: 13px; font-weight: bold;" onclick="switchLeaderboardSubTab('lbd1')">DAY 1 ZONES</button>
-        <button id="subBtn-lbd2" class="tab-btn" style="padding: 10px 16px; font-size: 13px; font-weight: bold;" onclick="switchLeaderboardSubTab('lbd2')">DAY 2 ZONES</button>
-        <button id="subBtn-lbind" class="tab-btn" style="padding: 10px 16px; font-size: 13px; font-weight: bold;" onclick="switchLeaderboardSubTab('lbind')">INDIVIDUAL CHAMPION</button>
-        <button id="subBtn-lbteam" class="tab-btn" style="padding: 10px 16px; font-size: 13px; font-weight: bold;" onclick="switchLeaderboardSubTab('lbteam')">TEAM CHAMPIONS</button>
-        <button id="subBtn-lbfish" class="tab-btn" style="padding: 10px 16px; font-size: 13px; font-weight: bold;" onclick="switchLeaderboardSubTab('lbfish')">BIGGEST FISH</button>
+    <div style="background: rgba(15, 23, 42, 0.75); border: 1px solid var(--border); border-radius: 10px; padding: 12px; text-align: center; color: #ffffff; margin-top: 15px; margin-bottom: 15px; font-size: 13px; font-weight: 600; letter-spacing: 0.5px; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
+        🏆 TIE BREAK LEGEND: <span style="color: var(--accent); font-weight: 800;">Points</span> | Total Length (cm) / Fish Count / Biggest Fish (cm) / Species Count
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 8px; margin-bottom: 25px; width: 100%;">
+        <button id="subBtn-lbd1" class="tab-btn active" style="padding: 12px 8px; font-size: 12px; font-weight: 800; text-align: center; border-radius: 8px; width: 100%;" onclick="switchLeaderboardSubTab('lbd1')">DAY 1 ZONES</button>
+        <button id="subBtn-lbd2" class="tab-btn" style="padding: 12px 8px; font-size: 12px; font-weight: 800; text-align: center; border-radius: 8px; width: 100%;" onclick="switchLeaderboardSubTab('lbd2')">DAY 2 ZONES</button>
+        <button id="subBtn-lbind" class="tab-btn" style="padding: 12px 8px; font-size: 12px; font-weight: 800; text-align: center; border-radius: 8px; width: 100%;" onclick="switchLeaderboardSubTab('lbind')">INDIVIDUAL CHAMPION</button>
+        <button id="subBtn-lbteam" class="tab-btn" style="padding: 12px 8px; font-size: 12px; font-weight: 800; text-align: center; border-radius: 8px; width: 100%;" onclick="switchLeaderboardSubTab('lbteam')">TEAM CHAMPIONS</button>
+        <button id="subBtn-lbfish" class="tab-btn" style="padding: 12px 8px; font-size: 12px; font-weight: 800; text-align: center; border-radius: 8px; width: 100%;" onclick="switchLeaderboardSubTab('lbfish')">BIGGEST FISH</button>
     </div>
 
     <!-- Tie-Breaker Legend Header -->
