@@ -1947,7 +1947,7 @@ function switchLeaderboardSubTab(subTabId) {
     } else if (subTabId === 'lbd2') {
         calculateAndRenderZoneLeaderboard(2, 'day2ZonesContainer');
     } else if (subTabId === 'lbind') {
-        calculateAndRenderIndividualLeaderboard('individualLeaderboardContainer');
+        calculateAndRenderIndividualLeaderboard('indivChampionContainer');
     }
 }
 // CORE MATH ENGINE: CALCULATES AND RENDERS ZONE LEADERBOARDS FOR DAY 1 OR DAY 2
