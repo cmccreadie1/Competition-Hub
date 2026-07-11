@@ -1950,6 +1950,8 @@ function switchLeaderboardSubTab(subTabId) {
         calculateAndRenderIndividualLeaderboard('indivChampionContainer');
     } else if (subTabId === 'lbteam') {
         calculateAndRenderTeamLeaderboard('teamChampionContainer');
+    } else if (subTabId === 'lbfish') {
+        calculateAndRenderBiggestFishLeaderboard('biggestFishContainer');
     }
 }
 // CORE MATH ENGINE: CALCULATES AND RENDERS ZONE LEADERBOARDS FOR DAY 1 OR DAY 2
