@@ -1948,6 +1948,8 @@ function switchLeaderboardSubTab(subTabId) {
         calculateAndRenderZoneLeaderboard(2, 'day2ZonesContainer');
     } else if (subTabId === 'lbind') {
         calculateAndRenderIndividualLeaderboard('indivChampionContainer');
+    } else if (subTabId === 'lbteam') {
+        calculateAndRenderTeamLeaderboard('teamChampionContainer');
     }
 }
 // CORE MATH ENGINE: CALCULATES AND RENDERS ZONE LEADERBOARDS FOR DAY 1 OR DAY 2
@@ -2336,6 +2338,221 @@ function calculateAndRenderIndividualLeaderboard(containerId) {
                         <span style="display:inline-block; width:55px; color:#ffffff; font-weight:800;">${row.comb.big}</span> 
                         <span style="display:inline-block; width:45px; color:#cbd5e1; font-weight:700;">${row.comb.spc}</span>
                     </td>` : ''}
+                </tr>
+            `;
+        });
+    }
+
+    html += `
+                </tbody>
+            </table>
+        </div>
+    </div>
+    `;
+
+    container.innerHTML = html;
+}
+
+// TEAM CHAMPIONSHIP MASTER LEADERBOARD MATH ENGINE
+function calculateAndRenderTeamLeaderboard(containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    if (typeof appState === 'undefined' || !appState || appState.length === 0) {
+        container.innerHTML = `<div style="text-align:center; padding: 40px; color: #94a3b8; font-weight:800;">NO LIVE TOURNAMENT DATA FOUND. RUN DRAW SETUP FIRST.</div>`;
+        return;
+    }
+
+    const isTwoDayMatch = (typeof matchDays !== 'undefined' && matchDays === 2);
+    let teamList = [];
+
+    // Helper sub-routine to process zone ranks & scores for point calculations exactly matching individuals
+    function getDayZonePointsMap(dayNum) {
+        let zonePointsMap = {};
+        const zones = ['RED', 'YELLOW', 'GREEN', 'BLUE'];
+
+        zones.forEach(zoneName => {
+            let zoneAnglers = [];
+            appState.forEach(teamEntry => {
+                teamEntry.anglers.forEach((angler, aIdx) => {
+                    const targetZone = dayNum === 1 ? angler.z1 : angler.z2;
+                    if (!angler.name || targetZone !== zoneName) return;
+
+                    const scoreKey = `${teamEntry.id}_${aIdx}_${dayNum}`;
+                    const rawScore = (typeof scoreState !== 'undefined' && scoreState[scoreKey]) ? scoreState[scoreKey] : { len:'', count:'', big:'', spec:'' };
+                    
+                    let rawSpec = String(rawScore.spec || '').trim();
+                    let compSpec = (rawSpec !== '') ? (!isNaN(rawSpec) ? Number(rawSpec) : rawSpec.split(',').filter(i => i.trim().length > 0).length) : 0;
+
+                    zoneAnglers.push({
+                        key: scoreKey,
+                        length: Number(rawScore.len) || 0,
+                        count: Number(rawScore.count) || 0,
+                        max: Number(rawScore.max) || 0,
+                        species: compSpec
+                    });
+                });
+            });
+
+            zoneAnglers.sort((a, b) => {
+                if (b.length !== a.length) return b.length - a.length;
+                if (b.count !== a.count) return b.count - a.count;
+                if (b.max !== a.max) return b.max - a.max;
+                return b.species - a.species;
+            });
+
+            let currentRank = 1;
+            while (currentRank <= zoneAnglers.length) {
+                let tieGroup = [zoneAnglers[currentRank - 1]];
+                let nextIdx = currentRank;
+                while (nextIdx < zoneAnglers.length && 
+                       zoneAnglers[nextIdx].length === tieGroup[0].length &&
+                       zoneAnglers[nextIdx].count === tieGroup[0].count &&
+                       zoneAnglers[nextIdx].max === tieGroup[0].max &&
+                       zoneAnglers[nextIdx].species === tieGroup[0].species) {
+                    tieGroup.push(zoneAnglers[nextIdx]);
+                    nextIdx++;
+                }
+
+                let pointsToAssign = 0;
+                if (tieGroup[0].length === 0) {
+                    pointsToAssign = zoneAnglers.length;
+                } else {
+                    let sumRanks = 0;
+                    for (let r = currentRank; r <= nextIdx; r++) sumRanks += r;
+                    pointsToAssign = sumRanks / tieGroup.length;
+                }
+
+                tieGroup.forEach(item => { zonePointsMap[item.key] = pointsToAssign; });
+                currentRank = nextIdx + 1;
+            }
+        });
+        return zonePointsMap;
+    }
+
+    const day1Points = getDayZonePointsMap(1);
+    const day2Points = getDayZonePointsMap(2);
+
+    // 1. Process teams from appState (Ignore entries explicitly marked as SOLO)
+    appState.forEach(teamEntry => {
+        const teamNameClean = (teamEntry.tName || '').trim();
+        if (!teamEntry.isTeam || teamNameClean === '' || teamNameClean.toUpperCase() === 'SOLO') return;
+
+        let totalTeamPoints = 0;
+        let totalTeamLength = 0;
+        let totalTeamCount = 0;
+        let anglerBreakdowns = [];
+
+        teamEntry.anglers.forEach((angler, aIdx) => {
+            if (!angler.name) return;
+
+            const k1 = `${teamEntry.id}_${aIdx}_1`;
+            const k2 = `${teamEntry.id}_${aIdx}_2`;
+
+            const s1 = (typeof scoreState !== 'undefined' && scoreState[k1]) ? scoreState[k1] : { len:'', count:'' };
+            const s2 = (typeof scoreState !== 'undefined' && scoreState[k2]) ? scoreState[k2] : { len:'', count:'' };
+
+            // Individual Accumulations
+            let a1Pts = day1Points[k1] !== undefined ? day1Points[k1] : 0;
+            let a1Len = Number(s1.len) || 0;
+            let a1Cnt = Number(s1.count) || 0;
+
+            let a2Pts = isTwoDayMatch && day2Points[k2] !== undefined ? day2Points[k2] : 0;
+            let a2Len = isTwoDayMatch ? (Number(s2.len) || 0) : 0;
+            let a2Cnt = isTwoDayMatch ? (Number(s2.count) || 0) : 0;
+
+            let individualTotalPoints = a1Pts + a2Pts;
+            let individualTotalLength = a1Len + a2Len;
+            let individualTotalCount = a1Cnt + a2Cnt;
+
+            // Add to team sums
+            totalTeamPoints += individualTotalPoints;
+            totalTeamLength += individualTotalLength;
+            totalTeamCount += individualTotalCount;
+
+            // Push details to inner breakdown array
+            anglerBreakdowns.push({
+                name: angler.name,
+                pts: individualTotalPoints,
+                len: individualTotalLength,
+                cnt: individualTotalCount
+            });
+        });
+
+        // Sort inside the team: Best performing (lowest zone points) to worst performing
+        anglerBreakdowns.sort((a, b) => {
+            if (a.pts !== b.pts) return a.pts - b.pts;
+            return b.len - a.len; // Tie break internal breakdown by total length
+        });
+
+        teamList.push({
+            name: teamNameClean.toUpperCase(),
+            pts: totalTeamPoints,
+            len: totalTeamLength,
+            cnt: totalTeamCount,
+            members: anglerBreakdowns
+        });
+    });
+
+    // 2. Global Leaderboard Sorting Engine (Hierarchy: Points -> Length -> Count)
+    teamList.sort((a, b) => {
+        if (a.pts !== b.pts) return a.pts - b.pts; // Main: Lowest Team Zone Points Wins
+        if (b.len !== a.len) return b.len - a.len; // 1st Tie-Breaker: Highest Combined Team Length
+        return b.cnt - a.cnt;                     // 2nd Tie-Breaker: Highest Combined Team Fish Count
+    });
+
+    // 3. Render Dashboard Interface Layout Mapping (MAX READABILITY UPGRADE)
+    let html = `
+    <div style="background: rgba(30, 41, 59, 0.7); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 16px; color: #ffffff; white-space: nowrap;">
+                <thead>
+                    <tr style="background: rgba(15, 23, 42, 0.6); color: #e2e8f0; font-weight: 900; font-size: 16px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                        <th style="padding: 16px 14px; text-align: left; width: 300px;">RANK / TEAM NAME</th>
+                        <th style="padding: 16px 10px; background: rgba(59, 130, 246, 0.15); width: 80px; color: var(--accent);">PTS</th>
+                        <th style="padding: 16px 10px; background: rgba(16, 185, 129, 0.15); width: 90px;">CM</th>
+                        <th style="padding: 16px 10px; background: rgba(234, 179, 8, 0.15); width: 90px;">FISH CT</th>
+                        <th style="padding: 16px 14px; text-align: left; background: rgba(15, 23, 42, 0.4);">TEAM CATCH BREAKDOWN (BEST TO LEAST PERFORMING)</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+
+    if (teamList.length === 0) {
+        html += `<tr><td colspan="5" style="padding:40px; color:#64748b; font-weight:800; font-size:16px;">No registered teams found with scored data logs.</td></tr>`;
+    } else {
+        teamList.forEach((team, index) => {
+            const currentRank = index + 1;
+            
+            // Build string layout for individual member contributions
+            let breakdownHTML = '';
+            team.members.forEach((m, idx) => {
+                breakdownHTML += `
+                    <div style="display: inline-block; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 6px; margin-right: 8px; font-size: 13px;">
+                        <span style="font-weight: 800; color: #ffffff;">${m.name}</span> 
+                        <span style="color: #94a3b8; font-family: monospace; font-size: 12px; margin-left: 4px;">(${m.pts}pts / ${m.len}cm / ${m.cnt}f)</span>
+                    </div>
+                `;
+            });
+
+            html += `
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.07); font-weight: 600; height: 56px;">
+                    <td style="padding: 12px 14px; text-align: left; text-transform: uppercase;">
+                        <span style="color: var(--accent); font-weight: 900; font-size: 18px; margin-right: 14px;">${currentRank}</span>
+                        <span style="font-weight: 900; color: #ffffff; font-size: 17px; letter-spacing: 0.5px;">${team.name}</span>
+                    </td>
+                    <td style="padding: 12px 10px; font-size: 18px; font-weight: 900; color: var(--accent); background: rgba(59, 130, 246, 0.02); border-left: 1px solid rgba(255,255,255,0.03); border-right: 1px solid rgba(255,255,255,0.03); font-family: monospace;">
+                        ${team.pts}
+                    </td>
+                    <td style="padding: 12px 10px; font-size: 17px; font-weight: 800; color: #ffffff; background: rgba(16, 185, 129, 0.02); border-right: 1px solid rgba(255,255,255,0.03); font-family: monospace;">
+                        ${team.len}
+                    </td>
+                    <td style="padding: 12px 10px; font-size: 17px; font-weight: 800; color: #e2e8f0; background: rgba(234, 179, 8, 0.02); border-right: 1px solid rgba(255,255,255,0.03); font-family: monospace;">
+                        ${team.cnt}
+                    </td>
+                    <td style="padding: 12px 14px; text-align: left; background: rgba(15, 23, 42, 0.1); white-space: normal;">
+                        ${breakdownHTML}
+                    </td>
                 </tr>
             `;
         });
