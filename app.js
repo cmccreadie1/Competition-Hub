@@ -2694,3 +2694,187 @@ function calculateAndRenderBiggestFishLeaderboard(containerId) {
 
     container.innerHTML = htmlOutput;
 }
+
+// DIRECT WEB-TO-WEB PUBLIC DATA CONVERTER
+function exportPublicResults() {
+    if (typeof appState === 'undefined' || !appState || appState.length === 0) {
+        alert("No active tournament data found to compile.");
+        return;
+    }
+
+    const isTwoDayMatch = (typeof matchDays !== 'undefined' && matchDays === 2);
+
+    // Re-use the exact point allocation logic from your champion calculation systems
+    function getDayZonePointsMap(dayNum) {
+        let zonePointsMap = {};
+        const zones = ['RED', 'YELLOW', 'GREEN', 'BLUE'];
+
+        zones.forEach(zoneName => {
+            let zoneAnglers = [];
+            appState.forEach(teamEntry => {
+                teamEntry.anglers.forEach((angler, aIdx) => {
+                    const targetZone = dayNum === 1 ? angler.z1 : angler.z2;
+                    if (!angler.name || targetZone !== zoneName) return;
+
+                    const scoreKey = `${teamEntry.id}_${aIdx}_${dayNum}`;
+                    const rawScore = (typeof scoreState !== 'undefined' && scoreState[scoreKey]) ? scoreState[scoreKey] : { len:'', count:'', big:'', spec:'' };
+                    
+                    let rawSpec = String(rawScore.spec || '').trim();
+                    let compSpec = (rawSpec !== '') ? (!isNaN(rawSpec) ? Number(rawSpec) : rawSpec.split(',').filter(i => i.trim().length > 0).length) : 0;
+
+                    zoneAnglers.push({
+                        key: scoreKey,
+                        length: Number(rawScore.len) || 0,
+                        count: Number(rawScore.count) || 0,
+                        max: Number(rawScore.big) || 0,
+                        species: compSpec
+                    });
+                });
+            });
+
+            zoneAnglers.sort((a, b) => {
+                if (b.length !== a.length) return b.length - a.length;
+                if (b.count !== a.count) return b.count - a.count;
+                if (b.max !== a.max) return b.max - a.max;
+                return b.species - a.species;
+            });
+
+            let currentRank = 1;
+            while (currentRank <= zoneAnglers.length) {
+                let tieGroup = [zoneAnglers[currentRank - 1]];
+                let nextIdx = currentRank;
+                while (nextIdx < zoneAnglers.length && 
+                       zoneAnglers[nextIdx].length === tieGroup[0].length &&
+                       zoneAnglers[nextIdx].count === tieGroup[0].count &&
+                       zoneAnglers[nextIdx].max === tieGroup[0].max &&
+                       zoneAnglers[nextIdx].species === tieGroup[0].species) {
+                    tieGroup.push(zoneAnglers[nextIdx]);
+                    nextIdx++;
+                }
+
+                let pointsToAssign = 0;
+                if (tieGroup[0].length === 0) {
+                    pointsToAssign = zoneAnglers.length;
+                } else {
+                    let sumRanks = 0;
+                    for (let r = currentRank; r <= nextIdx; r++) sumRanks += r;
+                    pointsToAssign = sumRanks / tieGroup.length;
+                }
+
+                tieGroup.forEach(item => { zonePointsMap[item.key] = pointsToAssign; });
+                currentRank = nextIdx + 1;
+            }
+        });
+        return zonePointsMap;
+    }
+
+    const day1Points = getDayZonePointsMap(1);
+    const day2Points = getDayZonePointsMap(2);
+    let compiledList = [];
+
+    appState.forEach(teamEntry => {
+        teamEntry.anglers.forEach((angler, aIdx) => {
+            if (!angler.name || !angler.z1) return;
+
+            const k1 = `${teamEntry.id}_${aIdx}_1`;
+            const k2 = `${teamEntry.id}_${aIdx}_2`;
+
+            const s1 = (typeof scoreState !== 'undefined' && scoreState[k1]) ? scoreState[k1] : {};
+            const s2 = (typeof scoreState !== 'undefined' && scoreState[k2]) ? scoreState[k2] : {};
+
+            let specRaw1 = String(s1.spec || '').trim();
+            let sp1 = (specRaw1 !== '') ? (!isNaN(specRaw1) ? Number(specRaw1) : specRaw1.split(',').filter(i => i.trim().length > 0).length) : 0;
+
+            let specRaw2 = String(s2.spec || '').trim();
+            let sp2 = (specRaw2 !== '') ? (!isNaN(specRaw2) ? Number(specRaw2) : specRaw2.split(',').filter(i => i.trim().length > 0).length) : 0;
+
+            let d1Pts = day1Points[k1] !== undefined ? day1Points[k1] : zonePointsMaxFallback;
+            let d1Len = Number(s1.len) || 0;
+            let d1Cnt = Number(s1.count) || 0;
+            let d1Big = Number(s1.big) || 0;
+            let d1Spc = sp1;
+
+            let d2Pts = isTwoDayMatch && day2Points[k2] !== undefined ? day2Points[k2] : 0;
+            let d2Len = isTwoDayMatch ? (Number(s2.len) || 0) : 0;
+            let d2Cnt = isTwoDayMatch ? (Number(s2.count) || 0) : 0;
+            let d2Big = isTwoDayMatch ? (Number(s2.big) || 0) : 0;
+            let d2Spc = isTwoDayMatch ? sp2 : 0;
+
+            let combPts = d1Pts + d2Pts;
+            let combLen = d1Len + d2Len;
+            let combCnt = d1Cnt + d2Cnt;
+            let combBig = Math.max(d1Big, d2Big);
+            let combSpc = d1Spc + d2Spc;
+
+            let teamNameClean = (teamEntry.isTeam && teamEntry.tName && teamEntry.tName.trim().toUpperCase() !== 'SOLO') ? teamEntry.tName.trim() : 'Solo';
+
+            function formatZoneName(z) {
+                if (!z) return "";
+                return z.charAt(0).toUpperCase() + z.slice(1).toLowerCase() + " Zone";
+            }
+
+            compiledList.push({
+                anglerName: angler.name,
+                teamName: teamNameClean,
+                day1: {
+                    zone: formatZoneName(angler.z1),
+                    peg: angler.p1 ? (isNaN(angler.p1) ? angler.p1 : Number(angler.p1)) : 0,
+                    fishCount: d1Cnt,
+                    totalLengthCm: d1Len,
+                    biggestFishCm: d1Big,
+                    zonePoints: d1Pts
+                },
+                day2: {
+                    zone: formatZoneName(angler.z2),
+                    peg: angler.p2 ? (isNaN(angler.p2) ? angler.p2 : Number(angler.p2)) : 0,
+                    fishCount: d2Cnt,
+                    totalLengthCm: d2Len,
+                    biggestFishCm: d2Big,
+                    zonePoints: d2Pts
+                },
+                totals: {
+                    cumulativePoints: combPts,
+                    cumulativeFish: combCnt,
+                    cumulativeLengthCm: combLen,
+                    overallRank: 0 
+                },
+                _sort: {
+                    pts: isTwoDayMatch ? combPts : d1Pts,
+                    len: isTwoDayMatch ? combLen : d1Len,
+                    cnt: isTwoDayMatch ? combCnt : d1Cnt,
+                    big: isTwoDayMatch ? combBig : d1Big,
+                    spc: isTwoDayMatch ? combSpc : d1Spc
+                }
+            });
+        });
+    });
+
+    // Run absolute tie-breaker hierarchy sort engine matching live screens
+    compiledList.sort((a, b) => {
+        if (a._sort.pts !== b._sort.pts) return a._sort.pts - b._sort.pts;
+        if (b._sort.len !== a._sort.len) return b._sort.len - a._sort.len;
+        if (b._sort.cnt !== a._sort.cnt) return b._sort.cnt - a._sort.cnt;
+        if (b._sort.big !== a._sort.big) return b._sort.big - a._sort.big;
+        return b._sort.spc - a._sort.spc;
+    });
+
+    // Map exact rank index positions and clean out the sort helper object
+    let cleanExport = compiledList.map((item, index) => {
+        item.totals.overallRank = index + 1;
+        delete item._sort;
+        return item;
+    });
+
+    // Automated JSON background assembly download routine
+    const blob = new Blob([JSON.stringify(cleanExport, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = 'scores.json';
+    document.body.appendChild(anchor);
+    anchor.click();
+    document.body.removeChild(anchor);
+    URL.revokeObjectURL(url);
+    
+    showToast("🚀 PUBLIC PORTAL SCORES.JSON GENERATED!");
+}
