@@ -2068,7 +2068,7 @@ function calculateAndRenderZoneLeaderboard(dayNum, containerId) {
 
         // UI Generation: Standardized to the uniform 60% transparency layout configuration
         htmlOutput += `
-        <div style="background: rgba(30, 41, 59, 0.6); border: 1px solid var(--border); overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
+        <div style="background: rgba(30, 41, 59, 0.7); border: 1px solid var(--border); overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
             <div style="background: ${activeColor}; color: #ffffff; padding: 12px; text-align: center; font-size: 14px; font-weight: 900; letter-spacing: 1px;">
                 ZONE ${zoneName}
             </div>
@@ -2262,7 +2262,7 @@ function calculateAndRenderIndividualLeaderboard(containerId) {
 
     // Render Dashboard Interface layout mapping (Standardized uniform 60% background card styling)
     let html = `
-    <div style="background: rgba(30, 41, 59, 0.6); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+    <div style="background: rgba(30, 41, 59, 0.7); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
         <div style="overflow-x: auto;">
             <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 16px; color: #ffffff; white-space: nowrap;">
                 <thead>
@@ -2505,7 +2505,7 @@ function calculateAndRenderTeamLeaderboard(containerId) {
 
     // 3. Render Dashboard Interface Layout Mapping (Standardized uniform 60% card backup transparency)
     let html = `
-    <div style="background: rgba(30, 41, 59, 0.6); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+    <div style="background: rgba(30, 41, 59, 0.7); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
         <div style="overflow-x: auto;">
             <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 16px; color: #ffffff; white-space: nowrap;">
                 <thead>
@@ -2654,7 +2654,7 @@ function calculateAndRenderBiggestFishLeaderboard(containerId) {
 
         // Standardized table cards to uniform 60% opacity look
         return `
-        <div style="background: rgba(30, 41, 59, 0.6); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+        <div style="background: rgba(30, 41, 59, 0.7); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
             <div style="background: ${accentColor}; color: #ffffff; padding: 14px; text-align: center; font-size: 15px; font-weight: 900; letter-spacing: 1px;">
                 ${dayTitle.toUpperCase()} - SCORES MATRIX (BIGGEST FISH)
             </div>
