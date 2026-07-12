@@ -2062,12 +2062,12 @@ function calculateAndRenderZoneLeaderboard(dayNum, containerId) {
         // Re-sort cleanly by points to keep list layout immaculate
         zoneAnglers.sort((a, b) => a.zonePoints - b.zonePoints);
 
-       const zoneColors = { RED: '#ef4444', YELLOW: '#eab308', GREEN: '#10b981', BLUE: '#3b82f6' };
+    const zoneColors = { RED: '#ef4444', YELLOW: '#eab308', GREEN: '#10b981', BLUE: '#3b82f6' };
         const activeColor = zoneColors[zoneName] || '#64748b';
 
-        // UI Generation: Adjusted to approved 60% opacity look
+        // UI Generation: Standardized to the 60% transparency layout configuration
         htmlOutput += `
-        <div style="background: rgba(30, 41, 59, 0.65); border: 1px solid var(--border); overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
+        <div style="background: rgba(30, 41, 59, 0.6); border: 1px solid var(--border); overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
             <div style="background: ${activeColor}; color: #ffffff; padding: 12px; text-align: center; font-size: 14px; font-weight: 900; letter-spacing: 1px;">
                 ZONE ${zoneName}
             </div>
