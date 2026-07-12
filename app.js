@@ -2509,7 +2509,7 @@ function calculateAndRenderTeamLeaderboard(containerId) {
 
     // 3. Render Dashboard Interface Layout Mapping (OPTIMIZED COLUMN SPACE)
     let html = `
-    <div style="background: rgba(30, 41, 59, 0.7); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+    <div style="background: rgba(30, 41, 59, 0.65); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
         <div style="overflow-x: auto;">
             <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 16px; color: #ffffff; white-space: nowrap;">
                 <thead>
