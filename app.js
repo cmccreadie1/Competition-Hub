@@ -2062,22 +2062,22 @@ function calculateAndRenderZoneLeaderboard(dayNum, containerId) {
         // Re-sort cleanly by points to keep list layout immaculate
         zoneAnglers.sort((a, b) => a.zonePoints - b.zonePoints);
 
-        const zoneColors = { RED: '#ef4444', YELLOW: '#eab308', GREEN: '#10b981', BLUE: '#3b82f6' };
+       const zoneColors = { RED: '#ef4444', YELLOW: '#eab308', GREEN: '#10b981', BLUE: '#3b82f6' };
         const activeColor = zoneColors[zoneName] || '#64748b';
 
-        // UI Generation: Removing bottom-margin for zero vertical spacing gap between zones
+        // UI Generation: Adjusted to approved 60% opacity look
         htmlOutput += `
-        <div style="background: rgba(30, 41, 59, 0.7); border: 1px solid var(--border); overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
+        <div style="background: rgba(30, 41, 59, 0.6); border: 1px solid var(--border); overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
             <div style="background: ${activeColor}; color: #ffffff; padding: 12px; text-align: center; font-size: 14px; font-weight: 900; letter-spacing: 1px;">
                 ZONE ${zoneName}
             </div>
             <div style="padding: 6px; overflow-x: auto;">
                 <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; color: #ffffff; table-layout: auto;">
                     <thead>
-                        <tr style="border-bottom: 2px solid rgba(255,255,255,0.1); color: #94a3b8; font-weight: 800; font-size: 11px;">
-                            <th style="padding: 6px 2px; text-align: center; width: 35px;">PTS</th>
+                        <tr style="border-bottom: 2px solid rgba(255,255,255,0.15); color: #94a3b8; font-weight: 800; font-size: 11px;">
+                            <th style="padding: 6px 2px; text-align: center; width: 45px;">PTS</th>
                             <th style="padding: 6px 6px;">ANGLER</th>
-                            <th style="padding: 6px 2px; text-align: right; width: 140px;">DATA MATRIX (L/F/B/S)</th>
+                            <th style="padding: 6px 2px; text-align: right; width: 150px;">SCORES MATRIX (L/F/B/S)</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -2089,13 +2089,17 @@ function calculateAndRenderZoneLeaderboard(dayNum, containerId) {
             zoneAnglers.forEach(angler => {
                 const dataString = `${angler.length} / ${angler.count} / ${angler.max} / ${angler.species}`;
                 htmlOutput += `
-                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); font-weight: 600;">
-                        <td style="padding: 10px 2px; text-align: center; color: var(--accent); font-weight: 900; font-size: 15px;">${angler.zonePoints}</td>
-                        <td style="padding: 10px 6px; text-transform: uppercase; white-space: nowrap;">
-                            <span style="font-weight: 800; color: #ffffff; font-size: 14px;">${angler.name}</span>
-                            <span style="font-size: 10px; color: #94a3b8; font-weight: 600; margin-left: 8px;">(${angler.team})</span>
+                    <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.15); background: rgba(15, 23, 42, 0.1); font-weight: 600; height: 54px;">
+                        <td style="padding: 6px 2px; text-align: center; color: var(--accent); font-weight: 900; font-size: 16px; font-family: monospace;">${angler.zonePoints}</td>
+                        
+                        <td style="padding: 6px 6px; text-transform: uppercase;">
+                            <div style="display: flex; flex-direction: column; justify-content: center; gap: 2px;">
+                                <span style="font-weight: 800; color: #ffffff; font-size: 14px; letter-spacing: 0.3px; line-height: 1.2;">${angler.name}</span>
+                                <span style="font-size: 11px; color: #94a3b8; font-weight: 700; letter-spacing: 0.5px;">${angler.team}</span>
+                            </div>
                         </td>
-                        <td style="padding: 10px 2px; text-align: right; font-family: monospace; font-size: 13px; letter-spacing: 0.5px; color: #e2e8f0; white-space: nowrap;">${dataString}</td>
+                        
+                        <td style="padding: 6px 2px; text-align: right; font-family: monospace; font-size: 14px; letter-spacing: 0.5px; color: #e2e8f0; white-space: nowrap;">${dataString}</td>
                     </tr>
                 `;
             });
