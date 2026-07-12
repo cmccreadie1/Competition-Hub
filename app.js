@@ -2067,7 +2067,7 @@ function calculateAndRenderZoneLeaderboard(dayNum, containerId) {
 
         // UI Generation: Adjusted to approved 60% opacity look
         htmlOutput += `
-        <div style="background: rgba(30, 41, 59, 0.7); border: 1px solid var(--border); overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
+        <div style="background: rgba(30, 41, 59, 0.65); border: 1px solid var(--border); overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
             <div style="background: ${activeColor}; color: #ffffff; padding: 12px; text-align: center; font-size: 14px; font-weight: 900; letter-spacing: 1px;">
                 ZONE ${zoneName}
             </div>
