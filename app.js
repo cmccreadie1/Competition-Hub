@@ -1911,6 +1911,7 @@
     }
 
 // CONTROLLER FOR SWITCHING BETWEEN THE 5 LEADERBOARD PANELS
+// CONTROLLER FOR SWITCHING BETWEEN THE 5 LEADERBOARD PANELS
 function switchLeaderboardSubTab(subTabId) {
     // 1. Reset all leaderboard sub-tab pills back to the default dark inactive layout
     document.querySelectorAll('#leaderboardTab button').forEach(btn => {
@@ -1941,7 +1942,6 @@ function switchLeaderboardSubTab(subTabId) {
     }
 
     // 5. Automated Leaderboard Calculation Data Hooks
-    // 5. Automated Leaderboard Calculation Data Hooks
     if (subTabId === 'lbd1') {
         calculateAndRenderZoneLeaderboard(1, 'day1ZonesContainer');
     } else if (subTabId === 'lbd2') {
@@ -1954,6 +1954,7 @@ function switchLeaderboardSubTab(subTabId) {
         calculateAndRenderBiggestFishLeaderboard('biggestFishContainer');
     }
 }
+
 // CORE MATH ENGINE: CALCULATES AND RENDERS ZONE LEADERBOARDS FOR DAY 1 OR DAY 2
 function calculateAndRenderZoneLeaderboard(dayNum, containerId) {
     const container = document.getElementById(containerId);
@@ -1962,7 +1963,7 @@ function calculateAndRenderZoneLeaderboard(dayNum, containerId) {
     // 1. DYNAMIC MATCH DAY CHECK: If Day 2 is clicked but it's a 1-day comp
     if (dayNum === 2 && typeof matchDays !== 'undefined' && matchDays === 1) {
         container.innerHTML = `
-            <div style="grid-column: 1/-1; text-align:center; padding: 50px 20px; color: #94a3b8; background: rgba(30, 41, 59, 0.7); border: 1px solid var(--border); border-radius: 12px; font-weight: 800; font-size: 14px; letter-spacing: 0.5px;">
+            <div style="grid-column: 1/-1; text-align:center; padding: 50px 20px; color: #94a3b8; background: rgba(30, 41, 59, 0.6); border: 1px solid var(--border); border-radius: 12px; font-weight: 800; font-size: 14px; letter-spacing: 0.5px;">
                 🚫 NOT APPLICABLE FOR 1-DAY COMPETITIONS
             </div>`;
         return;
@@ -2062,10 +2063,10 @@ function calculateAndRenderZoneLeaderboard(dayNum, containerId) {
         // Re-sort cleanly by points to keep list layout immaculate
         zoneAnglers.sort((a, b) => a.zonePoints - b.zonePoints);
 
-    const zoneColors = { RED: '#ef4444', YELLOW: '#eab308', GREEN: '#10b981', BLUE: '#3b82f6' };
+        const zoneColors = { RED: '#ef4444', YELLOW: '#eab308', GREEN: '#10b981', BLUE: '#3b82f6' };
         const activeColor = zoneColors[zoneName] || '#64748b';
 
-        // UI Generation: Standardized to the 60% transparency layout configuration
+        // UI Generation: Standardized to the uniform 60% transparency layout configuration
         htmlOutput += `
         <div style="background: rgba(30, 41, 59, 0.6); border: 1px solid var(--border); overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
             <div style="background: ${activeColor}; color: #ffffff; padding: 12px; text-align: center; font-size: 14px; font-weight: 900; letter-spacing: 1px;">
@@ -2218,7 +2219,7 @@ function calculateAndRenderIndividualLeaderboard(containerId) {
             let sp2 = (specRaw2 !== '') ? (!isNaN(specRaw2) ? Number(specRaw2) : specRaw2.split(',').filter(i => i.trim().length > 0).length) : 0;
 
             // Individual component extractions
-            let d1Pts = day1Points[k1] !== undefined ? day1Points[k1] : (angler.z1 ? 0 : 0);
+            let d1Pts = day1Points[k1] !== undefined ? day1Points[k1] : 0;
             let d1Len = Number(s1.len) || 0;
             let d1Cnt = Number(s1.count) || 0;
             let d1Big = Number(s1.big) || 0;
@@ -2234,7 +2235,7 @@ function calculateAndRenderIndividualLeaderboard(containerId) {
             let combPts = d1Pts + d2Pts;
             let combLen = d1Len + d2Len;
             let combCnt = d1Cnt + d2Cnt;
-            let combBig = Math.max(d1Big, d2Big); // Dynamic check: Largest fish overall wins tie-breaker
+            let combBig = Math.max(d1Big, d2Big);
             let combSpc = d1Spc + d2Spc;
 
             masterList.push({
@@ -2252,14 +2253,14 @@ function calculateAndRenderIndividualLeaderboard(containerId) {
         const targetA = isTwoDayMatch ? a.comb : a.d1;
         const targetB = isTwoDayMatch ? b.comb : b.d1;
 
-        if (targetA.pts !== targetB.pts) return targetA.pts - targetB.pts; // Lower points wins match
+        if (targetA.pts !== targetB.pts) return targetA.pts - targetB.pts;
         if (targetB.len !== targetA.len) return targetB.len - targetA.len;
         if (targetB.cnt !== targetA.cnt) return targetB.cnt - targetA.cnt;
         if (targetB.big !== targetA.big) return targetB.big - targetA.big;
         return targetB.spc - targetA.spc;
     });
 
-    // Render Dashboard Interface layout mapping (EXTRA-LARGE READABILITY UPGRADE)
+    // Render Dashboard Interface layout mapping (Standardized uniform 60% background card styling)
     let html = `
     <div style="background: rgba(30, 41, 59, 0.6); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
         <div style="overflow-x: auto;">
@@ -2483,7 +2484,7 @@ function calculateAndRenderTeamLeaderboard(containerId) {
         // Sort inside the team: Best performing (lowest zone points) to worst performing
         anglerBreakdowns.sort((a, b) => {
             if (a.pts !== b.pts) return a.pts - b.pts;
-            return b.len - a.len; // Tie break internal breakdown by total length
+            return b.len - a.len;
         });
 
         teamList.push({
@@ -2497,28 +2498,26 @@ function calculateAndRenderTeamLeaderboard(containerId) {
 
     // 2. Global Leaderboard Sorting Engine (Hierarchy: Points -> Length -> Count)
     teamList.sort((a, b) => {
-        if (a.pts !== b.pts) return a.pts - b.pts; // Main: Lowest Team Zone Points Wins
-        if (b.len !== a.len) return b.len - a.len; // 1st Tie-Breaker: Highest Combined Team Length
-        return b.cnt - a.cnt;                     // 2nd Tie-Breaker: Highest Combined Team Fish Count
+        if (a.pts !== b.pts) return a.pts - b.pts;
+        if (b.len !== a.len) return b.len - a.len;
+        return b.cnt - a.cnt;
     });
 
-    // 3. Render Dashboard Interface Layout Mapping (OPTIMIZED COLUMN SPACE)
+    // 3. Render Dashboard Interface Layout Mapping (Standardized uniform 60% card backup transparency)
     let html = `
-    <div style="background: rgba(30, 41, 59, 0.65); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+    <div style="background: rgba(30, 41, 59, 0.6); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
         <div style="overflow-x: auto;">
             <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 16px; color: #ffffff; white-space: nowrap;">
                 <thead>
-                    <!-- Master Header Deck Category Columns -->
-                 <!-- Master Header Deck Category Columns -->
-            <tr style="background: rgba(15, 23, 42, 0.65); color: #e2e8f0; font-weight: 900; font-size: 16px; border-bottom: 1px solid rgba(255,255,255,0.15);">
-                <th style="padding: 16px 14px; text-align: left; width: 280px;">RANK / TEAM NAME</th>
-                <th style="padding: 16px 4px; background: rgba(59, 130, 246, 0.15); width: 45px; color: var(--accent);">PTS</th>
-                <th style="padding: 16px 4px; background: rgba(16, 185, 129, 0.15); width: 55px;">CM</th>
-                <th style="padding: 16px 4px; background: rgba(234, 179, 8, 0.15); width: 55px;">FISH CT</th>
-                <th style="padding: 16px 14px; text-align: left; background: rgba(15, 23, 42, 0.75);">TEAM CATCH BREAKDOWN</th>
-            </tr>
-        </thead>
-        <tbody>
+                    <tr style="background: rgba(15, 23, 42, 0.6); color: #e2e8f0; font-weight: 900; font-size: 16px; border-bottom: 1px solid rgba(255,255,255,0.15);">
+                        <th style="padding: 16px 14px; text-align: left; width: 280px;">RANK / TEAM NAME</th>
+                        <th style="padding: 16px 4px; background: rgba(59, 130, 246, 0.15); width: 45px; color: var(--accent);">PTS</th>
+                        <th style="padding: 16px 4px; background: rgba(16, 185, 129, 0.15); width: 55px;">CM</th>
+                        <th style="padding: 16px 4px; background: rgba(234, 179, 8, 0.15); width: 55px;">FISH CT</th>
+                        <th style="padding: 16px 14px; text-align: left; background: rgba(15, 23, 42, 0.6);">TEAM SCORES MATRIX</th>
+                    </tr>
+                </thead>
+                <tbody>
         `;
 
         if (teamList.length === 0) {
@@ -2539,29 +2538,24 @@ function calculateAndRenderTeamLeaderboard(containerId) {
                 });
 
                 html += `
-                <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.15); background: rgba(15, 23, 42, 0.75); height: 60px;">
-                    <!-- Rank & Team Name Details -->
+                <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.15); background: rgba(15, 23, 42, 0.1); height: 60px;">
                     <td style="padding: 12px 14px; text-align: left; text-transform: uppercase;">
                         <span style="color: var(--accent); font-weight: 900; font-size: 18px; margin-right: 12px;">${currentRank}</span>
                         <span style="font-weight: 900; color: #ffffff; font-size: 17px; letter-spacing: 0.5px;">${team.name}</span>
                     </td>
                     
-                    <!-- Cumulative Team Points Column -->
                     <td style="padding: 12px 4px; font-size: 17px; font-weight: 900; color: var(--accent); background: rgba(59, 130, 246, 0.02); border-left: 1px solid rgba(255,255,255,0.03); border-right: 1px solid rgba(255,255,255,0.03); font-family: monospace;">
                         ${team.pts}
                     </td>
                     
-                    <!-- Cumulative Team Length Column -->
                     <td style="padding: 12px 4px; font-size: 15px; font-weight: 800; color: #ffffff; background: rgba(16, 185, 129, 0.02); border-right: 1px solid rgba(255,255,255,0.03); font-family: monospace;">
                         ${team.len}
                     </td>
                     
-                    <!-- Cumulative Team Fish Count Column -->
                     <td style="padding: 12px 4px; font-size: 15px; font-weight: 800; color: #ffffff; background: rgba(234, 179, 8, 0.02); border-right: 1px solid rgba(255,255,255,0.03); font-family: monospace;">
                         ${team.cnt}
                     </td>
                     
-                    <!-- Space-Optimized Catch Contribution Blocks -->
                     <td style="padding: 8px 14px; text-align: left;">
                         <div style="display: flex; flex-wrap: wrap; gap: 2px;">
                             ${breakdownHTML}
@@ -2643,7 +2637,7 @@ function calculateAndRenderBiggestFishLeaderboard(containerId) {
         } else {
             topCatches.forEach((c, index) => {
                 tableRows += `
-                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.06); height: 46px;">
+                    <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.15); background: rgba(15, 23, 42, 0.1); height: 46px;">
                         <td style="padding: 10px 12px; font-size: 16px; font-weight: 900; color: ${accentColor}; width: 40px;">${index + 1}</td>
                         <td style="padding: 10px 6px; text-align: left; text-transform: uppercase;">
                             <div style="font-weight: 800; color: #ffffff; font-size: 15px;">${c.name}</div>
@@ -2658,15 +2652,16 @@ function calculateAndRenderBiggestFishLeaderboard(containerId) {
             });
         }
 
+        // Standardized table cards to uniform 60% opacity look
         return `
-        <div style="background: rgba(30, 41, 59, 0.7); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+        <div style="background: rgba(30, 41, 59, 0.6); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
             <div style="background: ${accentColor}; color: #ffffff; padding: 14px; text-align: center; font-size: 15px; font-weight: 900; letter-spacing: 1px;">
-                ${dayTitle.toUpperCase()} - TOP 10 BIGGEST FISH
+                ${dayTitle.toUpperCase()} - SCORES MATRIX (BIGGEST FISH)
             </div>
             <div style="padding: 6px; overflow-x: auto;">
                 <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 15px; color: #ffffff; white-space: nowrap;">
                     <thead>
-                        <tr style="border-bottom: 2px solid rgba(255,255,255,0.1); color: #94a3b8; font-weight: 800; font-size: 12px; background: rgba(15, 23, 42, 0.3);">
+                        <tr style="border-bottom: 2px solid rgba(255,255,255,0.15); color: #94a3b8; font-weight: 800; font-size: 12px; background: rgba(15, 23, 42, 0.3);">
                             <th style="padding: 10px 12px; width: 40px;">POS</th>
                             <th style="padding: 10px 6px; text-align: left;">ANGLER DETAILS</th>
                             <th style="padding: 10px 6px;">PEG ZONE</th>
@@ -2685,14 +2680,12 @@ function calculateAndRenderBiggestFishLeaderboard(containerId) {
     // Build adaptive grid layout layout properties
     let htmlOutput = '';
     if (isTwoDayMatch) {
-        // Widescreen side-by-side grid template layout mapping
         htmlOutput = `
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 20px;">
             ${buildDayTableHTML('Day 1', day1Top10, '#3b82f6')}
             ${buildDayTableHTML('Day 2', day2Top10, '#10b981')}
         </div>`;
     } else {
-        // Full width single column mapping for 1-day events
         htmlOutput = `
         <div style="max-width: 800px; margin: 0 auto;">
             ${buildDayTableHTML('Day 1', day1Top10, '#3b82f6')}
