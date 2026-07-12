@@ -2259,24 +2259,21 @@ function calculateAndRenderIndividualLeaderboard(containerId) {
         return targetB.spc - targetA.spc;
     });
 
-    // 3. Render Dashboard Interface layout mapping (EXTRA-LARGE READABILITY UPGRADE)
+    // Render Dashboard Interface layout mapping (EXTRA-LARGE READABILITY UPGRADE)
     let html = `
-    <div style="background: rgba(30, 41, 59, 0.7); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+    <div style="background: rgba(30, 41, 59, 0.6); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
         <div style="overflow-x: auto;">
             <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 16px; color: #ffffff; white-space: nowrap;">
                 <thead>
-                    <!-- Master Header Sections Category Decks -->
-                    <tr style="background: rgba(15, 23, 42, 0.6); color: #e2e8f0; font-weight: 900; font-size: 16px; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                        <th style="padding: 16px 14px; text-align: left; font-size: 16px;">RANK / ANGLER DETAILS</th>
+                    <tr style="background: rgba(15, 23, 42, 0.6); color: #e2e8f0; font-weight: 900; font-size: 16px; border-bottom: 1px solid rgba(255,255,255,0.15);">
+                        <th style="padding: 16px 14px; text-align: left; font-size: 16px; width: 280px;">RANK / ANGLER DETAILS</th>
                         <th style="padding: 16px 8px; background: rgba(59, 130, 246, 0.15); border-left: 1px solid rgba(255,255,255,0.05); border-right: 1px solid rgba(255,255,255,0.05);">DAY 1 PERFORMANCE</th>
                         ${isTwoDayMatch ? `
                         <th style="padding: 16px 8px; background: rgba(16, 185, 129, 0.15); border-right: 1px solid rgba(255,255,255,0.05);">DAY 2 PERFORMANCE</th>
                         <th style="padding: 16px 8px; background: rgba(234, 179, 8, 0.15);">COMBINED MATCH TOTALS</th>` : ''}
                     </tr>
-                    <!-- Matrix Column Subheaders Decks -->
-                    <tr style="border-bottom: 2px solid rgba(255,255,255,0.1); color: #cbd5e1; font-weight: 800; font-size: 14px; background: rgba(15, 23, 42, 0.3);">
+                    <tr style="border-bottom: 2px solid rgba(255,255,255,0.15); color: #cbd5e1; font-weight: 800; font-size: 14px; background: rgba(15, 23, 42, 0.3);">
                         <th style="padding: 12px 14px; text-align: left;">POS & ANGLER (TEAM)</th>
-                        <!-- Day 1 Sub matrix -->
                         <th style="padding: 12px 8px; background: rgba(59, 130, 246, 0.05); border-left: 1px solid rgba(255,255,255,0.05); border-right: 1px solid rgba(255,255,255,0.05); letter-spacing: 1px;">
                             <span style="display:inline-block; width:55px; color:var(--accent); font-weight: 900;">PTS</span>|
                             <span style="display:inline-block; width:65px;">CM</span>|
@@ -2285,7 +2282,6 @@ function calculateAndRenderIndividualLeaderboard(containerId) {
                             <span style="display:inline-block; width:45px;">SPC</span>
                         </th>
                         ${isTwoDayMatch ? `
-                        <!-- Day 2 Sub matrix -->
                         <th style="padding: 12px 8px; background: rgba(16, 185, 129, 0.05); border-right: 1px solid rgba(255,255,255,0.05); letter-spacing: 1px;">
                             <span style="display:inline-block; width:55px; color:var(--accent); font-weight: 900;">PTS</span>|
                             <span style="display:inline-block; width:65px;">CM</span>|
@@ -2293,7 +2289,6 @@ function calculateAndRenderIndividualLeaderboard(containerId) {
                             <span style="display:inline-block; width:55px;">BIG</span>|
                             <span style="display:inline-block; width:45px;">SPC</span>
                         </th>
-                        <!-- Combined Sub matrix -->
                         <th style="padding: 12px 8px; background: rgba(234, 179, 8, 0.05); letter-spacing: 1px;">
                             <span style="display:inline-block; width:55px; color:var(--accent); font-weight:900;">PTS</span>|
                             <span style="display:inline-block; width:65px; font-weight:900;">CM</span>|
@@ -2312,14 +2307,16 @@ function calculateAndRenderIndividualLeaderboard(containerId) {
         masterList.forEach((row, index) => {
             const currentRank = index + 1;
             html += `
-                <tr style="border-bottom: 1px solid rgba(255,255,255,0.07); font-weight:600; height:52px;">
-                    <!-- Angler Name Info Details -->
-                    <td style="padding: 12px 14px; text-align: left; text-transform: uppercase;">
-                        <span style="color:var(--accent); font-weight:900; font-size:18px; margin-right:14px;">${currentRank}</span>
-                        <span style="font-weight:800; color:#ffffff; font-size:17px; letter-spacing: 0.3px;">${row.name}</span>
-                        <span style="font-size:13px; color:#a3a3a3; font-weight:700; margin-left:10px; opacity:0.9;">(${row.team})</span>
+                <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.15); background: rgba(15, 23, 42, 0.1); font-weight: 600; height: 54px;">
+                    <td style="padding: 6px 14px; text-align: left; text-transform: uppercase;">
+                        <div style="display: flex; align-items: center;">
+                            <span style="color:var(--accent); font-weight:900; font-size:18px; margin-right:14px; width: 25px; text-align: center;">${currentRank}</span>
+                            <div style="display: flex; flex-direction: column; justify-content: center; gap: 2px;">
+                                <span style="font-weight: 800; color: #ffffff; font-size: 15px; letter-spacing: 0.3px; line-height: 1.2;">${row.name}</span>
+                                <span style="font-size: 11px; color: #94a3b8; font-weight: 700; letter-spacing: 0.5px;">${row.team}</span>
+                            </div>
+                        </div>
                     </td>
-                    <!-- Day 1 Values Matrix -->
                     <td style="padding: 12px 8px; font-family:monospace; font-size:16px; background: rgba(59, 130, 246, 0.02); border-left: 1px solid rgba(255,255,255,0.05); border-right: 1px solid rgba(255,255,255,0.05); letter-spacing: 0.5px;">
                         <span style="display:inline-block; width:55px; color:var(--accent); font-weight:900; font-size:17px;">${row.d1.pts}</span> 
                         <span style="display:inline-block; width:65px; color:#ffffff; font-weight:700;">${row.d1.len}</span> 
@@ -2328,7 +2325,6 @@ function calculateAndRenderIndividualLeaderboard(containerId) {
                         <span style="display:inline-block; width:45px; color:#94a3b8;">${row.d1.spc}</span>
                     </td>
                     ${isTwoDayMatch ? `
-                    <!-- Day 2 Values Matrix -->
                     <td style="padding: 12px 8px; font-family:monospace; font-size:16px; background: rgba(16, 185, 129, 0.02); border-right: 1px solid rgba(255,255,255,0.05); letter-spacing: 0.5px;">
                         <span style="display:inline-block; width:55px; color:var(--accent); font-weight:900; font-size:17px;">${row.d2.pts}</span> 
                         <span style="display:inline-block; width:65px; color:#ffffff; font-weight:700;">${row.d2.len}</span> 
@@ -2336,7 +2332,6 @@ function calculateAndRenderIndividualLeaderboard(containerId) {
                         <span style="display:inline-block; width:55px; color:#cbd5e1;">${row.d2.big}</span> 
                         <span style="display:inline-block; width:45px; color:#94a3b8;">${row.d2.spc}</span>
                     </td>
-                    <!-- Combined Match Values Matrix -->
                     <td style="padding: 12px 8px; font-family:monospace; font-size:16px; background: rgba(234, 179, 8, 0.04); letter-spacing: 0.5px;">
                         <span style="display:inline-block; width:55px; color:#ffffff; font-weight:900; font-size:17px;">${row.comb.pts}</span> 
                         <span style="display:inline-block; width:65px; color:var(--accent); font-weight:900; font-size:17px;">${row.comb.len}</span> 
