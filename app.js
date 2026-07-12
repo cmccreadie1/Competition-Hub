@@ -2511,7 +2511,7 @@ function calculateAndRenderTeamLeaderboard(containerId) {
                 <thead>
                     <!-- Master Header Deck Category Columns -->
                  <!-- Master Header Deck Category Columns -->
-            <tr style="background: rgba(15, 23, 42, 0.75); color: #e2e8f0; font-weight: 900; font-size: 16px; border-bottom: 1px solid rgba(255,255,255,0.15);">
+            <tr style="background: rgba(15, 23, 42, 0.65); color: #e2e8f0; font-weight: 900; font-size: 16px; border-bottom: 1px solid rgba(255,255,255,0.15);">
                 <th style="padding: 16px 14px; text-align: left; width: 280px;">RANK / TEAM NAME</th>
                 <th style="padding: 16px 4px; background: rgba(59, 130, 246, 0.15); width: 45px; color: var(--accent);">PTS</th>
                 <th style="padding: 16px 4px; background: rgba(16, 185, 129, 0.15); width: 55px;">CM</th>
