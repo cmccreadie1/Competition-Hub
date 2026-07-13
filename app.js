@@ -2695,7 +2695,7 @@ function calculateAndRenderBiggestFishLeaderboard(containerId) {
     container.innerHTML = htmlOutput;
 }
 
-// DIRECT WEB-TO-WEB PUBLIC DATA CONVERTER
+// DIRECT WEB-TO-WEB PUBLIC DATA CONVERTER (WITH DYNAMIC SECRET PAIRS)
 function exportPublicResults() {
     if (typeof appState === 'undefined' || !appState || appState.length === 0) {
         alert("No active tournament data found to compile.");
@@ -2704,7 +2704,7 @@ function exportPublicResults() {
 
     const isTwoDayMatch = (typeof matchDays !== 'undefined' && matchDays === 2);
 
-    // Re-use the exact point allocation logic from your champion calculation systems
+    // --- SUB-ROUTINE 1: DAY ZONE POINTS MAPS ---
     function getDayZonePointsMap(dayNum) {
         let zonePointsMap = {};
         const zones = ['RED', 'YELLOW', 'GREEN', 'BLUE'];
@@ -2770,7 +2770,9 @@ function exportPublicResults() {
 
     const day1Points = getDayZonePointsMap(1);
     const day2Points = getDayZonePointsMap(2);
-    let compiledList = [];
+
+    // --- SUB-ROUTINE 2: COMPILE STANDARD ANGLERS ---
+    let compiledAnglersList = [];
 
     appState.forEach(teamEntry => {
         teamEntry.anglers.forEach((angler, aIdx) => {
@@ -2788,7 +2790,7 @@ function exportPublicResults() {
             let specRaw2 = String(s2.spec || '').trim();
             let sp2 = (specRaw2 !== '') ? (!isNaN(specRaw2) ? Number(specRaw2) : specRaw2.split(',').filter(i => i.trim().length > 0).length) : 0;
 
-            let d1Pts = day1Points[k1] !== undefined ? day1Points[k1] : zonePointsMaxFallback;
+            let d1Pts = day1Points[k1] !== undefined ? day1Points[k1] : 0;
             let d1Len = Number(s1.len) || 0;
             let d1Cnt = Number(s1.count) || 0;
             let d1Big = Number(s1.big) || 0;
@@ -2813,7 +2815,7 @@ function exportPublicResults() {
                 return z.charAt(0).toUpperCase() + z.slice(1).toLowerCase() + " Zone";
             }
 
-            compiledList.push({
+            compiledAnglersList.push({
                 anglerName: angler.name,
                 teamName: teamNameClean,
                 day1: {
@@ -2849,8 +2851,8 @@ function exportPublicResults() {
         });
     });
 
-    // Run absolute tie-breaker hierarchy sort engine matching live screens
-    compiledList.sort((a, b) => {
+    // Sort individuals based on the standard hierarchy
+    compiledAnglersList.sort((a, b) => {
         if (a._sort.pts !== b._sort.pts) return a._sort.pts - b._sort.pts;
         if (b._sort.len !== a._sort.len) return b._sort.len - a._sort.len;
         if (b._sort.cnt !== a._sort.cnt) return b._sort.cnt - a._sort.cnt;
@@ -2858,15 +2860,88 @@ function exportPublicResults() {
         return b._sort.spc - a._sort.spc;
     });
 
-    // Map exact rank index positions and clean out the sort helper object
-    let cleanExport = compiledList.map((item, index) => {
+    // Map ranks to the clean export list
+    let cleanAnglersExport = compiledAnglersList.map((item, index) => {
         item.totals.overallRank = index + 1;
         delete item._sort;
         return item;
     });
 
+
+    // --- SUB-ROUTINE 3: COMPILE SECRET PAIRS ---
+    let compiledPairs = [];
+    
+    // Safely verify if secretPairs assignments exist in global memory state
+    if (typeof secretPairs !== 'undefined' && Array.isArray(secretPairs) && secretPairs.length > 0) {
+        secretPairs.forEach(pair => {
+            const a1Name = pair.angler1 || "";
+            const a2Name = pair.angler2 || "";
+            if (!a1Name && !a2Name) return;
+
+            // Look up points and lengths from the already processed cleanAnglersExport list
+            const angler1Data = cleanAnglersExport.find(a => a.anglerName.toUpperCase() === a1Name.toUpperCase());
+            const angler2Data = cleanAnglersExport.find(a => a.anglerName.toUpperCase() === a2Name.toUpperCase());
+
+            const a1Pts = angler1Data ? angler1Data.totals.cumulativePoints : 0;
+            const a1Len = angler1Data ? angler1Data.totals.cumulativeLengthCm : 0;
+
+            const a2Pts = angler2Data ? angler2Data.totals.cumulativePoints : 0;
+            const a2Len = angler2Data ? angler2Data.totals.cumulativeLengthCm : 0;
+
+            compiledPairs.push({
+                angler1: a1Name,
+                angler2: a2Name || "No Partner Assigned",
+                combinedPoints: a1Pts + a2Pts,
+                combinedLengthCm: a1Len + a2Len
+            });
+        });
+
+        // Sort Pairs descending: Lowest Combined Points -> Highest Combined Length
+        compiledPairs.sort((a, b) => {
+            if (a.combinedPoints !== b.combinedPoints) return a.combinedPoints - b.combinedPoints;
+            return b.combinedLengthCm - a.combinedLengthCm;
+        });
+    }
+
+    // Assign final rankings to the pairs list
+    let cleanPairsExport = compiledPairs.map((pair, index) => {
+        return {
+            rank: index + 1,
+            angler1: pair.angler1,
+            angler2: pair.angler2,
+            combinedPoints: pair.combinedPoints,
+            combinedLengthCm: pair.combinedLengthCm
+        };
+    });
+
+    // Try to pull dynamic rules text or target size from input values, otherwise use default fallbacks
+    const secretPairsDescElement = document.querySelector('#pairsTab p');
+    const secretPairsDesc = secretPairsDescElement ? secretPairsDescElement.innerText.trim() : "Randomly drawn pairs competing on combined zone points and cumulative length.";
+    
+    // Attempt to pull size settings (checking common naming conventions like minSize, targetLength, etc.)
+    let parsedTargetLength = "15cm"; 
+    if (typeof minSize !== 'undefined') {
+        parsedTargetLength = `${minSize}cm`;
+    } else {
+        const sizeInput = document.getElementById('minSize') || document.getElementById('sizeLimit');
+        if (sizeInput && sizeInput.value) {
+            parsedTargetLength = `${sizeInput.value}cm`;
+        }
+    }
+
+
+    // --- SUB-ROUTINE 4: OUTPUT UNIFIED SCHEMATIC ---
+    const finalPayload = {
+        "anglers": cleanAnglersExport,
+        "secretPairs": {
+            "description": secretPairsDesc,
+            "targetLength": parsedTargetLength,
+            "winners": cleanPairsExport
+        }
+    };
+
     // Automated JSON background assembly download routine
-    const blob = new Blob([JSON.stringify(cleanExport, null, 2)], { type: 'application/json' });
+    const blob = new Blob([JSON.stringify(finalPayload, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement('a');
     anchor.href = url;
@@ -2876,5 +2951,5 @@ function exportPublicResults() {
     document.body.removeChild(anchor);
     URL.revokeObjectURL(url);
     
-    showToast("🚀 PUBLIC PORTAL SCORES.JSON GENERATED!");
+    showToast("🚀 UNIFIED SCORES.JSON GENERATED!");
 }
