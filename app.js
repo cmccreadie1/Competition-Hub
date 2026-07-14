@@ -2695,7 +2695,7 @@ function calculateAndRenderBiggestFishLeaderboard(containerId) {
     container.innerHTML = htmlOutput;
 }
 
-// DIRECT WEB-TO-WEB PUBLIC DATA CONVERTER (WITH DYNAMIC SECRET PAIRS)
+// DIRECT WEB-TO-WEB PUBLIC DATA CONVERTER (WITH SCRAPED SECRET PAIRS)
 function exportPublicResults() {
     if (typeof appState === 'undefined' || !appState || appState.length === 0) {
         alert("No active tournament data found to compile.");
@@ -2851,7 +2851,7 @@ function exportPublicResults() {
         });
     });
 
-    // Sort individuals based on the standard hierarchy
+    // Rank the overall angler list
     compiledAnglersList.sort((a, b) => {
         if (a._sort.pts !== b._sort.pts) return a._sort.pts - b._sort.pts;
         if (b._sort.len !== a._sort.len) return b._sort.len - a._sort.len;
@@ -2860,7 +2860,6 @@ function exportPublicResults() {
         return b._sort.spc - a._sort.spc;
     });
 
-    // Map ranks to the clean export list
     let cleanAnglersExport = compiledAnglersList.map((item, index) => {
         item.totals.overallRank = index + 1;
         delete item._sort;
@@ -2868,75 +2867,90 @@ function exportPublicResults() {
     });
 
 
-    // --- SUB-ROUTINE 3: COMPILE SECRET PAIRS ---
-    let compiledPairs = [];
-    
-    // Safely verify if secretPairs assignments exist in global memory state
-    if (typeof secretPairs !== 'undefined' && Array.isArray(secretPairs) && secretPairs.length > 0) {
-        secretPairs.forEach(pair => {
-            const a1Name = pair.angler1 || "";
-            const a2Name = pair.angler2 || "";
-            if (!a1Name && !a2Name) return;
-
-            // Look up points and lengths from the already processed cleanAnglersExport list
-            const angler1Data = cleanAnglersExport.find(a => a.anglerName.toUpperCase() === a1Name.toUpperCase());
-            const angler2Data = cleanAnglersExport.find(a => a.anglerName.toUpperCase() === a2Name.toUpperCase());
-
-            const a1Pts = angler1Data ? angler1Data.totals.cumulativePoints : 0;
-            const a1Len = angler1Data ? angler1Data.totals.cumulativeLengthCm : 0;
-
-            const a2Pts = angler2Data ? angler2Data.totals.cumulativePoints : 0;
-            const a2Len = angler2Data ? angler2Data.totals.cumulativeLengthCm : 0;
-
-            compiledPairs.push({
-                angler1: a1Name,
-                angler2: a2Name || "No Partner Assigned",
-                combinedPoints: a1Pts + a2Pts,
-                combinedLengthCm: a1Len + a2Len
-            });
-        });
-
-        // Sort Pairs descending: Lowest Combined Points -> Highest Combined Length
-        compiledPairs.sort((a, b) => {
-            if (a.combinedPoints !== b.combinedPoints) return a.combinedPoints - b.combinedPoints;
-            return b.combinedLengthCm - a.combinedLengthCm;
-        });
-    }
-
-    // Assign final rankings to the pairs list
-    let cleanPairsExport = compiledPairs.map((pair, index) => {
-        return {
-            rank: index + 1,
-            angler1: pair.angler1,
-            angler2: pair.angler2,
-            combinedPoints: pair.combinedPoints,
-            combinedLengthCm: pair.combinedLengthCm
-        };
-    });
-
-    // Try to pull dynamic rules text or target size from input values, otherwise use default fallbacks
-    const secretPairsDescElement = document.querySelector('#pairsTab p');
-    const secretPairsDesc = secretPairsDescElement ? secretPairsDescElement.innerText.trim() : "Randomly drawn pairs competing on combined zone points and cumulative length.";
-    
-    // Attempt to pull size settings (checking common naming conventions like minSize, targetLength, etc.)
+    // --- SUB-ROUTINE 3: SCRAPE SECRET PAIRS FROM THE SCREEN ---
+    let allPairsScraped = [];
     let parsedTargetLength = "15cm"; 
-    if (typeof minSize !== 'undefined') {
-        parsedTargetLength = `${minSize}cm`;
-    } else {
-        const sizeInput = document.getElementById('minSize') || document.getElementById('sizeLimit');
-        if (sizeInput && sizeInput.value) {
-            parsedTargetLength = `${sizeInput.value}cm`;
+
+    // Find the secret pairs table dynamically by sniffing its headers
+    let pairsTable = null;
+    const tables = document.querySelectorAll('table');
+    for (let t of tables) {
+        const tableText = t.innerText.toUpperCase();
+        if (tableText.includes('ANGLER 1') && tableText.includes('ANGLER 2')) {
+            pairsTable = t;
+            break;
         }
     }
 
+    if (pairsTable) {
+        const rows = pairsTable.querySelectorAll('tr');
+        rows.forEach(row => {
+            // Skip the header row
+            if (row.querySelector('th') || row.innerText.toUpperCase().includes('ANGLER 1')) {
+                return;
+            }
+            const cells = row.querySelectorAll('td');
+            if (cells.length >= 4) {
+                const rankText = cells[0].innerText.trim();
+                const rank = parseInt(rankText) || 0;
+                
+                const angler1 = cells[1].innerText.trim();
+                const angler2 = cells[2].innerText.trim();
+                
+                // Pull combined points and clean the text
+                const pointsText = cells[3].innerText.trim();
+                const combinedPoints = parseFloat(pointsText) || 0;
+                
+                // Pull combined length and strip non-numeric characters (e.g. "cm")
+                const lengthText = cells[4].innerText.trim();
+                const combinedLengthCm = parseFloat(lengthText.replace(/[^\d.]/g, '')) || 0;
 
-    // --- SUB-ROUTINE 4: OUTPUT UNIFIED SCHEMATIC ---
+                if (angler1 || angler2) {
+                    allPairsScraped.push({
+                        rank: rank,
+                        angler1: angler1,
+                        angler2: angler2 || "No Partner Assigned",
+                        combinedPoints: combinedPoints,
+                        combinedLengthCm: combinedLengthCm
+                    });
+                }
+            }
+        });
+    }
+
+    // Ensure the scraped pairs list matches screen sorting order
+    allPairsScraped.sort((a, b) => a.rank - b.rank);
+
+    // Visual Split: Top 3 (winners) get their own array, everyone else is listed below
+    const winners = allPairsScraped.filter(p => p.rank >= 1 && p.rank <= 3);
+    const otherPairs = allPairsScraped.filter(p => p.rank > 3);
+
+    // Scrape Target Length from screen if calculated
+    const targetLengthTextElement = Array.from(document.querySelectorAll('*')).find(el => 
+        el.children.length === 0 && 
+        (el.innerText.includes('Target Length:') || el.innerText.includes('Target:'))
+    );
+    if (targetLengthTextElement) {
+        const match = targetLengthTextElement.innerText.match(/(\d+\s*cm|\d+)/i);
+        if (match) {
+            parsedTargetLength = match[0].toLowerCase().includes('cm') ? match[0] : `${match[0]}cm`;
+        }
+    } else if (typeof minSize !== 'undefined') {
+        parsedTargetLength = `${minSize}cm`;
+    }
+
+    // Set the exact, formatted rules description text requested
+    const secretPairsDesc = "The computer calculated a hidden Target Length that falls strictly between the lowest and highest possible combined scores. The randomly chosen pair whose combined length finishes closest to the target wins.\n\nIf you have an uneven number of entries in the cash pool, the computer automatically generates a virtual partner named Joe Average. Joe is mathematically given the exact mean average score of the entire active field. Tie breaker if its a draw the tie breaker reverts to longest combined length.";
+
+
+    // --- SUB-ROUTINE 4: COMPILE AND DOWNLOAD SCORES.JSON ---
     const finalPayload = {
         "anglers": cleanAnglersExport,
         "secretPairs": {
             "description": secretPairsDesc,
             "targetLength": parsedTargetLength,
-            "winners": cleanPairsExport
+            "winners": winners,
+            "otherPairs": otherPairs
         }
     };
 
