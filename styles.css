@@ -553,3 +553,42 @@
     border: 2px solid #2ecc71 !important; /* Vibrant thin green border */
     box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3) !important; /* Clean glowing drop shadow */
 }
+/* ==========================================================================
+   🧼 OPTION 1: MODERN SLEEK UNDERLINE FOR MAIN HUB NAVIGATION TABS
+   ========================================================================== */
+
+/* Removes boxy backgrounds, outer borders, and shadows from all top main tabs */
+.tab-btn, 
+.nav-tabs button,
+header nav button {
+    background: transparent !important;
+    border: none !important;
+    border-bottom: 3px solid transparent !important; /* Invisible bottom border to prevent text jumping */
+    border-radius: 0px !important; /* Removes rounded corner boxes */
+    box-shadow: none !important; /* Removes heavy drop-shadow lines */
+    color: #555555 !important; /* Muted grey text when resting */
+    font-weight: 600 !important;
+    padding: 12px 18px !important;
+    margin: 0 10px !important;
+    transition: all 0.2s ease !important;
+}
+
+/* Selected Tab: Bright text color and an elegant bottom underline indicator */
+.tab-btn.active,
+.nav-tabs button.active,
+header nav button.active {
+    background: transparent !important;
+    color: #0056b3 !important; /* Vivid theme blue text */
+    border-bottom: 3px solid #0056b3 !important; /* Sleek indicator underline */
+    font-weight: 700 !important;
+}
+
+/* Hover State: Soft text color change and a faint grey indicator line */
+.tab-btn:hover:not(.active),
+.nav-tabs button:hover:not(.active),
+header nav button:hover:not(.active) {
+    background: transparent !important;
+    color: #222222 !important;
+    border-bottom: 3px solid #dddddd !important; /* Soft grey hover underline */
+    transform: none !important; /* Keeps navigation still and steady at the top */
+}
