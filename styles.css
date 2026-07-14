@@ -542,7 +542,7 @@
 .leaderboard-filters button, 
 .filter-btn, 
 .tab-btn {
-    border: 2px solid #4a5a6a !important; /* Crisp, thin slate-grey border */
+    border: 3px solid #4a5a6a !important; /* Crisp, thin slate-grey border */
     box-shadow: 0 2px 5px rgba(0,0,0,0.15) !important; /* Subtle shadow to lift them off the background */
 }
 
@@ -550,6 +550,6 @@
 .leaderboard-filters button.active, 
 .filter-btn.active, 
 .tab-btn.active {
-    border: 2px solid #2ecc71 !important; /* Vibrant thin green border */
+    border: 3px solid #2ecc71 !important; /* Vibrant thin green border */
     box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3) !important; /* Clean glowing drop shadow */
 }
