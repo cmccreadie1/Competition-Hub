@@ -2871,8 +2871,62 @@ function exportPublicResults() {
         return item;
     });
 
+    // --- RETRIEVE SECRET PAIRS STANDINGS FROM MEMORY ---
+    let secretPairsWinners = [];
+    let secretPairsOthers = [];
+    let officialTargetLength = "Pending Draw...";
+
+    const savedPairsRaw = localStorage.getItem('savedSecretPairs');
+    const savedTargetRaw = localStorage.getItem('savedSecretPairsTarget');
+
+    if (savedTargetRaw) {
+        officialTargetLength = `${savedTargetRaw}cm`;
+    }
+
+    if (savedPairsRaw) {
+        try {
+            const storedStandings = JSON.parse(savedPairsRaw);
+            storedStandings.forEach((pair, index) => {
+                let name1 = pair.p1 ? pair.p1.name : "Unknown Angler";
+                let name2 = pair.p2 ? pair.p2.name : "Joe Average";
+
+                if (name1.toUpperCase() === "JOE AVERAGE") name1 = "Joe Average";
+                if (name2.toUpperCase() === "JOE AVERAGE") name2 = "Joe Average";
+
+                let pairPayload = {
+                    rank: index + 1,
+                    angler1: name1,
+                    angler2: name2,
+                    combinedLengthCm: Number(pair.len) || 0,
+                    offBy: Number(pair.off) || 0
+                };
+
+                if (index < 3) {
+                    secretPairsWinners.push(pairPayload);
+                } else {
+                    secretPairsOthers.push(pairPayload);
+                }
+            });
+        } catch (e) {
+            console.error("Error loading secret pairs memory array:", e);
+        }
+    }
+
+    const secretPairsDesc = "The computer calculated a hidden Target Length that falls strictly between the lowest and highest possible combined scores. The randomly chosen pair whose combined length finishes closest to the target wins.\n\nIf you have an uneven number of entries in the cash pool, the computer automatically generates a virtual partner named Joe Average. Joe is mathematically given the exact mean average score of the entire active field. Tie breaker if its a draw the tie breaker reverts to longest combined length.";
+
+    // --- COMPILE BOTH LISTS INTO THE UNIFIED PAYLOAD ---
+    const finalPayload = {
+        "anglers": cleanExport,
+        "secretPairs": {
+            "description": secretPairsDesc,
+            "targetLength": officialTargetLength,
+            "winners": secretPairsWinners,
+            "otherPairs": secretPairsOthers
+        }
+    };
+
     // Automated JSON background assembly download routine
-    const blob = new Blob([JSON.stringify(cleanExport, null, 2)], { type: 'application/json' });
+    const blob = new Blob([JSON.stringify(finalPayload, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement('a');
     anchor.href = url;
