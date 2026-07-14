@@ -2695,7 +2695,7 @@ function calculateAndRenderBiggestFishLeaderboard(containerId) {
     container.innerHTML = htmlOutput;
 }
 
-// DIRECT WEB-TO-WEB PUBLIC DATA CONVERTER (WITH SCRAPED SECRET PAIRS)
+// DIRECT WEB-TO-WEB PUBLIC DATA CONVERTER (WITH DYNAMIC SECRET PAIRS SCRAPER)
 function exportPublicResults() {
     if (typeof appState === 'undefined' || !appState || appState.length === 0) {
         alert("No active tournament data found to compile.");
@@ -2851,7 +2851,7 @@ function exportPublicResults() {
         });
     });
 
-    // Sort individuals based on standard hierarchy
+    // Rank the overall angler list
     compiledAnglersList.sort((a, b) => {
         if (a._sort.pts !== b._sort.pts) return a._sort.pts - b._sort.pts;
         if (b._sort.len !== a._sort.len) return b._sort.len - a._sort.len;
@@ -2871,61 +2871,101 @@ function exportPublicResults() {
     let allPairsScraped = [];
     let parsedTargetLength = "15cm"; 
 
-    // Find the secret pairs table dynamically by sniffing its column headers
+    // Directly isolate the secret pairs DOM container to avoid background leaks
+    const pairsContainer = document.getElementById('pairsTab');
     let pairsTable = null;
-    const tables = document.querySelectorAll('table');
-    for (let t of tables) {
-        const tableText = t.innerText.toUpperCase();
-        if (tableText.includes('ANGLER 1') && tableText.includes('ANGLER 2')) {
-            pairsTable = t;
-            break;
+
+    if (pairsContainer) {
+        pairsTable = pairsContainer.querySelector('table');
+    }
+
+    // Fallback: Sniff tables globally if they are rendered inside a shared container
+    if (!pairsTable) {
+        const tables = document.querySelectorAll('table');
+        for (let t of tables) {
+            const tableText = t.innerText.toUpperCase();
+            if (tableText.includes('ANGLER') || tableText.includes('COMBINED')) {
+                pairsTable = t;
+                break;
+            }
         }
     }
 
     if (pairsTable) {
+        const firstRow = pairsTable.querySelector('tr');
+        let colIndices = { rank: 0, angler1: 1, angler2: 2, points: 3, length: 4 };
+        let hasCustomHeaders = false;
+
+        // Smart dynamic column mapping to guarantee perfect data matching
+        if (firstRow) {
+            const headerCells = firstRow.querySelectorAll('th, td');
+            let tempIndices = {};
+            headerCells.forEach((cell, idx) => {
+                const text = cell.innerText.toUpperCase();
+                if (text.includes('RANK') || text.includes('POS') || text === '#' || text === 'PLACE') {
+                    tempIndices.rank = idx;
+                } else if (text.includes('ANGLER 1') || text.includes('PARTNER 1') || text.includes('NAME 1') || text.includes('COMPETITOR 1')) {
+                    tempIndices.angler1 = idx;
+                } else if (text.includes('ANGLER 2') || text.includes('PARTNER 2') || text.includes('NAME 2') || text.includes('COMPETITOR 2')) {
+                    tempIndices.angler2 = idx;
+                } else if (text.includes('POINTS') || text.includes('PTS') || text.includes('COMBINED POINTS')) {
+                    tempIndices.points = idx;
+                } else if (text.includes('LENGTH') || text.includes('LEN') || text.includes('CM')) {
+                    tempIndices.length = idx;
+                }
+            });
+
+            if (tempIndices.angler1 !== undefined && tempIndices.angler2 !== undefined) {
+                colIndices = {
+                    rank: tempIndices.rank !== undefined ? tempIndices.rank : -1,
+                    angler1: tempIndices.angler1,
+                    angler2: tempIndices.angler2,
+                    points: tempIndices.points !== undefined ? tempIndices.points : 3,
+                    length: tempIndices.length !== undefined ? tempIndices.length : 4
+                };
+                hasCustomHeaders = true;
+            }
+        }
+
         const rows = pairsTable.querySelectorAll('tr');
-        rows.forEach(row => {
-            // Skip the header row
-            if (row.querySelector('th') || row.innerText.toUpperCase().includes('ANGLER 1')) {
+        rows.forEach((row, rIdx) => {
+            // Skip the header row dynamically
+            if (rIdx === 0 && (hasCustomHeaders || row.querySelector('th') || row.innerText.toUpperCase().includes('ANGLER') || row.innerText.toUpperCase().includes('PARTNER'))) {
                 return;
             }
             const cells = row.querySelectorAll('td');
-            if (cells.length >= 5) {
-                const rankText = cells[0].innerText.trim();
-                const rank = parseInt(rankText) || 0;
+            if (cells.length > Math.max(colIndices.angler1, colIndices.angler2)) {
+                const rankVal = colIndices.rank !== -1 && cells[colIndices.rank] ? parseInt(cells[colIndices.rank].innerText.trim()) : (allPairsScraped.length + 1);
+                const angler1Val = cells[colIndices.angler1] ? cells[colIndices.angler1].innerText.trim() : "";
+                const angler2Val = cells[colIndices.angler2] ? cells[colIndices.angler2].innerText.trim() : "";
                 
-                const angler1 = cells[1].innerText.trim();
-                const angler2 = cells[2].innerText.trim();
+                const pointsText = cells[colIndices.points] ? cells[colIndices.points].innerText.trim() : "0";
+                const pointsVal = parseFloat(pointsText) || 0;
                 
-                // Pull combined points as a parsed float
-                const pointsText = cells[3].innerText.trim();
-                const combinedPoints = parseFloat(pointsText) || 0;
-                
-                // Pull combined length and strip non-numeric characters (like "cm") to get a clean number
-                const lengthText = cells[4].innerText.trim();
-                const combinedLengthCm = parseFloat(lengthText.replace(/[^\d.]/g, '')) || 0;
+                const lengthText = cells[colIndices.length] ? cells[colIndices.length].innerText.trim() : "0";
+                const lengthVal = parseFloat(lengthText.replace(/[^\d.]/g, '')) || 0;
 
-                if (angler1 || angler2) {
+                if (angler1Val || angler2Val) {
                     allPairsScraped.push({
-                        rank: rank,
-                        angler1: angler1,
-                        angler2: angler2 || "No Partner Assigned",
-                        combinedPoints: combinedPoints,
-                        combinedLengthCm: combinedLengthCm
+                        rank: rankVal,
+                        angler1: angler1Val,
+                        angler2: angler2Val || "No Partner Assigned",
+                        combinedPoints: pointsVal,
+                        combinedLengthCm: lengthVal
                     });
                 }
             }
         });
     }
 
-    // Ensure pairs array maintains the screen's ranking sequence
+    // Sort arrays safely based on absolute position rank
     allPairsScraped.sort((a, b) => a.rank - b.rank);
 
-    // Visual Split: Top 3 (winners) get their own array, everyone else (otherPairs) grouped below
+    // Grouping Split: Rank 1-3 go to the prominent prize list, Ranks 4+ go to the transparency pool
     const winners = allPairsScraped.filter(p => p.rank >= 1 && p.rank <= 3);
     const otherPairs = allPairsScraped.filter(p => p.rank > 3);
 
-    // Scrape calculated Target Length dynamically off screen text labels if available
+    // Scrape Target Length dynamically off target element text indicators
     const targetLengthTextElement = Array.from(document.querySelectorAll('*')).find(el => 
         el.children.length === 0 && 
         (el.innerText.includes('Target Length:') || el.innerText.includes('Target:'))
@@ -2939,9 +2979,8 @@ function exportPublicResults() {
         parsedTargetLength = `${minSize}cm`;
     }
 
-    // Two-paragraph description rules exactly as requested
+    // Exact two-paragraph description formatted as specified
     const secretPairsDesc = "The computer calculated a hidden Target Length that falls strictly between the lowest and highest possible combined scores. The randomly chosen pair whose combined length finishes closest to the target wins.\n\nIf you have an uneven number of entries in the cash pool, the computer automatically generates a virtual partner named Joe Average. Joe is mathematically given the exact mean average score of the entire active field. Tie breaker if its a draw the tie breaker reverts to longest combined length.";
-
 
     // --- SUB-ROUTINE 4: COMPILE AND DOWNLOAD SCORES.JSON ---
     const finalPayload = {
@@ -2954,7 +2993,7 @@ function exportPublicResults() {
         }
     };
 
-    // Trigger local client download of the JSON file
+    // Automated JSON background download trigger
     const blob = new Blob([JSON.stringify(finalPayload, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement('a');
