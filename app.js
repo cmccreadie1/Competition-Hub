@@ -528,9 +528,10 @@
 
         // Output Top 3 to Podium
         // Save the complete secret pairs list and the computed target length once
+        // Save the complete secret pairs list and the computed target length once
         localStorage.setItem('savedSecretPairs', JSON.stringify(standings));
-        if (typeof targetScore !== 'undefined') {
-            localStorage.setItem('savedSecretPairsTarget', targetScore);
+        if (typeof secretTarget !== 'undefined') {
+            localStorage.setItem('savedSecretPairsTarget', secretTarget);
         }
 
         // Output Top 3 to Podium
