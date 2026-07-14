@@ -2871,21 +2871,38 @@ function exportPublicResults() {
         return item;
     });
 
-    // --- RETRIEVE SECRET PAIRS STANDINGS FROM MEMORY ---
+    // --- RETRIEVE SECRET PAIRS STANDINGS FROM MEMORY (PURE FISH LENGTH LOGIC) ---
     let secretPairsWinners = [];
     let secretPairsOthers = [];
     let officialTargetLength = "Pending Draw...";
 
     const savedPairsRaw = localStorage.getItem('savedSecretPairs');
-    const savedTargetRaw = localStorage.getItem('savedSecretPairsTarget');
-
-    if (savedTargetRaw) {
-        officialTargetLength = `${savedTargetRaw}cm`;
-    }
 
     if (savedPairsRaw) {
         try {
             const storedStandings = JSON.parse(savedPairsRaw);
+            
+            // Auto-Deduce Target Length from Length metrics
+            if (storedStandings.length > 0) {
+                let firstPair = storedStandings[0];
+                let option1 = (firstPair.combinedLength || 0) + (firstPair.diff || 0);
+                let option2 = (firstPair.combinedLength || 0) - (firstPair.diff || 0);
+                
+                if (storedStandings.length > 1) {
+                    let secondPair = storedStandings[1];
+                    let opt2_1 = (secondPair.combinedLength || 0) + (secondPair.diff || 0);
+                    let opt2_2 = (secondPair.combinedLength || 0) - (secondPair.diff || 0);
+                    
+                    if (option1 === opt2_1 || option1 === opt2_2) {
+                        officialTargetLength = `${option1}cm`;
+                    } else {
+                        officialTargetLength = `${option2}cm`;
+                    }
+                } else {
+                    officialTargetLength = `${option1}cm`;
+                }
+            }
+
             storedStandings.forEach((pair, index) => {
                 let name1 = pair.p1 ? pair.p1.name : "Unknown Angler";
                 let name2 = pair.p2 ? pair.p2.name : "Joe Average";
@@ -2897,8 +2914,8 @@ function exportPublicResults() {
                     rank: index + 1,
                     angler1: name1,
                     angler2: name2,
-                    combinedLengthCm: Number(pair.len) || 0,
-                    offBy: Number(pair.off) || 0
+                    combinedLengthCm: Number(pair.combinedLength) || 0,
+                    offBy: Number(pair.diff) || 0
                 };
 
                 if (index < 3) {
