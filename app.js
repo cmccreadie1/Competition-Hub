@@ -526,8 +526,14 @@
             }
         }
 
-        // Output Top 3 to Podium
-        for (let i = 0; i < Math.min(3, standings.length); i++) {
+        // Save the secret pairs draw to background memory
+localStorage.setItem('savedSecretPairs', JSON.stringify(standings));
+if (typeof secretTarget !== 'undefined') {
+    localStorage.setItem('savedSecretPairsTarget', secretTarget);
+}
+
+// Output Top 3 to Podium
+for (let i = 0; i < Math.min(3, standings.length); i++) {
             const pair = standings[i];
             const tieClass = pair.isTie ? "shared-tie" : "";
             const noteText = pair.isTie ? ` (Split Pot Tie)` : "";
