@@ -2851,7 +2851,7 @@ function exportPublicResults() {
         });
     });
 
-    // Rank the overall angler list
+    // Sort individuals based on standard hierarchy
     compiledAnglersList.sort((a, b) => {
         if (a._sort.pts !== b._sort.pts) return a._sort.pts - b._sort.pts;
         if (b._sort.len !== a._sort.len) return b._sort.len - a._sort.len;
@@ -2871,7 +2871,7 @@ function exportPublicResults() {
     let allPairsScraped = [];
     let parsedTargetLength = "15cm"; 
 
-    // Find the secret pairs table dynamically by sniffing its headers
+    // Find the secret pairs table dynamically by sniffing its column headers
     let pairsTable = null;
     const tables = document.querySelectorAll('table');
     for (let t of tables) {
@@ -2890,18 +2890,18 @@ function exportPublicResults() {
                 return;
             }
             const cells = row.querySelectorAll('td');
-            if (cells.length >= 4) {
+            if (cells.length >= 5) {
                 const rankText = cells[0].innerText.trim();
                 const rank = parseInt(rankText) || 0;
                 
                 const angler1 = cells[1].innerText.trim();
                 const angler2 = cells[2].innerText.trim();
                 
-                // Pull combined points and clean the text
+                // Pull combined points as a parsed float
                 const pointsText = cells[3].innerText.trim();
                 const combinedPoints = parseFloat(pointsText) || 0;
                 
-                // Pull combined length and strip non-numeric characters (e.g. "cm")
+                // Pull combined length and strip non-numeric characters (like "cm") to get a clean number
                 const lengthText = cells[4].innerText.trim();
                 const combinedLengthCm = parseFloat(lengthText.replace(/[^\d.]/g, '')) || 0;
 
@@ -2918,14 +2918,14 @@ function exportPublicResults() {
         });
     }
 
-    // Ensure the scraped pairs list matches screen sorting order
+    // Ensure pairs array maintains the screen's ranking sequence
     allPairsScraped.sort((a, b) => a.rank - b.rank);
 
-    // Visual Split: Top 3 (winners) get their own array, everyone else is listed below
+    // Visual Split: Top 3 (winners) get their own array, everyone else (otherPairs) grouped below
     const winners = allPairsScraped.filter(p => p.rank >= 1 && p.rank <= 3);
     const otherPairs = allPairsScraped.filter(p => p.rank > 3);
 
-    // Scrape Target Length from screen if calculated
+    // Scrape calculated Target Length dynamically off screen text labels if available
     const targetLengthTextElement = Array.from(document.querySelectorAll('*')).find(el => 
         el.children.length === 0 && 
         (el.innerText.includes('Target Length:') || el.innerText.includes('Target:'))
@@ -2939,7 +2939,7 @@ function exportPublicResults() {
         parsedTargetLength = `${minSize}cm`;
     }
 
-    // Set the exact, formatted rules description text requested
+    // Two-paragraph description rules exactly as requested
     const secretPairsDesc = "The computer calculated a hidden Target Length that falls strictly between the lowest and highest possible combined scores. The randomly chosen pair whose combined length finishes closest to the target wins.\n\nIf you have an uneven number of entries in the cash pool, the computer automatically generates a virtual partner named Joe Average. Joe is mathematically given the exact mean average score of the entire active field. Tie breaker if its a draw the tie breaker reverts to longest combined length.";
 
 
@@ -2954,7 +2954,7 @@ function exportPublicResults() {
         }
     };
 
-    // Automated JSON background assembly download routine
+    // Trigger local client download of the JSON file
     const blob = new Blob([JSON.stringify(finalPayload, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement('a');
