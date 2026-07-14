@@ -532,6 +532,7 @@
             const tieClass = pair.isTie ? "shared-tie" : "";
             const noteText = pair.isTie ? ` (Split Pot Tie)` : "";
             let prizeAmount = assignedPrizes[i] || 0;
+            localStorage.setItem('savedSecretPairs', JSON.stringify(standings));
             let rankStr = i === 0 ? "1st Place" : i === 1 ? "2nd Place" : "3rd Place";
             let rankLabel = rankStr + noteText;
             let styleClass = (i === 0) ? "first-place" : "";
@@ -2694,7 +2695,7 @@ function calculateAndRenderBiggestFishLeaderboard(containerId) {
 
     container.innerHTML = htmlOutput;
 }
-// DIRECT WEB-TO-WEB PUBLIC DATA CONVERTER (WITH HIDDEN-DOM CARD SCRAPER)
+// DIRECT WEB-TO-WEB PUBLIC DATA CONVERTER (WITH STATE-CAPTURE SECRET PAIRS)
 function exportPublicResults() {
     if (typeof appState === 'undefined' || !appState || appState.length === 0) {
         alert("No active tournament data found to compile.");
@@ -2866,127 +2867,60 @@ function exportPublicResults() {
     });
 
 
-    // --- SUB-ROUTINE 3: SCRAPE SECRET PAIRS CARDS FROM THE SCREEN (STYLE BLIND) ---
+    // --- SUB-ROUTINE 3: RETRIEVE SECRET PAIRS FROM LOCAL STORAGE ---
     let allPairsScraped = [];
     let parsedTargetLength = "15cm"; 
 
-    const pairsContainer = document.getElementById('pairsTab');
+    // Read the saved state directly from local storage memory
+    const savedPairsRaw = localStorage.getItem('savedSecretPairs');
+    if (savedPairsRaw) {
+        try {
+            const standings = JSON.parse(savedPairsRaw);
+            standings.forEach((pair, index) => {
+                let angler1 = pair.p1 ? pair.p1.name : "Unknown Angler";
+                let angler2 = pair.p2 ? pair.p2.name : "Joe Average";
 
-    if (pairsContainer) {
-        // Compile standard registered names and sort by descending length to prevent substring overlap issues
-        let knownAnglerNames = cleanAnglersExport.map(a => a.anglerName.toUpperCase());
-        knownAnglerNames.sort((a, b) => b.length - a.length);
-        knownAnglerNames.push("JOE AVERAGE");
+                if (angler1.toUpperCase() === "JOE AVERAGE") angler1 = "Joe Average";
+                if (angler2.toUpperCase() === "JOE AVERAGE") angler2 = "Joe Average";
 
-        // Find leaf elements containing the text "OFF BY" using style-blind textContent
-        const allElements = Array.from(pairsContainer.querySelectorAll('*'));
-        const offByLeafs = allElements.filter(el => {
-            const text = (el.textContent || "").toUpperCase();
-            if (!text.includes('OFF BY')) return false;
-            // Leaf node validation: ensure children do not contain "OFF BY"
-            const children = Array.from(el.querySelectorAll('*'));
-            return !children.some(child => (child.textContent || "").toUpperCase().includes('OFF BY'));
-        });
+                // Map points dynamically from our fresh compiled standard leaderboards
+                const lookupPoints = (name) => {
+                    if (!name || name === "Joe Average") return 0;
+                    const match = cleanAnglersExport.find(a => a.anglerName.toUpperCase() === name.toUpperCase());
+                    return match ? match.totals.cumulativePoints : 0;
+                };
 
-        offByLeafs.forEach((leaf, idx) => {
-            let cardText = "";
-            let current = leaf;
-            let matchedAnglers = [];
-            let detectedRank = null;
+                const combPoints = lookupPoints(angler1) + lookupPoints(angler2);
+                const combLength = Number(pair.combinedLength) || 0;
 
-            // Traverse up to 4 parents to find the outermost container holding the angler names
-            for (let i = 0; i < 4; i++) {
-                if (!current) break;
-                const text = (current.textContent || "").toUpperCase();
-                
-                // Track matches
-                const found = knownAnglerNames.filter(name => text.includes(name));
-                if (found.length >= 1) {
-                    cardText = current.textContent;
-                    
-                    let tempMatched = [];
-                    found.forEach(name => {
-                        // Prevent sub-string conflicts (e.g. "GERMANY" matching inside "GERMANY GERMANY 2")
-                        if (!tempMatched.some(existing => existing.includes(name))) {
-                            tempMatched.push(name);
-                        }
-                    });
-                    matchedAnglers = tempMatched;
-
-                    // Parse the card's visual rank
-                    const rankMatch = text.match(/(?:(\d+)(?:ND|RD|ST|TH)?\s*PLACE|P\s*(\d+))/i);
-                    if (rankMatch) {
-                        detectedRank = parseInt(rankMatch[1] || rankMatch[2]);
-                    }
-                    break;
-                }
-                current = current.parentElement;
-            }
-
-            // Extract names and verify casing
-            let angler1 = "Unknown Angler";
-            let angler2 = "Joe Average";
-
-            if (matchedAnglers.length >= 1) {
-                const a1Match = cleanAnglersExport.find(a => a.anglerName.toUpperCase() === matchedAnglers[0]);
-                angler1 = a1Match ? a1Match.anglerName : matchedAnglers[0];
-            }
-            if (matchedAnglers.length >= 2) {
-                const a2Match = cleanAnglersExport.find(a => a.anglerName.toUpperCase() === matchedAnglers[1]);
-                angler2 = a2Match ? a2Match.anglerName : matchedAnglers[1];
-            }
-
-            if (angler1.toUpperCase() === "JOE AVERAGE") angler1 = "Joe Average";
-            if (angler2.toUpperCase() === "JOE AVERAGE") angler2 = "Joe Average";
-
-            // Map stats directly from compiled leaderboards
-            const lookupPoints = (name) => {
-                if (!name || name === "Joe Average") return 0;
-                const match = cleanAnglersExport.find(a => a.anglerName.toUpperCase() === name.toUpperCase());
-                return match ? match.totals.cumulativePoints : 0;
-            };
-
-            const lookupLength = (name) => {
-                if (!name || name === "Joe Average") return 0;
-                const match = cleanAnglersExport.find(a => a.anglerName.toUpperCase() === name.toUpperCase());
-                return match ? match.totals.cumulativeLengthCm : 0;
-            };
-
-            const combPoints = lookupPoints(angler1) + lookupPoints(angler2);
-            const combLength = lookupLength(angler1) + lookupLength(angler2);
-
-            allPairsScraped.push({
-                rank: detectedRank || (idx + 1),
-                angler1: angler1,
-                angler2: angler2,
-                combinedPoints: combPoints,
-                combinedLengthCm: combLength
+                allPairsScraped.push({
+                    rank: index + 1,
+                    angler1: angler1,
+                    angler2: angler2,
+                    combinedPoints: combPoints,
+                    combinedLengthCm: combLength
+                });
             });
-        });
+        } catch (e) {
+            console.error("Error parsing saved secret pairs:", e);
+        }
     }
 
-    // Sort matching screen positions
-    allPairsScraped.sort((a, b) => a.rank - b.rank);
-
-    // Grouping Split: Rank 1-3 go to the prominent prize list, Ranks 4+ go to the transparency pool
+    // Split rankings: Top 3 to "winners", everyone else to "otherPairs"
     const winners = allPairsScraped.filter(p => p.rank >= 1 && p.rank <= 3);
     const otherPairs = allPairsScraped.filter(p => p.rank > 3);
 
-    // Dynamic Target Length Scraping using style-blind textContent
-    const targetLengthTextElement = Array.from(document.querySelectorAll('*')).find(el => 
-        el.children.length === 0 && 
-        ((el.textContent || "").includes('Target Length:') || (el.textContent || "").includes('Target:'))
-    );
-    if (targetLengthTextElement) {
-        const match = targetLengthTextElement.textContent.match(/(\d+\s*cm|\d+)/i);
-        if (match) {
-            parsedTargetLength = match[0].toLowerCase().includes('cm') ? match[0] : `${match[0]}cm`;
-        }
-    } else if (typeof minSize !== 'undefined') {
+    // Target Length extraction fallback
+    if (typeof minSize !== 'undefined') {
         parsedTargetLength = `${minSize}cm`;
+    } else {
+        const sizeInput = document.getElementById('minSize') || document.getElementById('sizeLimit');
+        if (sizeInput && sizeInput.value) {
+            parsedTargetLength = `${sizeInput.value}cm`;
+        }
     }
 
-    // Two-paragraph custom description rules
+    // Two-paragraph formatted rules description
     const secretPairsDesc = "The computer calculated a hidden Target Length that falls strictly between the lowest and highest possible combined scores. The randomly chosen pair whose combined length finishes closest to the target wins.\n\nIf you have an uneven number of entries in the cash pool, the computer automatically generates a virtual partner named Joe Average. Joe is mathematically given the exact mean average score of the entire active field. Tie breaker if its a draw the tie breaker reverts to longest combined length.";
 
     // --- SUB-ROUTINE 4: COMPILE AND DOWNLOAD SCORES.JSON ---
@@ -3000,7 +2934,7 @@ function exportPublicResults() {
         }
     };
 
-    // Automated JSON background download trigger
+    // Trigger local client download of the completed JSON file
     const blob = new Blob([JSON.stringify(finalPayload, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement('a');
