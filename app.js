@@ -527,14 +527,6 @@
         }
 
         // Output Top 3 to Podium
-        // Save the complete secret pairs list and the computed target length once
-        // Save the complete secret pairs list and the computed target length once
-        localStorage.setItem('savedSecretPairs', JSON.stringify(standings));
-        if (typeof secretTarget !== 'undefined') {
-            localStorage.setItem('savedSecretPairsTarget', secretTarget);
-        }
-
-        // Output Top 3 to Podium
         for (let i = 0; i < Math.min(3, standings.length); i++) {
             const pair = standings[i];
             const tieClass = pair.isTie ? "shared-tie" : "";
@@ -2702,7 +2694,8 @@ function calculateAndRenderBiggestFishLeaderboard(containerId) {
 
     container.innerHTML = htmlOutput;
 }
-// DIRECT WEB-TO-WEB PUBLIC DATA CONVERTER (STATE-CAPTURE SECRET PAIRS)
+
+// DIRECT WEB-TO-WEB PUBLIC DATA CONVERTER
 function exportPublicResults() {
     if (typeof appState === 'undefined' || !appState || appState.length === 0) {
         alert("No active tournament data found to compile.");
@@ -2711,7 +2704,7 @@ function exportPublicResults() {
 
     const isTwoDayMatch = (typeof matchDays !== 'undefined' && matchDays === 2);
 
-    // --- SUB-ROUTINE 1: DAY ZONE POINTS MAPS ---
+    // Re-use the exact point allocation logic from your champion calculation systems
     function getDayZonePointsMap(dayNum) {
         let zonePointsMap = {};
         const zones = ['RED', 'YELLOW', 'GREEN', 'BLUE'];
@@ -2777,9 +2770,7 @@ function exportPublicResults() {
 
     const day1Points = getDayZonePointsMap(1);
     const day2Points = getDayZonePointsMap(2);
-
-    // --- SUB-ROUTINE 2: COMPILE STANDARD ANGLERS ---
-    let compiledAnglersList = [];
+    let compiledList = [];
 
     appState.forEach(teamEntry => {
         teamEntry.anglers.forEach((angler, aIdx) => {
@@ -2797,7 +2788,7 @@ function exportPublicResults() {
             let specRaw2 = String(s2.spec || '').trim();
             let sp2 = (specRaw2 !== '') ? (!isNaN(specRaw2) ? Number(specRaw2) : specRaw2.split(',').filter(i => i.trim().length > 0).length) : 0;
 
-            let d1Pts = day1Points[k1] !== undefined ? day1Points[k1] : 0;
+            let d1Pts = day1Points[k1] !== undefined ? day1Points[k1] : zonePointsMaxFallback;
             let d1Len = Number(s1.len) || 0;
             let d1Cnt = Number(s1.count) || 0;
             let d1Big = Number(s1.big) || 0;
@@ -2822,7 +2813,7 @@ function exportPublicResults() {
                 return z.charAt(0).toUpperCase() + z.slice(1).toLowerCase() + " Zone";
             }
 
-            compiledAnglersList.push({
+            compiledList.push({
                 anglerName: angler.name,
                 teamName: teamNameClean,
                 day1: {
@@ -2858,8 +2849,8 @@ function exportPublicResults() {
         });
     });
 
-    // Rank standard individual leaderboard
-    compiledAnglersList.sort((a, b) => {
+    // Run absolute tie-breaker hierarchy sort engine matching live screens
+    compiledList.sort((a, b) => {
         if (a._sort.pts !== b._sort.pts) return a._sort.pts - b._sort.pts;
         if (b._sort.len !== a._sort.len) return b._sort.len - a._sort.len;
         if (b._sort.cnt !== a._sort.cnt) return b._sort.cnt - a._sort.cnt;
@@ -2867,80 +2858,15 @@ function exportPublicResults() {
         return b._sort.spc - a._sort.spc;
     });
 
-    let cleanAnglersExport = compiledAnglersList.map((item, index) => {
+    // Map exact rank index positions and clean out the sort helper object
+    let cleanExport = compiledList.map((item, index) => {
         item.totals.overallRank = index + 1;
         delete item._sort;
         return item;
     });
 
-
-    // --- SUB-ROUTINE 3: RETRIEVE SECRET PAIRS STANDINGS FROM DATABASE ---
-    let allPairsScraped = [];
-    let parsedTargetLength = "Pending Draw..."; 
-
-    // Retrieve saved pairs and calculated target directly from local memory storage
-    const savedPairsRaw = localStorage.getItem('savedSecretPairs');
-    const savedTargetRaw = localStorage.getItem('savedSecretPairsTarget');
-
-    if (savedTargetRaw) {
-        parsedTargetLength = `${savedTargetRaw}cm`;
-    }
-
-    if (savedPairsRaw) {
-        try {
-            const standings = JSON.parse(savedPairsRaw);
-            standings.forEach((pair, index) => {
-                let angler1 = pair.p1 ? pair.p1.name : "Unknown Angler";
-                let angler2 = pair.p2 ? pair.p2.name : "Joe Average";
-
-                if (angler1.toUpperCase() === "JOE AVERAGE") angler1 = "Joe Average";
-                if (angler2.toUpperCase() === "JOE AVERAGE") angler2 = "Joe Average";
-
-                // Map points dynamically from the compiled standard leaderboards
-                const lookupPoints = (name) => {
-                    if (!name || name === "Joe Average") return 0;
-                    const match = cleanAnglersExport.find(a => a.anglerName.toUpperCase() === name.toUpperCase());
-                    return match ? match.totals.cumulativePoints : 0;
-                };
-
-                const combPoints = lookupPoints(angler1) + lookupPoints(angler2);
-                const combLength = Number(pair.len) || 0;
-                const offBy = Number(pair.off) || 0;
-
-                allPairsScraped.push({
-                    rank: index + 1,
-                    angler1: angler1,
-                    angler2: angler2,
-                    combinedPoints: combPoints,
-                    combinedLengthCm: combLength,
-                    offBy: offBy
-                });
-            });
-        } catch (e) {
-            console.error("Error parsing saved secret pairs:", e);
-        }
-    }
-
-    // Split rankings: Top 3 are primary prize winners; everyone else moves to the transparency panel
-    const winners = allPairsScraped.filter(p => p.rank >= 1 && p.rank <= 3);
-    const otherPairs = allPairsScraped.filter(p => p.rank > 3);
-
-    // Two-paragraph custom description formatted perfectly
-    const secretPairsDesc = "The computer calculated a hidden Target Length that falls strictly between the lowest and highest possible combined scores. The randomly chosen pair whose combined length finishes closest to the target wins.\n\nIf you have an uneven number of entries in the cash pool, the computer automatically generates a virtual partner named Joe Average. Joe is mathematically given the exact mean average score of the entire active field. Tie breaker if its a draw the tie breaker reverts to longest combined length.";
-
-    // --- SUB-ROUTINE 4: COMPILE AND DOWNLOAD SCORES.JSON ---
-    const finalPayload = {
-        "anglers": cleanAnglersExport,
-        "secretPairs": {
-            "description": secretPairsDesc,
-            "targetLength": parsedTargetLength,
-            "winners": winners,
-            "otherPairs": otherPairs
-        }
-    };
-
-    // Trigger local client download
-    const blob = new Blob([JSON.stringify(finalPayload, null, 2)], { type: 'application/json' });
+    // Automated JSON background assembly download routine
+    const blob = new Blob([JSON.stringify(cleanExport, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement('a');
     anchor.href = url;
@@ -2950,5 +2876,5 @@ function exportPublicResults() {
     document.body.removeChild(anchor);
     URL.revokeObjectURL(url);
     
-    showToast("🚀 UNIFIED SCORES.JSON GENERATED!");
+    showToast("🚀 PUBLIC PORTAL SCORES.JSON GENERATED!");
 }
