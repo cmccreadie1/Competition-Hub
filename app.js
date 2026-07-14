@@ -2694,7 +2694,7 @@ function calculateAndRenderBiggestFishLeaderboard(containerId) {
 
     container.innerHTML = htmlOutput;
 }
-// DIRECT WEB-TO-WEB PUBLIC DATA CONVERTER (WITH CARD-BASED SECRET PAIRS SCRAPER)
+// DIRECT WEB-TO-WEB PUBLIC DATA CONVERTER (WITH HIDDEN-DOM CARD SCRAPER)
 function exportPublicResults() {
     if (typeof appState === 'undefined' || !appState || appState.length === 0) {
         alert("No active tournament data found to compile.");
@@ -2866,25 +2866,26 @@ function exportPublicResults() {
     });
 
 
-    // --- SUB-ROUTINE 3: SCRAPE SECRET PAIRS CARDS FROM THE SCREEN ---
+    // --- SUB-ROUTINE 3: SCRAPE SECRET PAIRS CARDS FROM THE SCREEN (STYLE BLIND) ---
     let allPairsScraped = [];
     let parsedTargetLength = "15cm"; 
 
     const pairsContainer = document.getElementById('pairsTab');
+
     if (pairsContainer) {
         // Compile standard registered names and sort by descending length to prevent substring overlap issues
         let knownAnglerNames = cleanAnglersExport.map(a => a.anglerName.toUpperCase());
         knownAnglerNames.sort((a, b) => b.length - a.length);
         knownAnglerNames.push("JOE AVERAGE");
 
-        // Find leaf elements containing the text "OFF BY"
+        // Find leaf elements containing the text "OFF BY" using style-blind textContent
         const allElements = Array.from(pairsContainer.querySelectorAll('*'));
         const offByLeafs = allElements.filter(el => {
-            const text = (el.innerText || "").toUpperCase();
+            const text = (el.textContent || "").toUpperCase();
             if (!text.includes('OFF BY')) return false;
             // Leaf node validation: ensure children do not contain "OFF BY"
             const children = Array.from(el.querySelectorAll('*'));
-            return !children.some(child => (child.innerText || "").toUpperCase().includes('OFF BY'));
+            return !children.some(child => (child.textContent || "").toUpperCase().includes('OFF BY'));
         });
 
         offByLeafs.forEach((leaf, idx) => {
@@ -2896,12 +2897,12 @@ function exportPublicResults() {
             // Traverse up to 4 parents to find the outermost container holding the angler names
             for (let i = 0; i < 4; i++) {
                 if (!current) break;
-                const text = (current.innerText || "").toUpperCase();
+                const text = (current.textContent || "").toUpperCase();
                 
                 // Track matches
                 const found = knownAnglerNames.filter(name => text.includes(name));
                 if (found.length >= 1) {
-                    cardText = current.innerText;
+                    cardText = current.textContent;
                     
                     let tempMatched = [];
                     found.forEach(name => {
@@ -2967,17 +2968,17 @@ function exportPublicResults() {
     // Sort matching screen positions
     allPairsScraped.sort((a, b) => a.rank - b.rank);
 
-    // Group rankings: Top 3 (winners) get prominent placement; all remaining pairs (otherPairs) follow
+    // Grouping Split: Rank 1-3 go to the prominent prize list, Ranks 4+ go to the transparency pool
     const winners = allPairsScraped.filter(p => p.rank >= 1 && p.rank <= 3);
     const otherPairs = allPairsScraped.filter(p => p.rank > 3);
 
-    // Dynamic Target Length Scraping
+    // Dynamic Target Length Scraping using style-blind textContent
     const targetLengthTextElement = Array.from(document.querySelectorAll('*')).find(el => 
         el.children.length === 0 && 
-        (el.innerText.includes('Target Length:') || el.innerText.includes('Target:'))
+        ((el.textContent || "").includes('Target Length:') || (el.textContent || "").includes('Target:'))
     );
     if (targetLengthTextElement) {
-        const match = targetLengthTextElement.innerText.match(/(\d+\s*cm|\d+)/i);
+        const match = targetLengthTextElement.textContent.match(/(\d+\s*cm|\d+)/i);
         if (match) {
             parsedTargetLength = match[0].toLowerCase().includes('cm') ? match[0] : `${match[0]}cm`;
         }
@@ -2999,7 +3000,7 @@ function exportPublicResults() {
         }
     };
 
-    // Trigger local client download
+    // Automated JSON background download trigger
     const blob = new Blob([JSON.stringify(finalPayload, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement('a');
