@@ -550,6 +550,6 @@
 .leaderboard-filters button.active, 
 .filter-btn.active, 
 .tab-btn.active {
-    border: 3px solid #2ecc71 !important; /* Vibrant thin green border */
+    border: 2px solid #2ecc71 !important; /* Vibrant thin green border */
     box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3) !important; /* Clean glowing drop shadow */
 }
