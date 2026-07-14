@@ -527,12 +527,18 @@
         }
 
         // Output Top 3 to Podium
+        // Save the complete secret pairs list and the computed target length once
+        localStorage.setItem('savedSecretPairs', JSON.stringify(standings));
+        if (typeof targetScore !== 'undefined') {
+            localStorage.setItem('savedSecretPairsTarget', targetScore);
+        }
+
+        // Output Top 3 to Podium
         for (let i = 0; i < Math.min(3, standings.length); i++) {
             const pair = standings[i];
             const tieClass = pair.isTie ? "shared-tie" : "";
             const noteText = pair.isTie ? ` (Split Pot Tie)` : "";
             let prizeAmount = assignedPrizes[i] || 0;
-            localStorage.setItem('savedSecretPairs', JSON.stringify(standings));
             let rankStr = i === 0 ? "1st Place" : i === 1 ? "2nd Place" : "3rd Place";
             let rankLabel = rankStr + noteText;
             let styleClass = (i === 0) ? "first-place" : "";
@@ -2695,7 +2701,7 @@ function calculateAndRenderBiggestFishLeaderboard(containerId) {
 
     container.innerHTML = htmlOutput;
 }
-// DIRECT WEB-TO-WEB PUBLIC DATA CONVERTER (WITH STATE-CAPTURE SECRET PAIRS)
+// DIRECT WEB-TO-WEB PUBLIC DATA CONVERTER (STATE-CAPTURE SECRET PAIRS)
 function exportPublicResults() {
     if (typeof appState === 'undefined' || !appState || appState.length === 0) {
         alert("No active tournament data found to compile.");
@@ -2851,7 +2857,7 @@ function exportPublicResults() {
         });
     });
 
-    // Rank the overall angler list
+    // Rank standard individual leaderboard
     compiledAnglersList.sort((a, b) => {
         if (a._sort.pts !== b._sort.pts) return a._sort.pts - b._sort.pts;
         if (b._sort.len !== a._sort.len) return b._sort.len - a._sort.len;
@@ -2867,12 +2873,18 @@ function exportPublicResults() {
     });
 
 
-    // --- SUB-ROUTINE 3: RETRIEVE SECRET PAIRS FROM LOCAL STORAGE ---
+    // --- SUB-ROUTINE 3: RETRIEVE SECRET PAIRS STANDINGS FROM DATABASE ---
     let allPairsScraped = [];
-    let parsedTargetLength = "15cm"; 
+    let parsedTargetLength = "Pending Draw..."; 
 
-    // Read the saved state directly from local storage memory
+    // Retrieve saved pairs and calculated target directly from local memory storage
     const savedPairsRaw = localStorage.getItem('savedSecretPairs');
+    const savedTargetRaw = localStorage.getItem('savedSecretPairsTarget');
+
+    if (savedTargetRaw) {
+        parsedTargetLength = `${savedTargetRaw}cm`;
+    }
+
     if (savedPairsRaw) {
         try {
             const standings = JSON.parse(savedPairsRaw);
@@ -2883,7 +2895,7 @@ function exportPublicResults() {
                 if (angler1.toUpperCase() === "JOE AVERAGE") angler1 = "Joe Average";
                 if (angler2.toUpperCase() === "JOE AVERAGE") angler2 = "Joe Average";
 
-                // Map points dynamically from our fresh compiled standard leaderboards
+                // Map points dynamically from the compiled standard leaderboards
                 const lookupPoints = (name) => {
                     if (!name || name === "Joe Average") return 0;
                     const match = cleanAnglersExport.find(a => a.anglerName.toUpperCase() === name.toUpperCase());
@@ -2891,14 +2903,16 @@ function exportPublicResults() {
                 };
 
                 const combPoints = lookupPoints(angler1) + lookupPoints(angler2);
-                const combLength = Number(pair.combinedLength) || 0;
+                const combLength = Number(pair.len) || 0;
+                const offBy = Number(pair.off) || 0;
 
                 allPairsScraped.push({
                     rank: index + 1,
                     angler1: angler1,
                     angler2: angler2,
                     combinedPoints: combPoints,
-                    combinedLengthCm: combLength
+                    combinedLengthCm: combLength,
+                    offBy: offBy
                 });
             });
         } catch (e) {
@@ -2906,21 +2920,11 @@ function exportPublicResults() {
         }
     }
 
-    // Split rankings: Top 3 to "winners", everyone else to "otherPairs"
+    // Split rankings: Top 3 are primary prize winners; everyone else moves to the transparency panel
     const winners = allPairsScraped.filter(p => p.rank >= 1 && p.rank <= 3);
     const otherPairs = allPairsScraped.filter(p => p.rank > 3);
 
-    // Target Length extraction fallback
-    if (typeof minSize !== 'undefined') {
-        parsedTargetLength = `${minSize}cm`;
-    } else {
-        const sizeInput = document.getElementById('minSize') || document.getElementById('sizeLimit');
-        if (sizeInput && sizeInput.value) {
-            parsedTargetLength = `${sizeInput.value}cm`;
-        }
-    }
-
-    // Two-paragraph formatted rules description
+    // Two-paragraph custom description formatted perfectly
     const secretPairsDesc = "The computer calculated a hidden Target Length that falls strictly between the lowest and highest possible combined scores. The randomly chosen pair whose combined length finishes closest to the target wins.\n\nIf you have an uneven number of entries in the cash pool, the computer automatically generates a virtual partner named Joe Average. Joe is mathematically given the exact mean average score of the entire active field. Tie breaker if its a draw the tie breaker reverts to longest combined length.";
 
     // --- SUB-ROUTINE 4: COMPILE AND DOWNLOAD SCORES.JSON ---
@@ -2934,7 +2938,7 @@ function exportPublicResults() {
         }
     };
 
-    // Trigger local client download of the completed JSON file
+    // Trigger local client download
     const blob = new Blob([JSON.stringify(finalPayload, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement('a');
