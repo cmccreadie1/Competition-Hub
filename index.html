@@ -106,6 +106,61 @@
             from { opacity: 0; transform: translateY(3px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+        /* --- HIGH-VISIBILITY INCOMPLETE SCORECARD ROW ALERTS --- */
+        .score-card.incomplete, 
+        .scorecard.incomplete, 
+        .score-row.incomplete, 
+        .row-incomplete,
+        [class*="incomplete"] {
+            background-color: #fee2e2 !important; /* Rich High-Contrast Soft Red */
+            border-left: 8px solid #dc2626 !important; /* Thick Red Indicator Flag */
+            border-top: 2px solid #fca5a5 !important;
+            border-right: 2px solid #fca5a5 !important;
+            border-bottom: 2px solid #fca5a5 !important;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.1) !important;
+            transition: all 0.2s ease;
+        }
+
+        /* Dark crimson text inside incomplete lines for maximum contrast */
+        .score-card.incomplete *, 
+        .scorecard.incomplete *, 
+        .score-row.incomplete * {
+            color: #7f1d1d !important;
+            font-weight: 700;
+        }
+
+        /* Inputs inside incomplete rows stand out boldly */
+        .score-card.incomplete input, 
+        .scorecard.incomplete input, 
+        .score-row.incomplete input {
+            border: 2px solid #ef4444 !important;
+            background-color: #ffffff !important;
+            color: #000000 !important;
+            box-shadow: inset 0 2px 4px rgba(239, 68, 68, 0.05) !important;
+        }
+
+        .score-card.incomplete input::placeholder, 
+        .scorecard.incomplete input::placeholder, 
+        .score-row.incomplete input::placeholder {
+            color: #f87171 !important;
+        }
+
+        /* Warning alert for logical score discrepancies */
+        .reality-warning {
+            color: #b45309 !important;
+            background-color: #fef3c7 !important;
+            border: 1px solid #f59e0b !important;
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-size: 14px !important;
+            font-weight: 800 !important;
+            margin-top: 8px;
+            display: inline-block;
+            text-align: center;
+            width: calc(100% - 20px);
+            box-sizing: border-box;
+        }
     </style>
 </head>
 <body class="stage-draw">
@@ -843,6 +898,115 @@
         // Set target button to active
         event.currentTarget.classList.add('active');
     }
+
+    // --- DELEGATED SCORE DATA VALIDATION & ERROR PREVENTION ---
+    document.addEventListener('input', function(e) {
+        // Only target inputs within the dynamic scorecards container
+        if (!e.target.closest('#scoreListContainer')) return;
+        
+        let input = e.target;
+        let val = input.value;
+        
+        // 1. Instantly strip any non-numeric characters (extra safety check)
+        val = val.replace(/[^0-9]/g, '');
+        
+        // 2. Prevent leading zeros (e.g. "05" becomes "5"), but allow "0" as a single entry
+        if (val.length > 1 && val.startsWith('0')) {
+            val = val.replace(/^0+/, '');
+            if (val === '') val = '0';
+        }
+        
+        // 3. Determine the input field type safely using placeholder hints
+        let placeholder = (input.placeholder || '').toLowerCase();
+        let isLength = placeholder.includes('length') || placeholder.includes('len');
+        let isBiggest = placeholder.includes('biggest') || placeholder.includes('big') || placeholder.includes('size');
+        let isCount = placeholder.includes('count') || placeholder.includes('fish') || placeholder.includes('qty');
+        let isSpecies = placeholder.includes('species') || placeholder.includes('spec');
+        
+        // Fallback check based on standard element sequential index inside row
+        if (!isLength && !isBiggest && !isCount && !isSpecies) {
+            const rowInputs = Array.from(input.closest('.score-card, .score-row, tr, .scorecard-row').querySelectorAll('input'));
+            const idx = rowInputs.indexOf(input);
+            if (idx === 0) isLength = true;
+            if (idx === 1) isCount = true;
+            if (idx === 2) isBiggest = true;
+            if (idx === 3) isSpecies = true;
+        }
+        
+        // 4. Enforce strict character limits
+        if (isLength) {
+            if (val.length > 4) val = val.slice(0, 4); // Max 4 digits (e.g. 9999 cm)
+        } else if (isBiggest) {
+            if (val.length > 3) val = val.slice(0, 3); // Max 3 digits (e.g. 999 cm)
+        } else if (isCount || isSpecies) {
+            if (val.length > 2) val = val.slice(0, 2); // Max 2 digits (e.g. 99 fish/species)
+        }
+        
+        input.value = val;
+        
+        // 5. Logical Correlation Guard: Biggest fish vs. Total Length check
+        const parentRow = input.closest('.score-card, .score-row, tr, .scorecard-row');
+        if (parentRow) {
+            const allInputs = Array.from(parentRow.querySelectorAll('input'));
+            const lengthInput = allInputs.find(i => i.placeholder.toLowerCase().includes('length') || allInputs.indexOf(i) === 0);
+            const biggestInput = allInputs.find(i => i.placeholder.toLowerCase().includes('biggest') || i.placeholder.toLowerCase().includes('big') || allInputs.indexOf(i) === 2);
+            
+            if (lengthInput && biggestInput) {
+                const totalLen = parseInt(lengthInput.value) || 0;
+                const bigFish = parseInt(biggestInput.value) || 0;
+                
+                let warnLabel = parentRow.querySelector('.reality-warning');
+                
+                if (bigFish > totalLen && totalLen > 0) {
+                    // Turn outline yellow & insert a highly visible warning block
+                    parentRow.style.outline = "4px solid #f59e0b";
+                    parentRow.style.outlineOffset = "-4px";
+                    
+                    if (!warnLabel) {
+                        warnLabel = document.createElement('div');
+                        warnLabel.className = 'reality-warning';
+                        warnLabel.innerText = '⚠️ Check Entry: Biggest fish length exceeds total cumulative length!';
+                        parentRow.appendChild(warnLabel);
+                    }
+                } else {
+                    // Reset styling & clear active warning
+                    parentRow.style.outline = "";
+                    if (warnLabel) warnLabel.remove();
+                }
+            }
+        }
+    });
+
+    // Automatically inject phone-friendly input formats to newly drawn inputs
+    document.addEventListener('DOMContentLoaded', function() {
+        const scoreContainer = document.getElementById('scoreListContainer');
+        if (scoreContainer) {
+            const configObserver = new MutationObserver(function(mutations) {
+                const inputs = scoreContainer.querySelectorAll('input');
+                inputs.forEach(input => {
+                    if (!input.dataset.safeguardsApplied) {
+                        // Force clean mobile numeric touchpads
+                        input.setAttribute('inputmode', 'numeric');
+                        input.setAttribute('pattern', '[0-9]*');
+                        
+                        // Apply HTML native limit safeguards
+                        let placeholder = (input.placeholder || '').toLowerCase();
+                        let isLength = placeholder.includes('length');
+                        let isBiggest = placeholder.includes('biggest') || placeholder.includes('big');
+                        let isCount = placeholder.includes('count') || placeholder.includes('fish');
+                        let isSpecies = placeholder.includes('species');
+                        
+                        if (isLength) input.setAttribute('maxlength', '4');
+                        else if (isBiggest) input.setAttribute('maxlength', '3');
+                        else if (isCount || isSpecies) input.setAttribute('maxlength', '2');
+                        
+                        input.dataset.safeguardsApplied = "true";
+                    }
+                });
+            });
+            configObserver.observe(scoreContainer, { childList: true, subtree: true });
+        }
+    });
 </script>
 <div id="exportGuideModal" class="export-modal" style="display: none;">
     <div class="export-modal-content">
