@@ -191,24 +191,24 @@
             gap: 6px; align-items: center;
         }
 
-       /* ==========================================================================
+ /* ==========================================================================
    📌 FLOATING STICKY SCORECARD COLUMN HEADERS
    ========================================================================== */
 
 .score-list-header {
     position: sticky !important;
     top: 108px !important;            /* Locks it perfectly just below the main white navigation header */
-    z-index: 4000 !important;          /* Sits safely below the main white header (5000) but above scrolling rows */
-    background: #334155 !important;    /* Default solid Slate Blue background so text doesn't overlap when scrolling */
-    padding: 10px 15px 8px !important; /* Slightly taller padding for better tapping/viewing alignment */
+    z-index: 4000 !important;          /* Keeps it above the scrolling list items */
+    background: #334155 !important;    /* Default solid Slate Blue background */
+    padding: 10px 15px 8px !important; 
     font-weight: 900;
     font-size: 11px;
     color: #ffffff;
-    border-bottom: 2px solid rgba(255, 255, 255, 0.1) !important; /* Soft bottom divider */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25) !important; /* Soft drop shadow so it visually lifts above the scrolling rows */
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25) !important; /* Shadow so it visually floats above scrolling rows */
 }
 
-/* Day 2 Override: Dynamically changes the sticky header background to match the Forest Teal theme */
+/* Day 2 Override: Dynamically changes the sticky header background to Forest Teal */
 body.stage-score-d2 .score-list-header {
     background: #0f766e !important;
 }
@@ -235,8 +235,19 @@ body.stage-score-d2 .score-list-header {
         .s-team { font-size: 11px; font-weight: 800; color: var(--text-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .s-peg { font-size: 12px; font-weight: 900; }
 
-        .scorecard-scroll-wrapper { width: 100%; overflow-x: auto; padding-bottom: 20px; }
+       /* Fixes the sticky header context on desktop by allowing overflow to be visible */
+        .scorecard-scroll-wrapper { 
+            width: 100%; 
+            overflow: visible !important; 
+            padding-bottom: 20px; 
+        }
 
+        /* Keeps swipe-scrolling enabled on small mobile screens only */
+        @media (max-width: 768px) {
+            .scorecard-scroll-wrapper { 
+                overflow-x: auto !important; 
+            }
+        }
         /* Buttons */
         .btn-action { 
             background: var(--accent); border: none; color: white; font-weight: 800; 
