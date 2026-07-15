@@ -538,18 +538,44 @@
    🎯 CRISP BORDERS FOR THE 5 RESULTS PAGE FILTER BUTTONS
    ========================================================================== */
 
-/* Gives the 5 resting buttons a sharp, thin slate border to frame them */
+/* Gives ONLY the 5 resting filter buttons a sharp, thin slate border to frame them */
 .leaderboard-filters button, 
-.filter-btn, 
-.tab-btn {
+.filter-btn {
     border: 3px solid #4a5a6a !important; /* Crisp, thin slate-grey border */
     box-shadow: 0 2px 5px rgba(0,0,0,0.15) !important; /* Subtle shadow to lift them off the background */
 }
 
-/* Gives the currently selected/active button a bright green border */
+/* Gives ONLY the currently selected/active filter button a bright green border */
 .leaderboard-filters button.active, 
-.filter-btn.active, 
-.tab-btn.active {
+.filter-btn.active {
     border: 2px solid #2ecc71 !important; /* Vibrant thin green border */
     box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3) !important; /* Clean glowing drop shadow */
+}
+
+
+/* ==========================================================================
+   📁 CLEAN MATCHING SLATE BORDERS FOR THE 4 MAIN TABS (NO GREEN)
+   ========================================================================== */
+
+/* Resting state: Clean slate-grey frame */
+.tab-btn {
+    border: 2px solid #cbd5e1 !important;
+    border-bottom: none !important;
+    box-shadow: inset 0 -4px 10px rgba(0,0,0,0.05) !important;
+}
+
+/* Selected Draw & Pairs & Leaderboard Tabs: Blends perfectly into the Slate Blue background */
+#tabBtn-draw.active, 
+#tabBtn-pairs.active,
+.tab-btn.active:not(#tabBtn-score) { 
+    border: 2px solid #334155 !important;
+    border-bottom: none !important;
+    box-shadow: none !important;
+}
+
+/* Selected Scorecard Tab: Blends perfectly into the Dark Slate background */
+#tabBtn-score.active { 
+    border: 2px solid #1e293b !important;
+    border-bottom: none !important;
+    box-shadow: 0 -4px 15px rgba(0,0,0,0.2) !important;
 }
