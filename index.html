@@ -1170,6 +1170,104 @@
             progressObserver.observe(targetNode, { characterData: true, childList: true, subtree: true });
         }
     });
+    if (isLength) input.setAttribute('maxlength', '4');
+                        else if (isBiggest) input.setAttribute('maxlength', '3');
+                        else if (isCount || isSpecies) input.setAttribute('maxlength', '2');
+                        
+                        input.dataset.safeguardsApplied = "true";
+                    }
+                });
+            });
+            configObserver.observe(scoreContainer, { childList: true, subtree: true });
+        }
+    });
+
+    // ==========================================
+    // PASTE THE NEW MEMORY CODE DIRECTLY HERE:
+    // ==========================================
+    document.addEventListener('DOMContentLoaded', function() {
+        const originalSwitch = window.switchScoreDay;
+        window.switchScoreDay = function(day) {
+            if (typeof originalSwitch === 'function') {
+                originalSwitch(day);
+            } else {
+                const btn1 = document.getElementById('subBtn-1');
+                const btn2 = document.getElementById('subBtn-2');
+                if (day === 1) {
+                    if (btn1) btn1.classList.add('active');
+                    if (btn2) btn2.classList.remove('active');
+                } else if (day === 2) {
+                    if (btn2) btn2.classList.add('active');
+                    if (btn1) btn1.classList.remove('active');
+                }
+            }
+            localStorage.setItem('savedActiveScoreDay', day);
+        };
+
+        function updateTabCheckmarks() {
+            const d1Done = localStorage.getItem('day1_completed') === 'true';
+            const d2Done = localStorage.getItem('day2_completed') === 'true';
+            
+            const tab1 = document.getElementById('subBtn-1');
+            const tab2 = document.getElementById('subBtn-2');
+            
+            if (tab1) {
+                tab1.innerHTML = d1Done 
+                    ? 'DAY 1 SCORES <span style="color: #10b981; font-weight: 900; margin-left: 6px;">✓ DONE</span>' 
+                    : 'DAY 1 SCORES';
+            }
+            if (tab2) {
+                tab2.innerHTML = d2Done 
+                    ? 'DAY 2 SCORES <span style="color: #10b981; font-weight: 900; margin-left: 6px;">✓ DONE</span>' 
+                    : 'DAY 2 SCORES';
+            }
+        }
+
+        const savedDay = localStorage.getItem('savedActiveScoreDay');
+        if (savedDay) {
+            const dayNum = parseInt(savedDay, 10);
+            if (dayNum === 1 || dayNum === 2) {
+                setTimeout(() => {
+                    if (typeof window.switchScoreDay === 'function') {
+                        window.switchScoreDay(dayNum);
+                    }
+                }, 300);
+            }
+        }
+
+        updateTabCheckmarks();
+
+        const progressEl = document.getElementById('scoreProgressText');
+        if (progressEl) {
+            const observer = new MutationObserver(function() {
+                const text = progressEl.innerText || "";
+                const remainingMatch = text.match(/(\d+)\s+REMAINING/i);
+                const enteredMatch = text.match(/(\d+)\s+ENTERED/i);
+                
+                if (remainingMatch && enteredMatch) {
+                    const remaining = parseInt(remainingMatch[1], 10);
+                    const entered = parseInt(enteredMatch[1], 10);
+                    const isDay1 = text.toUpperCase().includes("DAY 1");
+                    const isDay2 = text.toUpperCase().includes("DAY 2");
+                    const isDone = (remaining === 0 && entered > 0);
+                    
+                    if (isDay1) {
+                        localStorage.setItem('day1_completed', isDone ? 'true' : 'false');
+                    } else if (isDay2) {
+                        localStorage.setItem('day2_completed', isDone ? 'true' : 'false');
+                    }
+                    updateTabCheckmarks();
+                }
+            });
+            observer.observe(progressEl, { childList: true, characterData: true, subtree: true });
+        }
+    });
+    // ==========================================
+
+</script> <!-- THIS IS THE END OF YOUR SCRIPT tag -->
+
+<div id="exportGuideModal" class="export-modal" style="display: none;">
+...
 </script>
 <div id="exportGuideModal" class="export-modal" style="display: none;">
     <div class="export-modal-content">
