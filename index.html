@@ -195,6 +195,42 @@
     color: #475569 !important; /* Readable medium slate gray subtext */
     font-weight: 800 !important;
 }
+        /* --- HIGH-VISIBILITY DURATION TOGGLE (1 DAY / 2 DAYS) --- */
+.duration-toggle {
+    background-color: #f1f5f9 !important; /* Soft gray background track */
+    border: 3px solid #cbd5e1 !important; /* Strong outer boundary */
+    border-radius: 50px !important;
+    padding: 6px !important;
+    display: inline-flex !important;
+    align-items: center;
+    gap: 6px !important;
+}
+
+/* Base style for both options when inactive */
+.dt-opt {
+    background-color: transparent !important;
+    color: #475569 !important; /* Readable dark gray for the unselected option */
+    font-weight: 800 !important;
+    font-size: 14px !important;
+    padding: 12px 28px !important;
+    border-radius: 50px !important;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out !important;
+}
+
+/* Active Option: High-contrast white text on deep slate background */
+.dt-opt.active {
+    background-color: #0f172a !important; /* Deep dark slate */
+    color: #ffffff !important; /* Crisp white text */
+    font-weight: 900 !important;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.35) !important; /* Makes the active choice pop out */
+}
+
+/* Quick hover effect for the inactive option */
+.dt-opt:not(.active):hover {
+    background-color: #e2e8f0 !important;
+    color: #0f172a !important;
+}
     </style>
 </head>
 <body class="stage-draw">
