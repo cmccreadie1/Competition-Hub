@@ -11,28 +11,28 @@
 
     <link rel="stylesheet" href="styles.css">
     <style>
-        /* --- MODAL TAB BAR --- */
+        /* --- ACCESSIBILITY OPTIMIZED MODAL TAB BAR --- */
         .modal-tabs {
             display: flex;
-            gap: 10px;
+            gap: 12px;
             background: #ffffff;
-            padding: 12px 25px;
+            padding: 16px 30px;
             border-bottom: 1px solid #cbd5e1;
         }
 
         .modal-tab-btn {
             background: transparent;
-            border: 1px solid #cbd5e1;
+            border: 2px solid #cbd5e1;
             color: #64748b;
-            padding: 10px 18px;
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: 13px;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 800;
+            font-size: 18px; /* High-visibility font size */
             cursor: pointer;
             transition: all 0.2s ease;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
         }
 
         .modal-tab-btn:hover {
@@ -45,7 +45,7 @@
             background-color: #334155 !important;
             color: #ffffff !important;
             border-color: #334155 !important;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
         }
 
         /* Day 2 Dynamic Transition - Automatically switches to Forest Teal */
@@ -61,41 +61,41 @@
 
         /* Security Sections Formatting */
         .security-section {
-            margin-bottom: 25px;
+            margin-bottom: 30px;
             background: white;
-            padding: 25px;
-            border-radius: 12px;
+            padding: 30px;
+            border-radius: 14px;
             border: 1px solid #cbd5e1;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
         }
 
         .security-section h3 {
             color: #0f172a;
-            font-size: 16px;
+            font-size: 22px; /* High-visibility heading */
             font-weight: 900;
             margin-top: 0;
-            margin-bottom: 12px;
+            margin-bottom: 16px;
             border-bottom: 2px solid #f1f5f9;
-            padding-bottom: 10px;
+            padding-bottom: 12px;
         }
 
         .security-section p {
-            color: #334155;
-            font-size: 14px;
-            line-height: 1.6;
-            margin-bottom: 12px;
+            color: #1e293b;
+            font-size: 18px; /* High-visibility paragraph text */
+            line-height: 1.8; /* Generous breathing room */
+            margin-bottom: 16px;
         }
 
         .security-section ul {
-            padding-left: 20px;
-            margin-bottom: 12px;
+            padding-left: 25px;
+            margin-bottom: 16px;
         }
 
         .security-section li {
-            margin-bottom: 8px;
-            color: #334155;
-            font-size: 14px;
-            line-height: 1.6;
+            margin-bottom: 10px;
+            color: #1e293b;
+            font-size: 18px; /* High-visibility list item text */
+            line-height: 1.8;
         }
 
         .security-section li strong {
@@ -555,16 +555,16 @@
     </div>
 </div>
 
-<div id="manualModal" class="modal-overlay no-print" style="z-index: 10000; align-items: center; justify-content: center; padding: 10px;">
-    <div class="modal-content" style="max-width: 850px; width: 100%; height: 90vh; display: flex; flex-direction: column; padding: 0; overflow: hidden; border-radius: 20px; border: none;">
+<div id="manualModal" class="modal-overlay no-print" style="z-index: 10000; align-items: center; justify-content: center; padding: 15px;">
+    <div class="modal-content" style="max-width: 1300px; width: 95%; height: 95vh; display: flex; flex-direction: column; padding: 0; overflow: hidden; border-radius: 20px; border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.3);">
         
-        <div style="background: var(--bg-base); color: white; padding: 20px 25px; display: flex; justify-content: space-between; align-items: center;">
-            <h2 style="margin: 0; font-size: 18px; font-weight: 900; display: flex; align-items: center; gap: 10px;">
+        <div style="background: var(--bg-base); color: white; padding: 25px 30px; display: flex; justify-content: space-between; align-items: center;">
+            <h2 style="margin: 0; font-size: 24px; font-weight: 900; display: flex; align-items: center; gap: 12px;">
                 <i class="fa-solid fa-book-open text-accent"></i> MASTER ORGANISER'S MANUAL
             </h2>
-            <button onclick="closeManualModal()" style="background: transparent; border: none; color: white; font-size: 26px; cursor: pointer; font-weight: bold; line-height: 1;">&times;</button>
+            <button onclick="closeManualModal()" style="background: transparent; border: none; color: white; font-size: 36px; cursor: pointer; font-weight: bold; line-height: 1;">&times;</button>
         </div>
-        <div style="background: #e0f2fe; color: #0369a1; text-align: center; padding: 10px; font-size: 12px; font-weight: 900; border-bottom: 1px solid rgba(0,0,0,0.05); letter-spacing: 0.5px; text-transform: uppercase;">
+        <div style="background: #e0f2fe; color: #0369a1; text-align: center; padding: 12px; font-size: 15px; font-weight: 900; border-bottom: 1px solid rgba(0,0,0,0.05); letter-spacing: 0.5px; text-transform: uppercase;">
             Scroll down to view all sections
         </div>
 
@@ -577,17 +577,17 @@
             </button>
         </div>
 
-        <div style="flex-grow: 1; overflow-y: auto; background: #f8fafc; padding: 30px 25px; font-size: 14px; line-height: 1.6; color: var(--text-dark); text-transform: none !important;">
+        <div style="flex-grow: 1; overflow-y: auto; background: #f8fafc; padding: 35px 30px; font-size: 18px; line-height: 1.8; color: var(--text-dark); text-transform: none !important;">
             
             <div id="tab-guide" class="modal-tab-pane active" style="display: block;">
-                <div style="margin-bottom: 30px; background: white; padding: 25px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+                <div style="margin-bottom: 30px; background: white; padding: 30px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
                     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 15px;">
-                        <h3 style="margin: 0; font-size: 18px; font-weight: 900; color: var(--accent);">1. WELCOME & MATCH OVERVIEW</h3>
-                        <span style="font-size: 11px; font-weight: 800; background: #e0f2fe; color: #0284c7; padding: 4px 12px; border-radius: 50px;">Slide 1 of 10</span>
+                        <h3 style="margin: 0; font-size: 24px; font-weight: 900; color: var(--accent);">1. WELCOME & MATCH OVERVIEW</h3>
+                        <span style="font-size: 14px; font-weight: 800; background: #e0f2fe; color: #0284c7; padding: 4px 12px; border-radius: 50px;">Slide 1 of 10</span>
                     </div>
-                    <h4 style="margin: 0 0 10px 0; font-size: 15px; font-weight: 800; color: var(--text-dark);">Getting Started with Your Match Software</h4>
+                    <h4 style="margin: 0 0 10px 0; font-size: 20px; font-weight: 800; color: var(--text-dark);">Getting Started with Your Match Software</h4>
                     <p style="margin: 0 0 15px 0;">Welcome to your Match Software! This platform is designed to take the stress out of running a major shore fishing competition. It completely automates the two biggest headaches of match organizing: generating a fair beach draw and calculating leaderboards. By handling all complex tie-breakers and zone mathematics natively, the software allows you to focus entirely on running a smooth match.</p>
-                    <h4 style="margin: 0 0 10px 0; font-size: 12px; font-weight: 900; color: var(--text-light); text-transform: uppercase;">The Simple Three-Step Workflow</h4>
+                    <h4 style="margin: 0 0 10px 0; font-size: 16px; font-weight: 900; color: var(--text-light); text-transform: uppercase;">The Simple Three-Step Workflow</h4>
                     <ul style="margin: 0; padding-left: 20px;">
                         <li style="margin-bottom: 6px;"><strong>STEP 1: THE DRAW SETUP</strong> &ndash; Choose your options, enter your anglers, and let the software map out a mathematically fair beach placement.</li>
                         <li style="margin-bottom: 6px;"><strong>STEP 2: EASY SCORE ENTRY</strong> &ndash; Type catch totals directly from paper sheets into automated scorecards. The app saves instantly as you type.</li>
@@ -595,12 +595,12 @@
                     </ul>
                 </div>
 
-                <div style="margin-bottom: 30px; background: white; padding: 25px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+                <div style="margin-bottom: 30px; background: white; padding: 30px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
                     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 15px;">
-                        <h3 style="margin: 0; font-size: 18px; font-weight: 900; color: var(--accent);">2. COMPETITION SETUP & DETAILS</h3>
-                        <span style="font-size: 11px; font-weight: 800; background: #e0f2fe; color: #0284c7; padding: 4px 12px; border-radius: 50px;">Slide 2 of 10</span>
+                        <h3 style="margin: 0; font-size: 24px; font-weight: 900; color: var(--accent);">2. COMPETITION SETUP & DETAILS</h3>
+                        <span style="font-size: 14px; font-weight: 800; background: #e0f2fe; color: #0284c7; padding: 4px 12px; border-radius: 50px;">Slide 2 of 10</span>
                     </div>
-                    <h4 style="margin: 0 0 10px 0; font-size: 15px; font-weight: 800; color: var(--text-dark);">Basic Match Details & Accessibility Settings</h4>
+                    <h4 style="margin: 0 0 10px 0; font-size: 20px; font-weight: 800; color: var(--text-dark);">Basic Match Details & Accessibility Settings</h4>
                     <p style="margin: 0 0 15px 0;">Setting up a brand-new match takes less than two minutes. The entire setup screen is designed to guide you step-by-step so you cannot make a mistake.</p>
                     <ul style="margin: 0 0 15px 0; padding-left: 20px;">
                         <li style="margin-bottom: 10px;"><strong>1. BASIC MATCH DETAILS:</strong> Click the title area to enter the official name of your competition, then select whether this is a <strong>1-Day Match</strong> or a <strong>2-Day Match</strong>. The system automatically configures all scoring and leaderboard matrix grids behind the scenes based on this choice.</li>
@@ -612,12 +612,12 @@
                     </ul>
                 </div>
 
-                <div style="margin-bottom: 30px; background: white; padding: 25px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+                <div style="margin-bottom: 30px; background: white; padding: 30px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
                     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 15px;">
-                        <h3 style="margin: 0; font-size: 18px; font-weight: 900; color: var(--accent);">3. CREATING YOUR ROSTER & LINKING ACCESS</h3>
-                        <span style="font-size: 11px; font-weight: 800; background: #e0f2fe; color: #0284c7; padding: 4px 12px; border-radius: 50px;">Slide 3 of 10</span>
+                        <h3 style="margin: 0; font-size: 24px; font-weight: 900; color: var(--accent);">3. CREATING YOUR ROSTER & LINKING ACCESS</h3>
+                        <span style="font-size: 14px; font-weight: 800; background: #e0f2fe; color: #0284c7; padding: 4px 12px; border-radius: 50px;">Slide 3 of 10</span>
                     </div>
-                    <h4 style="margin: 0 0 10px 0; font-size: 15px; font-weight: 800; color: var(--text-dark);">The Unified Entry Template and Priority Flagging</h4>
+                    <h4 style="margin: 0 0 10px 0; font-size: 20px; font-weight: 800; color: var(--text-dark);">The Unified Entry Template and Priority Flagging</h4>
                     <p style="margin: 0 0 15px 0;">To save time and prevent layout errors during the busy morning check-in, the software features a single, unified entry roster system that directly pairs with your accessibility rules.</p>
                     <ul style="margin: 0; padding-left: 20px;">
                         <li style="margin-bottom: 10px;"><strong>1. SIMPLE DATA ENTRY TEMPLATE:</strong> Use the intuitive onscreen selector controls to specify the exact number of Teams and Solo Anglers fishing the match. The hub instantly builds a clean template grid directly in front of you.</li>
@@ -626,12 +626,12 @@
                     </ul>
                 </div>
 
-                <div style="margin-bottom: 30px; background: white; padding: 25px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+                <div style="margin-bottom: 30px; background: white; padding: 30px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
                     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 15px;">
-                        <h3 style="margin: 0; font-size: 18px; font-weight: 900; color: var(--accent);">4. UNDERSTANDING THE DRAW & VISUAL LEGEND</h3>
-                        <span style="font-size: 11px; font-weight: 800; background: #e0f2fe; color: #0284c7; padding: 4px 12px; border-radius: 50px;">Slide 4 of 10</span>
+                        <h3 style="margin: 0; font-size: 24px; font-weight: 900; color: var(--accent);">4. UNDERSTANDING THE DRAW & VISUAL LEGEND</h3>
+                        <span style="font-size: 14px; font-weight: 800; background: #e0f2fe; color: #0284c7; padding: 4px 12px; border-radius: 50px;">Slide 4 of 10</span>
                     </div>
-                    <h4 style="margin: 0 0 10px 0; font-size: 15px; font-weight: 800; color: var(--text-dark);">Smart Placements, Legends, and Uneven Fields</h4>
+                    <h4 style="margin: 0 0 10px 0; font-size: 20px; font-weight: 800; color: var(--text-dark);">Smart Placements, Legends, and Uneven Fields</h4>
                     <p style="margin: 0 0 15px 0;">The moment you click "Generate Draw", the math engine shuffles positions based on three strict rules of absolute sporting fairness:</p>
                     <ul style="margin: 0; padding-left: 20px;">
                         <li style="margin-bottom: 6px;"><strong>Separated Teams:</strong> Anglers from the same team are automatically split up so they never fish in the same zone against each other.</li>
@@ -642,12 +642,12 @@
                     </ul>
                 </div>
 
-                <div style="margin-bottom: 30px; background: white; padding: 25px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+                <div style="margin-bottom: 30px; background: white; padding: 30px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
                     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 15px;">
-                        <h3 style="margin: 0; font-size: 18px; font-weight: 900; color: var(--accent);">5. POST-DRAW MANAGEMENT & FLOATING BUTTONS</h3>
-                        <span style="font-size: 11px; font-weight: 800; background: #e0f2fe; color: #0284c7; padding: 4px 12px; border-radius: 50px;">Slide 5 of 10</span>
+                        <h3 style="margin: 0; font-size: 24px; font-weight: 900; color: var(--accent);">5. POST-DRAW MANAGEMENT & FLOATING BUTTONS</h3>
+                        <span style="font-size: 14px; font-weight: 800; background: #e0f2fe; color: #0284c7; padding: 4px 12px; border-radius: 50px;">Slide 5 of 10</span>
                     </div>
-                    <h4 style="margin: 0 0 10px 0; font-size: 15px; font-weight: 800; color: var(--text-dark);">Making Adjustments and Formatting Steward Sheets</h4>
+                    <h4 style="margin: 0 0 10px 0; font-size: 20px; font-weight: 800; color: var(--text-dark);">Making Adjustments and Formatting Steward Sheets</h4>
                     <p style="margin: 0 0 15px 0;">Once the draw is live, two convenient, sticky Floating Action Buttons appear at the bottom of your screen providing total control over match operations.</p>
                     <ul style="margin: 0; padding-left: 20px;">
                         <li style="margin-bottom: 10px;"><strong>1. THE "MANAGE DRAW" MENU:</strong> Handle last-minute slipway changes easily:
@@ -668,12 +668,12 @@
                     </ul>
                 </div>
 
-                <div style="margin-bottom: 30px; background: white; padding: 25px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+                <div style="margin-bottom: 30px; background: white; padding: 30px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
                     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 15px;">
-                        <h3 style="margin: 0; font-size: 18px; font-weight: 900; color: var(--accent);">6. RECORDING MATCH SCORES</h3>
-                        <span style="font-size: 11px; font-weight: 800; background: #e0f2fe; color: #0284c7; padding: 4px 12px; border-radius: 50px;">Slide 6 of 10</span>
+                        <h3 style="margin: 0; font-size: 24px; font-weight: 900; color: var(--accent);">6. RECORDING MATCH SCORES</h3>
+                        <span style="font-size: 14px; font-weight: 800; background: #e0f2fe; color: #0284c7; padding: 4px 12px; border-radius: 50px;">Slide 6 of 10</span>
                     </div>
-                    <h4 style="margin: 0 0 10px 0; font-size: 15px; font-weight: 800; color: var(--text-dark);">Fast Keyboard Input & Real-Time Auto-Saving</h4>
+                    <h4 style="margin: 0 0 10px 0; font-size: 20px; font-weight: 800; color: var(--text-dark);">Fast Keyboard Input & Real-Time Auto-Saving</h4>
                     <p style="margin: 0 0 15px 0;">When paper catch sheets come back to the organizer's desk, entering data is fast, seamless, and completely foolproof.</p>
                     <ul style="margin: 0; padding-left: 20px;">
                         <li style="margin-bottom: 6px;"><strong>SELECT THE ACTIVE DAY:</strong> Click the "Scorecards" tab and choose either the Day 1 or Day 2 sub-screen.</li>
@@ -683,12 +683,12 @@
                     </ul>
                 </div>
 
-                <div style="margin-bottom: 30px; background: white; padding: 25px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+                <div style="margin-bottom: 30px; background: white; padding: 30px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
                     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 15px;">
-                        <h3 style="margin: 0; font-size: 18px; font-weight: 900; color: var(--accent);">7. SECRET PAIRS SIDE-POOL</h3>
-                        <span style="font-size: 11px; font-weight: 800; background: #e0f2fe; color: #0284c7; padding: 4px 12px; border-radius: 50px;">Slide 7 of 10</span>
+                        <h3 style="margin: 0; font-size: 24px; font-weight: 900; color: var(--accent);">7. SECRET PAIRS SIDE-POOL</h3>
+                        <span style="font-size: 14px; font-weight: 800; background: #e0f2fe; color: #0284c7; padding: 4px 12px; border-radius: 50px;">Slide 7 of 10</span>
                     </div>
-                    <h4 style="margin: 0 0 10px 0; font-size: 15px; font-weight: 800; color: var(--text-dark);">Run an Automated Blind-Draw Pool for Every Angler</h4>
+                    <h4 style="margin: 0 0 10px 0; font-size: 20px; font-weight: 800; color: var(--text-dark);">Run an Automated Blind-Draw Pool for Every Angler</h4>
                     <p style="margin: 0 0 15px 0;">The Secret Pairs game is an optional side-pool that pairs anglers up completely at random and gives the entire field an absolutely equal chance to win prize money.</p>
                     <ul style="margin: 0; padding-left: 20px;">
                         <li style="margin-bottom: 6px;"><strong>THE TARGET LENGTH METHOD:</strong> Instead of crowning the highest score, the computer calculates a hidden Target Length that falls strictly between the lowest and highest possible combined scores. The pair whose combined length finishes closest to the target wins, completely removing predictable elements!</li>
@@ -697,12 +697,12 @@
                     </ul>
                 </div>
 
-                <div style="margin-bottom: 30px; background: white; padding: 25px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+                <div style="margin-bottom: 30px; background: white; padding: 30px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
                     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 15px;">
-                        <h3 style="margin: 0; font-size: 18px; font-weight: 900; color: var(--accent);">8. RESULTS, LEADERBOARDS & SCORING RULES</h3>
-                        <span style="font-size: 11px; font-weight: 800; background: #e0f2fe; color: #0284c7; padding: 4px 12px; border-radius: 50px;">Slide 8 of 10</span>
+                        <h3 style="margin: 0; font-size: 24px; font-weight: 900; color: var(--accent);">8. RESULTS, LEADERBOARDS & SCORING RULES</h3>
+                        <span style="font-size: 14px; font-weight: 800; background: #e0f2fe; color: #0284c7; padding: 4px 12px; border-radius: 50px;">Slide 8 of 10</span>
                     </div>
-                    <h4 style="margin: 0 0 10px 0; font-size: 15px; font-weight: 800; color: var(--text-dark);">The Multi-Metric Calculation Engine Hierarchy</h4>
+                    <h4 style="margin: 0 0 10px 0; font-size: 20px; font-weight: 800; color: var(--text-dark);">The Multi-Metric Calculation Engine Hierarchy</h4>
                     <p style="margin: 0 0 15px 0;">The Results tab houses your master tournament dashboards, backed by a clear **Scoring Legend** bar at the top of the page. The field is ranked using a native priority hierarchy system to instantly resolve ties:</p>
                     <ul style="margin: 0; padding-left: 20px;">
                         <li style="margin-bottom: 8px;"><strong>1. PRIMARY METRIC &ndash; LOWEST ZONE POINTS:</strong> Anglers earn points based on where they placed inside their specific colored zone (1 point for 1st, 2 points for 2nd, etc.). <strong>The lowest total points wins the match.</strong>
@@ -718,12 +718,12 @@
                     </ul>
                 </div>
 
-                <div style="margin-bottom: 30px; background: white; padding: 25px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+                <div style="margin-bottom: 30px; background: white; padding: 30px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
                     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 15px;">
-                        <h3 style="margin: 0; font-size: 18px; font-weight: 900; color: var(--accent);">9. END OF COMPETITION & DATA RESET</h3>
-                        <span style="font-size: 11px; font-weight: 800; background: #e0f2fe; color: #0284c7; padding: 4px 12px; border-radius: 50px;">Slide 9 of 10</span>
+                        <h3 style="margin: 0; font-size: 24px; font-weight: 900; color: var(--accent);">9. END OF COMPETITION & DATA RESET</h3>
+                        <span style="font-size: 14px; font-weight: 800; background: #e0f2fe; color: #0284c7; padding: 4px 12px; border-radius: 50px;">Slide 9 of 10</span>
                     </div>
-                    <h4 style="margin: 0 0 10px 0; font-size: 15px; font-weight: 800; color: var(--text-dark);">Cleaning the Slate and Downloading Your Archives</h4>
+                    <h4 style="margin: 0 0 10px 0; font-size: 20px; font-weight: 800; color: var(--text-dark);">Cleaning the Slate and Downloading Your Archives</h4>
                     <p style="margin: 0 0 15px 0;">Once all the prizes have been awarded and the match wraps up, you can safely reset the system memory for your next tournament.</p>
                     <p style="margin: 0 0 10px 0;"><strong>THE FINISH AND RESET TRIGGER:</strong> Look at the top right of the screen for the "Finish and Reset Competition" button. Clicking this triggers two actions simultaneously:</p>
                     <ul style="margin: 0 0 15px 0; padding-left: 20px;">
@@ -732,41 +732,41 @@
                     </ul>
                 </div>
 
-                <div style="margin-bottom: 10px; background: white; padding: 25px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+                <div style="margin-bottom: 10px; background: white; padding: 30px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
                     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 15px;">
-                        <h3 style="margin: 0; font-size: 18px; font-weight: 900; color: var(--accent);">10. FREQUENTLY ASKED QUESTIONS (FAQ)</h3>
-                        <span style="font-size: 11px; font-weight: 800; background: #e0f2fe; color: #0284c7; padding: 4px 12px; border-radius: 50px;">Slide 10 of 10</span>
+                        <h3 style="margin: 0; font-size: 24px; font-weight: 900; color: var(--accent);">10. FREQUENTLY ASKED QUESTIONS (FAQ)</h3>
+                        <span style="font-size: 14px; font-weight: 800; background: #e0f2fe; color: #0284c7; padding: 4px 12px; border-radius: 50px;">Slide 10 of 10</span>
                     </div>
-                    <h4 style="margin: 0 0 15px 0; font-size: 15px; font-weight: 800; color: var(--text-dark);">Quick Answers to Common Worries for Total Peace of Mind</h4>
+                    <h4 style="margin: 0 0 15px 0; font-size: 20px; font-weight: 800; color: var(--text-dark);">Quick Answers to Common Worries for Total Peace of Mind</h4>
                     
                     <div style="margin-bottom: 15px; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px;">
-                        <strong style="color: var(--text-dark); display: block; font-size: 14px;">Q: Can I pre-enter all my angler details days or weeks before the match?</strong>
-                        <span style="color: var(--text-muted); display: block; margin-top: 4px;"><strong>A:</strong> Yes, absolutely. You can type or import your entire competitor list well in advance at home. The app will save your roster indefinitely. The draw is never locked in or finalized until you click the "Generate Draw" button on match morning. Even after the draw is live, you can still easily adjust it.</span>
+                        <strong style="color: var(--text-dark); display: block; font-size: 18px;">Q: Can I pre-enter all my angler details days or weeks before the match?</strong>
+                        <span style="color: var(--text-muted); display: block; margin-top: 6px;"><strong>A:</strong> Yes, absolutely. You can type or import your entire competitor list well in advance at home. The app will save your roster indefinitely. The draw is never locked in or finalized until you click the "Generate Draw" button on match morning. Even after the draw is live, you can still easily adjust it.</span>
                     </div>
 
                     <div style="margin-bottom: 15px; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px;">
-                        <strong style="color: var(--text-dark); display: block; font-size: 14px;">Q: Can another angler or outsider open the website link and mess with my scores?</strong>
-                        <span style="color: var(--text-muted); display: block; margin-top: 4px;"><strong>A:</strong> Absolutely not. Your match data is saved exclusively on your physical device's local memory. Think of it like a secure, locked notebook inside your specific computer. No one else on the internet can see, access, or change your live data.</span>
+                        <strong style="color: var(--text-dark); display: block; font-size: 18px;">Q: Can another angler or outsider open the website link and mess with my scores?</strong>
+                        <span style="color: var(--text-muted); display: block; margin-top: 6px;"><strong>A:</strong> Absolutely not. Your match data is saved exclusively on your physical device's local memory. Think of it like a secure, locked notebook inside your specific computer. No one else on the internet can see, access, or change your live data.</span>
                     </div>
 
                     <div style="margin-bottom: 15px; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px;">
-                        <strong style="color: var(--text-dark); display: block; font-size: 14px;">Q: What happens if I accidentally close the browser tab, click back, or my battery dies?</strong>
-                        <span style="color: var(--text-muted); display: block; margin-top: 4px;"><strong>A:</strong> You won't lose a thing. The app features an instant auto-save engine. The exact millisecond you type a number or process a draw, it is securely locked into your device. You can close the screen or restart your computer, and your data will be exactly where you left it.</span>
+                        <strong style="color: var(--text-dark); display: block; font-size: 18px;">Q: What happens if I accidentally close the browser tab, click back, or my battery dies?</strong>
+                        <span style="color: var(--text-muted); display: block; margin-top: 6px;"><strong>A:</strong> You won't lose a thing. The app features an instant auto-save engine. The exact millisecond you type a number or process a draw, it is securely locked into your device. You can close the screen or restart your computer, and your data will be exactly where you left it.</span>
                     </div>
 
                     <div style="margin-bottom: 15px; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px;">
-                        <strong style="color: var(--text-dark); display: block; font-size: 14px;">Q: Do I need active internet or Wi-Fi on the beach to run the match?</strong>
-                        <span style="color: var(--text-muted); display: block; margin-top: 4px;"><strong>A:</strong> No. You only need internet once at home to initially open the website link and let your browser load the system templates. After that first load, the app is completely saved onto your device. You can run draws, log scores, and view leaderboards on a remote beach with zero mobile signal.</span>
+                        <strong style="color: var(--text-dark); display: block; font-size: 18px;">Q: Do I need active internet or Wi-Fi on the beach to run the match?</strong>
+                        <span style="color: var(--text-muted); display: block; margin-top: 6px;"><strong>A:</strong> No. You only need internet once at home to initially open the website link and let your browser load the system templates. After that first load, the app is completely saved onto your device. You can run draws, log scores, and view leaderboards on a remote beach with zero mobile signal.</span>
                     </div>
 
                     <div style="margin-bottom: 15px; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px;">
-                        <strong style="color: var(--text-dark); display: block; font-size: 14px;">Q: Can a beach steward or angler change a score from their own phone?</strong>
-                        <span style="color: var(--text-muted); display: block; margin-top: 4px;"><strong>A:</strong> No. Your device is the sole control tower. Unless someone physically picks up your computer and types onto your screen, no external device can alter your master scoresheets.</span>
+                        <strong style="color: var(--text-dark); display: block; font-size: 18px;">Q: Can a beach steward or angler change a score from their own phone?</strong>
+                        <span style="color: var(--text-muted); display: block; margin-top: 6px;"><strong>A:</strong> No. Your device is the sole control tower. Unless someone physically picks up your computer and types onto your screen, no external device can alter your master scoresheets.</span>
                     </div>
 
                     <div style="margin-bottom: 5px;">
-                        <strong style="color: var(--text-dark); display: block; font-size: 14px;">Q: What if I accidentally type a score layout into the wrong column or make a typo?</strong>
-                        <span style="color: var(--text-muted); display: block; margin-top: 4px;"><strong>A:</strong> Just type over it. Because the app updates in real time, you can click into any score box at any time to correct a number. The leaderboards will instantly recalculate themselves to show the corrected tournament positions.</span>
+                        <strong style="color: var(--text-dark); display: block; font-size: 18px;">Q: What if I accidentally type a score layout into the wrong column or make a typo?</strong>
+                        <span style="color: var(--text-muted); display: block; margin-top: 6px;"><strong>A:</strong> Just type over it. Because the app updates in real time, you can click into any score box at any time to correct a number. The leaderboards will instantly recalculate themselves to show the corrected tournament positions.</span>
                     </div>
                 </div>
             </div>
@@ -806,7 +806,7 @@
         </div>
 
         <div style="background: white; border-top: 1px solid var(--border); padding: 15px 25px; text-align: right; display: flex; justify-content: flex-end;">
-            <button onclick="closeManualModal()" class="btn-action" style="padding: 12px 32px; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);">CLOSE MANUAL</button>
+            <button onclick="closeManualModal()" class="btn-action" style="padding: 16px 40px; font-size: 18px; font-weight: 800; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);">CLOSE MANUAL</button>
         </div>
 
     </div>
