@@ -10,6 +10,103 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <link rel="stylesheet" href="styles.css">
+    <style>
+        /* --- MODAL TAB BAR --- */
+        .modal-tabs {
+            display: flex;
+            gap: 10px;
+            background: #ffffff;
+            padding: 12px 25px;
+            border-bottom: 1px solid #cbd5e1;
+        }
+
+        .modal-tab-btn {
+            background: transparent;
+            border: 1px solid #cbd5e1;
+            color: #64748b;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .modal-tab-btn:hover {
+            background: #f1f5f9;
+            color: #334155;
+        }
+
+        /* Active Tab - Matches Dark Slate Active Theme */
+        .modal-tab-btn.active {
+            background-color: #334155 !important;
+            color: #ffffff !important;
+            border-color: #334155 !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Day 2 Dynamic Transition - Automatically switches to Forest Teal */
+        body.stage-score-d2 .modal-tab-btn.active {
+            background-color: #0f766e !important;
+            border-color: #0f766e !important;
+        }
+
+        /* Content Panes Toggle styling */
+        .modal-tab-pane {
+            animation: modalFadeIn 0.2s ease-in-out;
+        }
+
+        /* Security Sections Formatting */
+        .security-section {
+            margin-bottom: 25px;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid #cbd5e1;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        }
+
+        .security-section h3 {
+            color: #0f172a;
+            font-size: 16px;
+            font-weight: 900;
+            margin-top: 0;
+            margin-bottom: 12px;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 10px;
+        }
+
+        .security-section p {
+            color: #334155;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .security-section ul {
+            padding-left: 20px;
+            margin-bottom: 12px;
+        }
+
+        .security-section li {
+            margin-bottom: 8px;
+            color: #334155;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .security-section li strong {
+            color: #0f172a;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(3px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 </head>
 <body class="stage-draw">
     
@@ -25,7 +122,7 @@
         <div id="saveIndicator" style="position: fixed; top: 18px; right: 20px; background: var(--green-color); color: white; padding: 4px 10px; border-radius: 50px; font-weight: 800; font-size: 11px; opacity: 0; transition: opacity 0.3s; z-index: 9999; pointer-events: none; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);">✓ SAVED</div>
         
         <button id="masterResetBtn" onclick="showWipeModal()" class="btn-action-outline btn-danger-outline" style="padding: 10px 16px; font-size: 11px; font-weight: 900; background: white;">🏁 FINISH AND RESET COMPETITION</button>
-        <button id="globalHelpBtn" onclick="openManualModal()" class="btn-action-outline" style="padding: 10px 16px; font-size: 11px; font-weight: 900; background: #e0f2fe; color: #0369a1; border-color: #bae6fd; margin-left: 8px;">📘 VIEW USER GUIDE</button>
+        <button id="globalHelpBtn" onclick="openManualModal()" class="btn-action-outline" style="padding: 10px 16px; font-size: 11px; font-weight: 900; background: #e0f2fe; color: #0369a1; border-color: #bae6fd; margin-left: 8px;">📖 Guide & Draw Security</button>
     </div>
     
     <div class="tab-nav">
@@ -41,7 +138,7 @@
     <div id="entrySection" class="no-print">
         
         <div style="text-align: right; margin-bottom: 10px;">
-            <button onclick="openManualModal()" style="background: #e0f2fe; color: #0284c7; border: 1px solid #bae6fd; font-weight: 800; font-size: 12px; padding: 8px 16px; border-radius: 50px; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">📘 Need Help? View Manual ↓</button>
+            <button onclick="openManualModal()" style="background: #e0f2fe; color: #0284c7; border: 1px solid #bae6fd; font-weight: 800; font-size: 12px; padding: 8px 16px; border-radius: 50px; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">📖 Need Help? Guide & Draw Security ↓</button>
         </div>
         
         <div id="editDrawBanner" style="display:none; background:var(--green-soft); border: 1px solid var(--green-color); border-radius:16px; padding: 16px; margin-bottom: 20px; text-align: left; display: flex; align-items: center; gap: 15px;">
@@ -377,7 +474,6 @@
         🏆 TIE BREAK LEGEND: <span style="color: var(--accent); font-weight: 800;">Points</span> | Total Length (cm) / Fish Count / Biggest Fish (cm) / Species Count
     </div>
 
-    <!-- Sub-Navigation Dashboard Deck (Rounded Pills with Dark Base) -->
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-bottom: 25px; width: 100%;">
         <button id="subBtn-lbd1" class="tab-btn active" style="padding: 12px 16px; font-size: 12px; font-weight: 800; text-align: center; border-radius: 50px; width: 100%; background: #ffffff; color: #0f172a; border: 1px solid transparent; cursor: pointer; transition: all 0.2s;" onclick="switchLeaderboardSubTab('lbd1')">DAY 1 ZONES</button>
         <button id="subBtn-lbd2" class="tab-btn" style="padding: 12px 16px; font-size: 12px; font-weight: 800; text-align: center; border-radius: 50px; width: 100%; background: #1e293b; color: #94a3b8; border: 1px solid rgba(255,255,255,0.05); cursor: pointer; transition: all 0.2s;" onclick="switchLeaderboardSubTab('lbd2')">DAY 2 ZONES</button>
@@ -472,195 +568,238 @@
             Scroll down to view all sections
         </div>
 
+        <div class="modal-tabs">
+            <button class="modal-tab-btn active" onclick="switchModalTab(event, 'tab-guide')">
+                <span>📖 App Guide</span>
+            </button>
+            <button class="modal-tab-btn" onclick="switchModalTab(event, 'tab-security')">
+                <span>🔒 Security & Math</span>
+            </button>
+        </div>
+
         <div style="flex-grow: 1; overflow-y: auto; background: #f8fafc; padding: 30px 25px; font-size: 14px; line-height: 1.6; color: var(--text-dark); text-transform: none !important;">
             
-            <div style="margin-bottom: 30px; background: white; padding: 25px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
-                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 15px;">
-                    <h3 style="margin: 0; font-size: 18px; font-weight: 900; color: var(--accent);">1. WELCOME & MATCH OVERVIEW</h3>
-                    <span style="font-size: 11px; font-weight: 800; background: #e0f2fe; color: #0284c7; padding: 4px 12px; border-radius: 50px;">Slide 1 of 10</span>
+            <div id="tab-guide" class="modal-tab-pane active" style="display: block;">
+                <div style="margin-bottom: 30px; background: white; padding: 25px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 15px;">
+                        <h3 style="margin: 0; font-size: 18px; font-weight: 900; color: var(--accent);">1. WELCOME & MATCH OVERVIEW</h3>
+                        <span style="font-size: 11px; font-weight: 800; background: #e0f2fe; color: #0284c7; padding: 4px 12px; border-radius: 50px;">Slide 1 of 10</span>
+                    </div>
+                    <h4 style="margin: 0 0 10px 0; font-size: 15px; font-weight: 800; color: var(--text-dark);">Getting Started with Your Match Software</h4>
+                    <p style="margin: 0 0 15px 0;">Welcome to your Match Software! This platform is designed to take the stress out of running a major shore fishing competition. It completely automates the two biggest headaches of match organizing: generating a fair beach draw and calculating leaderboards. By handling all complex tie-breakers and zone mathematics natively, the software allows you to focus entirely on running a smooth match.</p>
+                    <h4 style="margin: 0 0 10px 0; font-size: 12px; font-weight: 900; color: var(--text-light); text-transform: uppercase;">The Simple Three-Step Workflow</h4>
+                    <ul style="margin: 0; padding-left: 20px;">
+                        <li style="margin-bottom: 6px;"><strong>STEP 1: THE DRAW SETUP</strong> &ndash; Choose your options, enter your anglers, and let the software map out a mathematically fair beach placement.</li>
+                        <li style="margin-bottom: 6px;"><strong>STEP 2: EASY SCORE ENTRY</strong> &ndash; Type catch totals directly from paper sheets into automated scorecards. The app saves instantly as you type.</li>
+                        <li style="margin-bottom: 6px;"><strong>STEP 3: LIVE LEADERBOARDS</strong> &ndash; View immaculate, real-time standings for individuals, teams, and the biggest fish instantly.</li>
+                    </ul>
                 </div>
-                <h4 style="margin: 0 0 10px 0; font-size: 15px; font-weight: 800; color: var(--text-dark);">Getting Started with Your Match Software</h4>
-                <p style="margin: 0 0 15px 0;">Welcome to your Match Software! This platform is designed to take the stress out of running a major shore fishing competition. It completely automates the two biggest headaches of match organizing: generating a fair beach draw and calculating leaderboards. By handling all complex tie-breakers and zone mathematics natively, the software allows you to focus entirely on running a smooth match.</p>
-                <h4 style="margin: 0 0 10px 0; font-size: 12px; font-weight: 900; color: var(--text-light); text-transform: uppercase;">The Simple Three-Step Workflow</h4>
-                <ul style="margin: 0; padding-left: 20px;">
-                    <li style="margin-bottom: 6px;"><strong>STEP 1: THE DRAW SETUP</strong> &ndash; Choose your options, enter your anglers, and let the software map out a mathematically fair beach placement.</li>
-                    <li style="margin-bottom: 6px;"><strong>STEP 2: EASY SCORE ENTRY</strong> &ndash; Type catch totals directly from paper sheets into automated scorecards. The app saves instantly as you type.</li>
-                    <li style="margin-bottom: 6px;"><strong>STEP 3: LIVE LEADERBOARDS</strong> &ndash; View immaculate, real-time standings for individuals, teams, and the biggest fish instantly.</li>
-                </ul>
+
+                <div style="margin-bottom: 30px; background: white; padding: 25px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 15px;">
+                        <h3 style="margin: 0; font-size: 18px; font-weight: 900; color: var(--accent);">2. COMPETITION SETUP & DETAILS</h3>
+                        <span style="font-size: 11px; font-weight: 800; background: #e0f2fe; color: #0284c7; padding: 4px 12px; border-radius: 50px;">Slide 2 of 10</span>
+                    </div>
+                    <h4 style="margin: 0 0 10px 0; font-size: 15px; font-weight: 800; color: var(--text-dark);">Basic Match Details & Accessibility Settings</h4>
+                    <p style="margin: 0 0 15px 0;">Setting up a brand-new match takes less than two minutes. The entire setup screen is designed to guide you step-by-step so you cannot make a mistake.</p>
+                    <ul style="margin: 0 0 15px 0; padding-left: 20px;">
+                        <li style="margin-bottom: 10px;"><strong>1. BASIC MATCH DETAILS:</strong> Click the title area to enter the official name of your competition, then select whether this is a <strong>1-Day Match</strong> or a <strong>2-Day Match</strong>. The system automatically configures all scoring and leaderboard matrix grids behind the scenes based on this choice.</li>
+                    </ul>
+                    <p style="margin: 0 0 10px 0;"><strong>2. SMART ACCESSIBILITY FUNCTION:</strong> Toggle this "ON" if you have anglers who require flat, easy-to-reach beach pegs. Once the draw runs, these specific anglers will automatically be allocated priority placements from your ruleset without disrupting random fairness for the rest of the field:</p>
+                    <ul style="margin: 0; padding-left: 20px;">
+                        <li style="margin-bottom: 6px;"><strong>OPTION A: DISTRIBUTED PEGS:</strong> Use if you have suitable, easy-access pegs scattered safely along the beach (e.g., near parking). Type specific peg numbers separated by commas (like 5, 12, 19).</li>
+                        <li style="margin-bottom: 6px;"><strong>OPTION B: STATIC ZONES:</strong> Use if beach access is highly restricted and only one specific section is safe. Assign which general color zone they will fish in for each day of the match.</li>
+                    </ul>
+                </div>
+
+                <div style="margin-bottom: 30px; background: white; padding: 25px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 15px;">
+                        <h3 style="margin: 0; font-size: 18px; font-weight: 900; color: var(--accent);">3. CREATING YOUR ROSTER & LINKING ACCESS</h3>
+                        <span style="font-size: 11px; font-weight: 800; background: #e0f2fe; color: #0284c7; padding: 4px 12px; border-radius: 50px;">Slide 3 of 10</span>
+                    </div>
+                    <h4 style="margin: 0 0 10px 0; font-size: 15px; font-weight: 800; color: var(--text-dark);">The Unified Entry Template and Priority Flagging</h4>
+                    <p style="margin: 0 0 15px 0;">To save time and prevent layout errors during the busy morning check-in, the software features a single, unified entry roster system that directly pairs with your accessibility rules.</p>
+                    <ul style="margin: 0; padding-left: 20px;">
+                        <li style="margin-bottom: 10px;"><strong>1. SIMPLE DATA ENTRY TEMPLATE:</strong> Use the intuitive onscreen selector controls to specify the exact number of Teams and Solo Anglers fishing the match. The hub instantly builds a clean template grid directly in front of you.</li>
+                        <li style="margin-bottom: 10px;"><strong>2. ASSIGNING ACCESSIBILITY PEGS:</strong> Look closely at the roster template list. Right beside each angler's name field, you will see a small <strong><code>[A]</code> button</strong>. If an angler has a mobility constraint, simply click their <code>[A]</code> button. It will highlight instantly, telling the draw algorithm to treat this person as a priority entry.</li>
+                        <li style="margin-bottom: 6px;"><strong>3. PROCEED TO DRAW:</strong> For teams, group fields together by Team Name. For solo competitors, use the standalone rows. Once all names are filled and your access priority buttons are highlighted, click the bright <strong>"Generate Draw"</strong> button. The priority anglers are automatically matched to your easy-access rules first, before the rest of the beach shuffling begins.</li>
+                    </ul>
+                </div>
+
+                <div style="margin-bottom: 30px; background: white; padding: 25px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 15px;">
+                        <h3 style="margin: 0; font-size: 18px; font-weight: 900; color: var(--accent);">4. UNDERSTANDING THE DRAW & VISUAL LEGEND</h3>
+                        <span style="font-size: 11px; font-weight: 800; background: #e0f2fe; color: #0284c7; padding: 4px 12px; border-radius: 50px;">Slide 4 of 10</span>
+                    </div>
+                    <h4 style="margin: 0 0 10px 0; font-size: 15px; font-weight: 800; color: var(--text-dark);">Smart Placements, Legends, and Uneven Fields</h4>
+                    <p style="margin: 0 0 15px 0;">The moment you click "Generate Draw", the math engine shuffles positions based on three strict rules of absolute sporting fairness:</p>
+                    <ul style="margin: 0; padding-left: 20px;">
+                        <li style="margin-bottom: 6px;"><strong>Separated Teams:</strong> Anglers from the same team are automatically split up so they never fish in the same zone against each other.</li>
+                        <li style="margin-bottom: 6px;"><strong>No Repeat Zones:</strong> On a 2-Day match, no competitor will ever fish the same beach zone twice.</li>
+                        <li style="margin-bottom: 6px;"><strong>Priority Access Placements:</strong> Accessibility anglers are placed into their safe pegs first, before the remaining field is randomly scattered.</li>
+                        <li style="margin-bottom: 10px;"><strong>THE VISUAL PEG LEGEND:</strong> A beautiful, color-coded legend bar appears at the top of the screen. This maps out the physical beach sequence by zone, showing exactly which peg numbers belong to the <strong>Red, Yellow, Green, and Blue</strong> sections for Day 1 and Day 2. Priority pegs are clearly highlighted.</li>
+                        <li style="margin-bottom: 6px;"><strong>EXTENDED PEGS:</strong> If late entries arrive after the draw is finalized, the system creates "Extended Pegs" (like 15A). This squeezes late arrivals onto the beach elegantly without altering the random positions already drawn by other anglers.</li>
+                    </ul>
+                </div>
+
+                <div style="margin-bottom: 30px; background: white; padding: 25px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 15px;">
+                        <h3 style="margin: 0; font-size: 18px; font-weight: 900; color: var(--accent);">5. POST-DRAW MANAGEMENT & FLOATING BUTTONS</h3>
+                        <span style="font-size: 11px; font-weight: 800; background: #e0f2fe; color: #0284c7; padding: 4px 12px; border-radius: 50px;">Slide 5 of 10</span>
+                    </div>
+                    <h4 style="margin: 0 0 10px 0; font-size: 15px; font-weight: 800; color: var(--text-dark);">Making Adjustments and Formatting Steward Sheets</h4>
+                    <p style="margin: 0 0 15px 0;">Once the draw is live, two convenient, sticky Floating Action Buttons appear at the bottom of your screen providing total control over match operations.</p>
+                    <ul style="margin: 0; padding-left: 20px;">
+                        <li style="margin-bottom: 10px;"><strong>1. THE "MANAGE DRAW" MENU:</strong> Handle last-minute slipway changes easily:
+                            <ul style="margin-top: 6px; padding-left: 20px;">
+                                <li><strong>Amend Names:</strong> Correct spelling typos on the fly without changing anyone's physical peg location.</li>
+                                <li><strong>Delete No-Shows:</strong> Remove an entry cleanly. <em>(Team Rule: If they belong to a team, click to unlink the team into solo anglers first so the remaining members aren't penalized).</em></li>
+                                <li><strong>Add Late Entries:</strong> Squeeze late arrivals smoothly onto extended pegs (`A`) to keep the primary draw safe.</li>
+                                <li><strong>Full Redraw (Last Resort):</strong> Wipes the slate clean to generate a brand-new random draw in the unlikely event that so many last-minute changes have occurred that the current setup can no longer abide by the fairness rules. <em>Note: You do not have to re-enter all the angler names and teams; the software remembers your roster and simply reshuffles assignments instantly.</em></li>
+                            </ul>
+                        </li>
+                        <li style="margin-bottom: 6px;"><strong>2. THE "OUTPUT MENU":</strong> Formats your screen into clean, printer-friendly layouts perfect for handing out:
+                            <ul style="margin-top: 6px; padding-left: 20px;">
+                                <li><strong>Master Angler List:</strong> An alphabetical directory of every competitor in the match.</li>
+                                <li><strong>Team Draws:</strong> Grouped cleanly by club name so team captains can instantly see member locations.</li>
+                                <li><strong>Zone Steward Sheets:</strong> A sequential list of pegs broken down zone-by-zone, ideal for stewards physically tracking cards on the beach.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+
+                <div style="margin-bottom: 30px; background: white; padding: 25px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 15px;">
+                        <h3 style="margin: 0; font-size: 18px; font-weight: 900; color: var(--accent);">6. RECORDING MATCH SCORES</h3>
+                        <span style="font-size: 11px; font-weight: 800; background: #e0f2fe; color: #0284c7; padding: 4px 12px; border-radius: 50px;">Slide 6 of 10</span>
+                    </div>
+                    <h4 style="margin: 0 0 10px 0; font-size: 15px; font-weight: 800; color: var(--text-dark);">Fast Keyboard Input & Real-Time Auto-Saving</h4>
+                    <p style="margin: 0 0 15px 0;">When paper catch sheets come back to the organizer's desk, entering data is fast, seamless, and completely foolproof.</p>
+                    <ul style="margin: 0; padding-left: 20px;">
+                        <li style="margin-bottom: 6px;"><strong>SELECT THE ACTIVE DAY:</strong> Click the "Scorecards" tab and choose either the Day 1 or Day 2 sub-screen.</li>
+                        <li style="margin-bottom: 6px;"><strong>STICKY SEARCH BAR:</strong> Do not waste time scrolling through a massive list. Type the first few letters of an angler's name into the search box at the top to bring their scorecard straight to the front.</li>
+                        <li style="margin-bottom: 6px;"><strong>KEYBOARD TAB OPTIMIZATION:</strong> Type the 4 metrics from the steward sheet: <strong>Total Length (cm)</strong>, <strong>Fish Count</strong>, <strong>Biggest Fish Size (cm)</strong>, and <strong>Species Count</strong>. Hit the <code>Tab</code> key on your keyboard to instantly jump to the next input box, letting you log an entire card in seconds without touching your mouse.</li>
+                        <li style="margin-bottom: 6px;"><strong>INSTANT SAVING:</strong> <strong>There is no save button.</strong> The software saves your metrics the exact millisecond you type them. The leaderboards instantly recalculate in the background automatically.</li>
+                    </ul>
+                </div>
+
+                <div style="margin-bottom: 30px; background: white; padding: 25px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 15px;">
+                        <h3 style="margin: 0; font-size: 18px; font-weight: 900; color: var(--accent);">7. SECRET PAIRS SIDE-POOL</h3>
+                        <span style="font-size: 11px; font-weight: 800; background: #e0f2fe; color: #0284c7; padding: 4px 12px; border-radius: 50px;">Slide 7 of 10</span>
+                    </div>
+                    <h4 style="margin: 0 0 10px 0; font-size: 15px; font-weight: 800; color: var(--text-dark);">Run an Automated Blind-Draw Pool for Every Angler</h4>
+                    <p style="margin: 0 0 15px 0;">The Secret Pairs game is an optional side-pool that pairs anglers up completely at random and gives the entire field an absolutely equal chance to win prize money.</p>
+                    <ul style="margin: 0; padding-left: 20px;">
+                        <li style="margin-bottom: 6px;"><strong>THE TARGET LENGTH METHOD:</strong> Instead of crowning the highest score, the computer calculates a hidden Target Length that falls strictly between the lowest and highest possible combined scores. The pair whose combined length finishes closest to the target wins, completely removing predictable elements!</li>
+                        <li style="margin-bottom: 6px;"><strong>CASH POT DETAILS:</strong> Enter the entry fee per person. The software instantly maps out the total pot and displays exact cash payouts for 1st (50%), 2nd (30%), and 3rd (20%) places. Toggle non-participants to "NO" by tapping the box next to their name to remove them from the draw pool instantly.</li>
+                        <li style="margin-bottom: 6px;"><strong>THE "JOE AVERAGE" SAFEGUARD:</strong> If you have an uneven number of entries in the cash pool, the computer automatically generates a virtual partner named Joe Average. Joe is mathematically given the exact mean average score of the entire active field. This completes the final pair perfectly and ensures no real angler is left out of the game.</li>
+                    </ul>
+                </div>
+
+                <div style="margin-bottom: 30px; background: white; padding: 25px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 15px;">
+                        <h3 style="margin: 0; font-size: 18px; font-weight: 900; color: var(--accent);">8. RESULTS, LEADERBOARDS & SCORING RULES</h3>
+                        <span style="font-size: 11px; font-weight: 800; background: #e0f2fe; color: #0284c7; padding: 4px 12px; border-radius: 50px;">Slide 8 of 10</span>
+                    </div>
+                    <h4 style="margin: 0 0 10px 0; font-size: 15px; font-weight: 800; color: var(--text-dark);">The Multi-Metric Calculation Engine Hierarchy</h4>
+                    <p style="margin: 0 0 15px 0;">The Results tab houses your master tournament dashboards, backed by a clear **Scoring Legend** bar at the top of the page. The field is ranked using a native priority hierarchy system to instantly resolve ties:</p>
+                    <ul style="margin: 0; padding-left: 20px;">
+                        <li style="margin-bottom: 8px;"><strong>1. PRIMARY METRIC &ndash; LOWEST ZONE POINTS:</strong> Anglers earn points based on where they placed inside their specific colored zone (1 point for 1st, 2 points for 2nd, etc.). <strong>The lowest total points wins the match.</strong>
+                            <ul style="margin-top: 4px; padding-left: 15px;">
+                                <li><em>The Blank Rule:</em> Anglers who catch nothing (Blank Card) automatically receive maximum zone points equal to the total number of entries stationed inside that specific zone. Tying active scores automatically split the average points of the tied positions.</li>
+                            </ul>
+                        </li>
+                        <li style="margin-bottom: 6px;"><strong>2. TIE-BREAKER 1 &ndash; TOTAL LENGTH (cm):</strong> If total zone points match, the competitor with the higher cumulative fish length takes the lead.</li>
+                        <li style="margin-bottom: 6px;"><strong>3. TIE-BREAKER 2 &ndash; TOTAL FISH COUNT:</strong> If lengths match, the angler who landed the highest number of fish wins.</li>
+                        <li style="margin-bottom: 6px;"><strong>4. TIE-BREAKER 3 &ndash; SINGLE LARGEST FISH (cm):</strong> If points, length, and counts are identical, victory goes to the angler with the longest single catch.</li>
+                        <li style="margin-bottom: 6px;"><strong>5. TIE-BREAKER 4 &ndash; TOTAL SPECIES COUNT:</strong> The final tier separator rewards the angler who caught the widest variety of distinct fish species.</li>
+                        <li style="margin-bottom: 6px;"><strong>CORE SCREENS PROVIDED:</strong> We provide full data grids for <strong>Zone Standings</strong>, <strong>Individual Champion Matrix</strong>, <strong>Team Championship</strong> (filters out solos automatically), and a side-by-side Top 10 <strong>Biggest Fish Board</strong> for Day 1 and Day 2.</li>
+                    </ul>
+                </div>
+
+                <div style="margin-bottom: 30px; background: white; padding: 25px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 15px;">
+                        <h3 style="margin: 0; font-size: 18px; font-weight: 900; color: var(--accent);">9. END OF COMPETITION & DATA RESET</h3>
+                        <span style="font-size: 11px; font-weight: 800; background: #e0f2fe; color: #0284c7; padding: 4px 12px; border-radius: 50px;">Slide 9 of 10</span>
+                    </div>
+                    <h4 style="margin: 0 0 10px 0; font-size: 15px; font-weight: 800; color: var(--text-dark);">Cleaning the Slate and Downloading Your Archives</h4>
+                    <p style="margin: 0 0 15px 0;">Once all the prizes have been awarded and the match wraps up, you can safely reset the system memory for your next tournament.</p>
+                    <p style="margin: 0 0 10px 0;"><strong>THE FINISH AND RESET TRIGGER:</strong> Look at the top right of the screen for the "Finish and Reset Competition" button. Clicking this triggers two actions simultaneously:</p>
+                    <ul style="margin: 0 0 15px 0; padding-left: 20px;">
+                        <li style="margin-bottom: 6px;"><strong>1. PERMANENT DATA ARCHIVE:</strong> It instantly compiles all competitor lists, draw layouts, scorecard metrics, and final leaderboards into a single file copy and downloads it directly to your computer’s local storage folder so you never lose a historical match record.</li>
+                        <li style="margin-bottom: 6px;"><strong>2. SYSTEM SLATE WIPE:</strong> It completely flushes the active screen memory, bringing the app back to a clean, pristine state, prepped and ready for your next tournament setup.</li>
+                    </ul>
+                </div>
+
+                <div style="margin-bottom: 10px; background: white; padding: 25px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 15px;">
+                        <h3 style="margin: 0; font-size: 18px; font-weight: 900; color: var(--accent);">10. FREQUENTLY ASKED QUESTIONS (FAQ)</h3>
+                        <span style="font-size: 11px; font-weight: 800; background: #e0f2fe; color: #0284c7; padding: 4px 12px; border-radius: 50px;">Slide 10 of 10</span>
+                    </div>
+                    <h4 style="margin: 0 0 15px 0; font-size: 15px; font-weight: 800; color: var(--text-dark);">Quick Answers to Common Worries for Total Peace of Mind</h4>
+                    
+                    <div style="margin-bottom: 15px; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px;">
+                        <strong style="color: var(--text-dark); display: block; font-size: 14px;">Q: Can I pre-enter all my angler details days or weeks before the match?</strong>
+                        <span style="color: var(--text-muted); display: block; margin-top: 4px;"><strong>A:</strong> Yes, absolutely. You can type or import your entire competitor list well in advance at home. The app will save your roster indefinitely. The draw is never locked in or finalized until you click the "Generate Draw" button on match morning. Even after the draw is live, you can still easily adjust it.</span>
+                    </div>
+
+                    <div style="margin-bottom: 15px; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px;">
+                        <strong style="color: var(--text-dark); display: block; font-size: 14px;">Q: Can another angler or outsider open the website link and mess with my scores?</strong>
+                        <span style="color: var(--text-muted); display: block; margin-top: 4px;"><strong>A:</strong> Absolutely not. Your match data is saved exclusively on your physical device's local memory. Think of it like a secure, locked notebook inside your specific computer. No one else on the internet can see, access, or change your live data.</span>
+                    </div>
+
+                    <div style="margin-bottom: 15px; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px;">
+                        <strong style="color: var(--text-dark); display: block; font-size: 14px;">Q: What happens if I accidentally close the browser tab, click back, or my battery dies?</strong>
+                        <span style="color: var(--text-muted); display: block; margin-top: 4px;"><strong>A:</strong> You won't lose a thing. The app features an instant auto-save engine. The exact millisecond you type a number or process a draw, it is securely locked into your device. You can close the screen or restart your computer, and your data will be exactly where you left it.</span>
+                    </div>
+
+                    <div style="margin-bottom: 15px; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px;">
+                        <strong style="color: var(--text-dark); display: block; font-size: 14px;">Q: Do I need active internet or Wi-Fi on the beach to run the match?</strong>
+                        <span style="color: var(--text-muted); display: block; margin-top: 4px;"><strong>A:</strong> No. You only need internet once at home to initially open the website link and let your browser load the system templates. After that first load, the app is completely saved onto your device. You can run draws, log scores, and view leaderboards on a remote beach with zero mobile signal.</span>
+                    </div>
+
+                    <div style="margin-bottom: 15px; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px;">
+                        <strong style="color: var(--text-dark); display: block; font-size: 14px;">Q: Can a beach steward or angler change a score from their own phone?</strong>
+                        <span style="color: var(--text-muted); display: block; margin-top: 4px;"><strong>A:</strong> No. Your device is the sole control tower. Unless someone physically picks up your computer and types onto your screen, no external device can alter your master scoresheets.</span>
+                    </div>
+
+                    <div style="margin-bottom: 5px;">
+                        <strong style="color: var(--text-dark); display: block; font-size: 14px;">Q: What if I accidentally type a score layout into the wrong column or make a typo?</strong>
+                        <span style="color: var(--text-muted); display: block; margin-top: 4px;"><strong>A:</strong> Just type over it. Because the app updates in real time, you can click into any score box at any time to correct a number. The leaderboards will instantly recalculate themselves to show the corrected tournament positions.</span>
+                    </div>
+                </div>
             </div>
 
-            <div style="margin-bottom: 30px; background: white; padding: 25px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
-                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 15px;">
-                    <h3 style="margin: 0; font-size: 18px; font-weight: 900; color: var(--accent);">2. COMPETITION SETUP & DETAILS</h3>
-                    <span style="font-size: 11px; font-weight: 800; background: #e0f2fe; color: #0284c7; padding: 4px 12px; border-radius: 50px;">Slide 2 of 10</span>
+            <div id="tab-security" class="modal-tab-pane" style="display: none;">
+                <div class="security-section">
+                    <h3>1. The Peg Draw: Absolute Randomness & Fairness</h3>
+                    <p>This app relies on the browser’s native <strong>Pseudo-Random Number Generator (PRNG)</strong>. This is a standardized, mathematically audited engine built directly into modern web browsers (like Google Chrome, Apple Safari, and Microsoft Edge).</p>
+                    <p>It is the exact same mathematical engine trusted globally for online banking encryption, secure web connections, and scientific simulations. This algorithm has been subjected to rigorous global industry testing (known as "Dieharder" statistical test suites) to guarantee three strict rules:</p>
+                    <ul>
+                        <li><strong>Zero Predictable Patterns:</strong> No sequence of draws can ever be predicted or reverse-engineered.</li>
+                        <li><strong>Zero Bias:</strong> Every single angler and every single peg has a mathematically identical probability of being selected.</li>
+                        <li><strong>Zero Memory:</strong> The computer doesn't "remember" past draws, ensuring each randomized calculation is completely independent of the last.</li>
+                    </ul>
+                    <p>Furthermore, the app enforces automated <strong>clash detection</strong> (ensuring team members are evenly split across zones), a complex rule-set that is virtually impossible to enforce purely by hand without bias. Once the draw is generated, the results are immediately locked and timestamped.</p>
                 </div>
-                <h4 style="margin: 0 0 10px 0; font-size: 15px; font-weight: 800; color: var(--text-dark);">Basic Match Details & Accessibility Settings</h4>
-                <p style="margin: 0 0 15px 0;">Setting up a brand-new match takes less than two minutes. The entire setup screen is designed to guide you step-by-step so you cannot make a mistake.</p>
-                <ul style="margin: 0 0 15px 0; padding-left: 20px;">
-                    <li style="margin-bottom: 10px;"><strong>1. BASIC MATCH DETAILS:</strong> Click the title area to enter the official name of your competition, then select whether this is a <strong>1-Day Match</strong> or a <strong>2-Day Match</strong>. The system automatically configures all scoring and leaderboard matrix grids behind the scenes based on this choice.</li>
-                </ul>
-                <p style="margin: 0 0 10px 0;"><strong>2. SMART ACCESSIBILITY FUNCTION:</strong> Toggle this "ON" if you have anglers who require flat, easy-to-reach beach pegs. Once the draw runs, these specific anglers will automatically be allocated priority placements from your ruleset without disrupting random fairness for the rest of the field:</p>
-                <ul style="margin: 0; padding-left: 20px;">
-                    <li style="margin-bottom: 6px;"><strong>OPTION A: DISTRIBUTED PEGS:</strong> Use if you have suitable, easy-access pegs scattered safely along the beach (e.g., near parking). Type specific peg numbers separated by commas (like 5, 12, 19).</li>
-                    <li style="margin-bottom: 6px;"><strong>OPTION B: STATIC ZONES:</strong> Use if beach access is highly restricted and only one specific section is safe. Assign which general color zone they will fish in for each day of the match.</li>
-                </ul>
-            </div>
-
-            <div style="margin-bottom: 30px; background: white; padding: 25px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
-                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 15px;">
-                    <h3 style="margin: 0; font-size: 18px; font-weight: 900; color: var(--accent);">3. CREATING YOUR ROSTER & LINKING ACCESS</h3>
-                    <span style="font-size: 11px; font-weight: 800; background: #e0f2fe; color: #0284c7; padding: 4px 12px; border-radius: 50px;">Slide 3 of 10</span>
-                </div>
-                <h4 style="margin: 0 0 10px 0; font-size: 15px; font-weight: 800; color: var(--text-dark);">The Unified Entry Template and Priority Flagging</h4>
-                <p style="margin: 0 0 15px 0;">To save time and prevent layout errors during the busy morning check-in, the software features a single, unified entry roster system that directly pairs with your accessibility rules.</p>
-                <ul style="margin: 0; padding-left: 20px;">
-                    <li style="margin-bottom: 10px;"><strong>1. SIMPLE DATA ENTRY TEMPLATE:</strong> Use the intuitive onscreen selector controls to specify the exact number of Teams and Solo Anglers fishing the match. The hub instantly builds a clean template grid directly in front of you.</li>
-                    <li style="margin-bottom: 10px;"><strong>2. ASSIGNING ACCESSIBILITY PEGS:</strong> Look closely at the roster template list. Right beside each angler's name field, you will see a small <strong><code>[A]</code> button</strong>. If an angler has a mobility constraint, simply click their <code>[A]</code> button. It will highlight instantly, telling the draw algorithm to treat this person as a priority entry.</li>
-                    <li style="margin-bottom: 6px;"><strong>3. PROCEED TO DRAW:</strong> For teams, group fields together by Team Name. For solo competitors, use the standalone rows. Once all names are filled and your access priority buttons are highlighted, click the bright <strong>"Generate Draw"</strong> button. The priority anglers are automatically matched to your easy-access rules first, before the rest of the beach shuffling begins.</li>
-                </ul>
-            </div>
-
-            <div style="margin-bottom: 30px; background: white; padding: 25px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
-                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 15px;">
-                    <h3 style="margin: 0; font-size: 18px; font-weight: 900; color: var(--accent);">4. UNDERSTANDING THE DRAW & VISUAL LEGEND</h3>
-                    <span style="font-size: 11px; font-weight: 800; background: #e0f2fe; color: #0284c7; padding: 4px 12px; border-radius: 50px;">Slide 4 of 10</span>
-                </div>
-                <h4 style="margin: 0 0 10px 0; font-size: 15px; font-weight: 800; color: var(--text-dark);">Smart Placements, Legends, and Uneven Fields</h4>
-                <p style="margin: 0 0 15px 0;">The moment you click "Generate Draw", the math engine shuffles positions based on three strict rules of absolute sporting fairness:</p>
-                <ul style="margin: 0; padding-left: 20px;">
-                    <li style="margin-bottom: 6px;"><strong>Separated Teams:</strong> Anglers from the same team are automatically split up so they never fish in the same zone against each other.</li>
-                    <li style="margin-bottom: 6px;"><strong>No Repeat Zones:</strong> On a 2-Day match, no competitor will ever fish the same beach zone twice.</li>
-                    <li style="margin-bottom: 6px;"><strong>Priority Access Placements:</strong> Accessibility anglers are placed into their safe pegs first, before the remaining field is randomly scattered.</li>
-                    <li style="margin-bottom: 10px;"><strong>THE VISUAL PEG LEGEND:</strong> A beautiful, color-coded legend bar appears at the top of the screen. This maps out the physical beach sequence by zone, showing exactly which peg numbers belong to the <strong>Red, Yellow, Green, and Blue</strong> sections for Day 1 and Day 2. Priority pegs are clearly highlighted.</li>
-                    <li style="margin-bottom: 6px;"><strong>EXTENDED PEGS:</strong> If late entries arrive after the draw is finalized, the system creates "Extended Pegs" (like 15A). This squeezes late arrivals onto the beach elegantly without altering the random positions already drawn by other anglers.</li>
-                </ul>
-            </div>
-
-            <div style="margin-bottom: 30px; background: white; padding: 25px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
-                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 15px;">
-                    <h3 style="margin: 0; font-size: 18px; font-weight: 900; color: var(--accent);">5. POST-DRAW MANAGEMENT & FLOATING BUTTONS</h3>
-                    <span style="font-size: 11px; font-weight: 800; background: #e0f2fe; color: #0284c7; padding: 4px 12px; border-radius: 50px;">Slide 5 of 10</span>
-                </div>
-                <h4 style="margin: 0 0 10px 0; font-size: 15px; font-weight: 800; color: var(--text-dark);">Making Adjustments and Formatting Steward Sheets</h4>
-                <p style="margin: 0 0 15px 0;">Once the draw is live, two convenient, sticky Floating Action Buttons appear at the bottom of your screen providing total control over match operations.</p>
-                <ul style="margin: 0; padding-left: 20px;">
-                    <li style="margin-bottom: 10px;"><strong>1. THE "MANAGE DRAW" MENU:</strong> Handle last-minute slipway changes easily:
-                        <ul style="margin-top: 6px; padding-left: 20px;">
-                            <li><strong>Amend Names:</strong> Correct spelling typos on the fly without changing anyone's physical peg location.</li>
-                            <li><strong>Delete No-Shows:</strong> Remove an entry cleanly. <em>(Team Rule: If they belong to a team, click to unlink the team into solo anglers first so the remaining members aren't penalized).</em></li>
-                            <li><strong>Add Late Entries:</strong> Squeeze late arrivals smoothly onto extended pegs (`A`) to keep the primary draw safe.</li>
-                            <li><strong>Full Redraw (Last Resort):</strong> Wipes the slate clean to generate a brand-new random draw in the unlikely event that so many last-minute changes have occurred that the current setup can no longer abide by the fairness rules. <em>Note: You do not have to re-enter all the angler names and teams; the software remembers your roster and simply reshuffles assignments instantly.</em></li>
-                        </ul>
-                    </li>
-                    <li style="margin-bottom: 6px;"><strong>2. THE "OUTPUT MENU":</strong> Formats your screen into clean, printer-friendly layouts perfect for handing out:
-                        <ul style="margin-top: 6px; padding-left: 20px;">
-                            <li><strong>Master Angler List:</strong> An alphabetical directory of every competitor in the match.</li>
-                            <li><strong>Team Draws:</strong> Grouped cleanly by club name so team captains can instantly see member locations.</li>
-                            <li><strong>Zone Steward Sheets:</strong> A sequential list of pegs broken down zone-by-zone, ideal for stewards physically tracking cards on the beach.</li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
-
-            <div style="margin-bottom: 30px; background: white; padding: 25px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
-                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 15px;">
-                    <h3 style="margin: 0; font-size: 18px; font-weight: 900; color: var(--accent);">6. RECORDING MATCH SCORES</h3>
-                    <span style="font-size: 11px; font-weight: 800; background: #e0f2fe; color: #0284c7; padding: 4px 12px; border-radius: 50px;">Slide 6 of 10</span>
-                </div>
-                <h4 style="margin: 0 0 10px 0; font-size: 15px; font-weight: 800; color: var(--text-dark);">Fast Keyboard Input & Real-Time Auto-Saving</h4>
-                <p style="margin: 0 0 15px 0;">When paper catch sheets come back to the organizer's desk, entering data is fast, seamless, and completely foolproof.</p>
-                <ul style="margin: 0; padding-left: 20px;">
-                    <li style="margin-bottom: 6px;"><strong>SELECT THE ACTIVE DAY:</strong> Click the "Scorecards" tab and choose either the Day 1 or Day 2 sub-screen.</li>
-                    <li style="margin-bottom: 6px;"><strong>STICKY SEARCH BAR:</strong> Do not waste time scrolling through a massive list. Type the first few letters of an angler's name into the search box at the top to bring their scorecard straight to the front.</li>
-                    <li style="margin-bottom: 6px;"><strong>KEYBOARD TAB OPTIMIZATION:</strong> Type the 4 metrics from the steward sheet: <strong>Total Length (cm)</strong>, <strong>Fish Count</strong>, <strong>Biggest Fish Size (cm)</strong>, and <strong>Species Count</strong>. Hit the <code>Tab</code> key on your keyboard to instantly jump to the next input box, letting you log an entire card in seconds without touching your mouse.</li>
-                    <li style="margin-bottom: 6px;"><strong>INSTANT SAVING:</strong> <strong>There is no save button.</strong> The software saves your metrics the exact millisecond you type them. The leaderboards instantly recalculate in the background automatically.</li>
-                </ul>
-            </div>
-
-            <div style="margin-bottom: 30px; background: white; padding: 25px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
-                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 15px;">
-                    <h3 style="margin: 0; font-size: 18px; font-weight: 900; color: var(--accent);">7. SECRET PAIRS SIDE-POOL</h3>
-                    <span style="font-size: 11px; font-weight: 800; background: #e0f2fe; color: #0284c7; padding: 4px 12px; border-radius: 50px;">Slide 7 of 10</span>
-                </div>
-                <h4 style="margin: 0 0 10px 0; font-size: 15px; font-weight: 800; color: var(--text-dark);">Run an Automated Blind-Draw Pool for Every Angler</h4>
-                <p style="margin: 0 0 15px 0;">The Secret Pairs game is an optional side-pool that pairs anglers up completely at random and gives the entire field an absolutely equal chance to win prize money.</p>
-                <ul style="margin: 0; padding-left: 20px;">
-                    <li style="margin-bottom: 6px;"><strong>THE TARGET LENGTH METHOD:</strong> Instead of crowning the highest score, the computer calculates a hidden Target Length that falls strictly between the lowest and highest possible combined scores. The pair whose combined length finishes closest to the target wins, completely removing predictable elements!</li>
-                    <li style="margin-bottom: 6px;"><strong>CASH POT DETAILS:</strong> Enter the entry fee per person. The software instantly maps out the total pot and displays exact cash payouts for 1st (50%), 2nd (30%), and 3rd (20%) places. Toggle non-participants to "NO" by tapping the box next to their name to remove them from the draw pool instantly.</li>
-                    <li style="margin-bottom: 6px;"><strong>THE "JOE AVERAGE" SAFEGUARD:</strong> If you have an uneven number of entries in the cash pool, the computer automatically generates a virtual partner named Joe Average. Joe is mathematically given the exact mean average score of the entire active field. This completes the final pair perfectly and ensures no real angler is left out of the game.</li>
-                </ul>
-            </div>
-
-            <div style="margin-bottom: 30px; background: white; padding: 25px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
-                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 15px;">
-                    <h3 style="margin: 0; font-size: 18px; font-weight: 900; color: var(--accent);">8. RESULTS, LEADERBOARDS & SCORING RULES</h3>
-                    <span style="font-size: 11px; font-weight: 800; background: #e0f2fe; color: #0284c7; padding: 4px 12px; border-radius: 50px;">Slide 8 of 10</span>
-                </div>
-                <h4 style="margin: 0 0 10px 0; font-size: 15px; font-weight: 800; color: var(--text-dark);">The Multi-Metric Calculation Engine Hierarchy</h4>
-                <p style="margin: 0 0 15px 0;">The Results tab houses your master tournament dashboards, backed by a clear **Scoring Legend** bar at the top of the page. The field is ranked using a native priority hierarchy system to instantly resolve ties:</p>
-                <ul style="margin: 0; padding-left: 20px;">
-                    <li style="margin-bottom: 8px;"><strong>1. PRIMARY METRIC &ndash; LOWEST ZONE POINTS:</strong> Anglers earn points based on where they placed inside their specific colored zone (1 point for 1st, 2 points for 2nd, etc.). <strong>The lowest total points wins the match.</strong>
-                        <ul style="margin-top: 4px; padding-left: 15px;">
-                            <li><em>The Blank Rule:</em> Anglers who catch nothing (Blank Card) automatically receive maximum zone points equal to the total number of entries stationed inside that specific zone. Tying active scores automatically split the average points of the tied positions.</li>
-                        </ul>
-                    </li>
-                    <li style="margin-bottom: 6px;"><strong>2. TIE-BREAKER 1 &ndash; TOTAL LENGTH (cm):</strong> If total zone points match, the competitor with the higher cumulative fish length takes the lead.</li>
-                    <li style="margin-bottom: 6px;"><strong>3. TIE-BREAKER 2 &ndash; TOTAL FISH COUNT:</strong> If lengths match, the angler who landed the highest number of fish wins.</li>
-                    <li style="margin-bottom: 6px;"><strong>4. TIE-BREAKER 3 &ndash; SINGLE LARGEST FISH (cm):</strong> If points, length, and counts are identical, victory goes to the angler with the longest single catch.</li>
-                    <li style="margin-bottom: 6px;"><strong>5. TIE-BREAKER 4 &ndash; TOTAL SPECIES COUNT:</strong> The final tier separator rewards the angler who caught the widest variety of distinct fish species.</li>
-                    <li style="margin-bottom: 6px;"><strong>CORE SCREENS PROVIDED:</strong> We provide full data grids for <strong>Zone Standings</strong>, <strong>Individual Champion Matrix</strong>, <strong>Team Championship</strong> (filters out solos automatically), and a side-by-side Top 10 <strong>Biggest Fish Board</strong> for Day 1 and Day 2.</li>
-                </ul>
-            </div>
-
-            <div style="margin-bottom: 30px; background: white; padding: 25px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
-                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 15px;">
-                    <h3 style="margin: 0; font-size: 18px; font-weight: 900; color: var(--accent);">9. END OF COMPETITION & DATA RESET</h3>
-                    <span style="font-size: 11px; font-weight: 800; background: #e0f2fe; color: #0284c7; padding: 4px 12px; border-radius: 50px;">Slide 9 of 10</span>
-                </div>
-                <h4 style="margin: 0 0 10px 0; font-size: 15px; font-weight: 800; color: var(--text-dark);">Cleaning the Slate and Downloading Your Archives</h4>
-                <p style="margin: 0 0 15px 0;">Once all the prizes have been awarded and the match wraps up, you can safely reset the system memory for your next tournament.</p>
-                <p style="margin: 0 0 10px 0;"><strong>THE FINISH AND RESET TRIGGER:</strong> Look at the top right of the screen for the "Finish and Reset Competition" button. Clicking this triggers two actions simultaneously:</p>
-                <ul style="margin: 0 0 15px 0; padding-left: 20px;">
-                    <li style="margin-bottom: 6px;"><strong>1. PERMANENT DATA ARCHIVE:</strong> It instantly compiles all competitor lists, draw layouts, scorecard metrics, and final leaderboards into a single file copy and downloads it directly to your computer’s local storage folder so you never lose a historical match record.</li>
-                    <li style="margin-bottom: 6px;"><strong>2. SYSTEM SLATE WIPE:</strong> It completely flushes the active screen memory, bringing the app back to a clean, pristine state, prepped and ready for your next tournament setup.</li>
-                </ul>
-            </div>
-
-            <div style="margin-bottom: 10px; background: white; padding: 25px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
-                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 15px;">
-                    <h3 style="margin: 0; font-size: 18px; font-weight: 900; color: var(--accent);">10. FREQUENTLY ASKED QUESTIONS (FAQ)</h3>
-                    <span style="font-size: 11px; font-weight: 800; background: #e0f2fe; color: #0284c7; padding: 4px 12px; border-radius: 50px;">Slide 10 of 10</span>
-                </div>
-                <h4 style="margin: 0 0 15px 0; font-size: 15px; font-weight: 800; color: var(--text-dark);">Quick Answers to Common Worries for Total Peace of Mind</h4>
                 
-                <div style="margin-bottom: 15px; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px;">
-                    <strong style="color: var(--text-dark); display: block; font-size: 14px;">Q: Can I pre-enter all my angler details days or weeks before the match?</strong>
-                    <span style="color: var(--text-muted); display: block; margin-top: 4px;"><strong>A:</strong> Yes, absolutely. You can type or import your entire competitor list well in advance at home. The app will save your roster indefinitely. The draw is never locked in or finalized until you click the "Generate Draw" button on match morning. Even after the draw is live, you can still easily adjust it.</span>
+                <div class="security-section">
+                    <h3>2. Secret Pairs: Unpredictable & Un-riggable</h3>
+                    <p>The Secret Pairs target length is completely organic and impossible to predict, influence, or manipulate, because the calculations rely entirely on live data that does not exist until the match is over.</p>
+                    <p>The target is determined by a strict, hard-coded mathematical formula that uses the actual total fish lengths caught by the competitors on the day. Because no one can predict how many fish will be caught, what species will show up, or what sizes they will be, the target is completely immune to human tampering.</p>
+                    <p>In the event of an odd number of competitors, the virtual partner (known as the "Ghost Partner" or "Joe Average") is assigned a score that is the mathematically exact average of the entire field's performance. This ensures that the unpaired angler is neither given an unfair advantage nor penalized, maintaining perfect competitive balance.</p>
                 </div>
-
-                <div style="margin-bottom: 15px; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px;">
-                    <strong style="color: var(--text-dark); display: block; font-size: 14px;">Q: Can another angler or outsider open the website link and mess with my scores?</strong>
-                    <span style="color: var(--text-muted); display: block; margin-top: 4px;"><strong>A:</strong> Absolutely not. Your match data is saved exclusively on your physical device's local memory. Think of it like a secure, locked notebook inside your specific computer. No one else on the internet can see, access, or change your live data.</span>
-                </div>
-
-                <div style="margin-bottom: 15px; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px;">
-                    <strong style="color: var(--text-dark); display: block; font-size: 14px;">Q: What happens if I accidentally close the browser tab, click back, or my battery dies?</strong>
-                    <span style="color: var(--text-muted); display: block; margin-top: 4px;"><strong>A:</strong> You won't lose a thing. The app features an instant auto-save engine. The exact millisecond you type a number or process a draw, it is securely locked into your device. You can close the screen or restart your computer, and your data will be exactly where you left it.</span>
-                </div>
-
-                <div style="margin-bottom: 15px; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px;">
-                    <strong style="color: var(--text-dark); display: block; font-size: 14px;">Q: Do I need active internet or Wi-Fi on the beach to run the match?</strong>
-                    <span style="color: var(--text-muted); display: block; margin-top: 4px;"><strong>A:</strong> No. You only need internet once at home to initially open the website link and let your browser load the system templates. After that first load, the app is completely saved onto your device. You can run draws, log scores, and view leaderboards on a remote beach with zero mobile signal.</span>
-                </div>
-
-                <div style="margin-bottom: 15px; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px;">
-                    <strong style="color: var(--text-dark); display: block; font-size: 14px;">Q: Can a beach steward or angler change a score from their own phone?</strong>
-                    <span style="color: var(--text-muted); display: block; margin-top: 4px;"><strong>A:</strong> No. Your device is the sole control tower. Unless someone physically picks up your computer and types onto your screen, no external device can alter your master scoresheets.</span>
-                </div>
-
-                <div style="margin-bottom: 5px;">
-                    <strong style="color: var(--text-dark); display: block; font-size: 14px;">Q: What if I accidentally type a score layout into the wrong column or make a typo?</strong>
-                    <span style="color: var(--text-muted); display: block; margin-top: 4px;"><strong>A:</strong> Just type over it. Because the app updates in real time, you can click into any score box at any time to correct a number. The leaderboards will instantly recalculate themselves to show the corrected tournament positions.</span>
+                
+                <div class="security-section">
+                    <h3>3. Data Privacy & Local Security (A Closed System)</h3>
+                    <p>Your personal data is completely safe, private, and secure. This application operates as a strict <strong>"closed-loop" system</strong>, meaning:</p>
+                    <ul>
+                        <li><strong>Zero External Servers:</strong> Unlike typical modern apps, this platform does not upload, transmit, or store your name, contact info, or scores to an external database or cloud server.</li>
+                        <li><strong>100% Local Storage:</strong> All tournament data lives exclusively inside your device's web browser memory (<code>localStorage</code>). It never leaves the physical laptop or tablet running the event.</li>
+                        <li><strong>No Third-Party Tracking:</strong> We do not run any cookies, advertising trackers, or background analytics scripts. Your activity is completely private.</li>
+                        <li><strong>Complete Offline Independence:</strong> Because the app is completely self-contained, it can run entirely offline without an internet connection. Your data remains on your screen, in your control, at all times.</li>
+                    </ul>
                 </div>
             </div>
 
@@ -674,6 +813,37 @@
 </div>
 
 <script src="app.js"></script>
+<script>
+    // Handles tab switching inside the User Guide Modal
+    function switchModalTab(event, tabId) {
+        // Prevent accidental form submissions or bubbling
+        event.preventDefault();
+        
+        // Find parent modal-content element to scope selectors safely
+        const modalContent = event.currentTarget.closest('.modal-content');
+        
+        // Hide all panes
+        const panes = modalContent.querySelectorAll('.modal-tab-pane');
+        panes.forEach(pane => {
+            pane.classList.remove('active');
+            pane.style.display = 'none';
+        });
+        
+        // Set all tab buttons to inactive
+        const buttons = modalContent.querySelectorAll('.modal-tab-btn');
+        buttons.forEach(btn => btn.classList.remove('active'));
+        
+        // Display target pane
+        const activePane = modalContent.querySelector('#' + tabId);
+        if (activePane) {
+            activePane.classList.add('active');
+            activePane.style.display = 'block';
+        }
+        
+        // Set target button to active
+        event.currentTarget.classList.add('active');
+    }
+</script>
 <div id="exportGuideModal" class="export-modal" style="display: none;">
     <div class="export-modal-content">
         <img src="excel-export-guide.png" alt="Excel Export Next Steps" class="export-infographic">
