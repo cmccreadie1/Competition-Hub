@@ -191,7 +191,27 @@
             gap: 6px; align-items: center;
         }
 
-        .score-list-header { padding: 6px 15px 4px; font-weight: 900; font-size: 11px; color: #ffffff; border-bottom: none; }
+       /* ==========================================================================
+   📌 FLOATING STICKY SCORECARD COLUMN HEADERS
+   ========================================================================== */
+
+.score-list-header {
+    position: sticky !important;
+    top: 108px !important;            /* Locks it perfectly just below the main white navigation header */
+    z-index: 4000 !important;          /* Sits safely below the main white header (5000) but above scrolling rows */
+    background: #334155 !important;    /* Default solid Slate Blue background so text doesn't overlap when scrolling */
+    padding: 10px 15px 8px !important; /* Slightly taller padding for better tapping/viewing alignment */
+    font-weight: 900;
+    font-size: 11px;
+    color: #ffffff;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1) !important; /* Soft bottom divider */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25) !important; /* Soft drop shadow so it visually lifts above the scrolling rows */
+}
+
+/* Day 2 Override: Dynamically changes the sticky header background to match the Forest Teal theme */
+body.stage-score-d2 .score-list-header {
+    background: #0f766e !important;
+}
         
         /* Maximize Real Estate: Thinner padding on rows */
         .score-row {
