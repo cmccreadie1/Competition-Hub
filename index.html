@@ -113,37 +113,38 @@
         .score-row.incomplete, 
         .row-incomplete,
         [class*="incomplete"] {
-            background-color: #fee2e2 !important; /* Rich High-Contrast Soft Red */
-            border-left: 8px solid #dc2626 !important; /* Thick Red Indicator Flag */
-            border-top: 2px solid #fca5a5 !important;
-            border-right: 2px solid #fca5a5 !important;
-            border-bottom: 2px solid #fca5a5 !important;
-            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.1) !important;
+            background-color: #ef4444 !important; /* Rich High-Contrast Warning Red */
+            border-left: 10px solid #7f1d1d !important; /* Thick Dark Blood-Red Side Flag */
+            border-top: 2px solid #b91c1c !important;
+            border-right: 2px solid #b91c1c !important;
+            border-bottom: 2px solid #b91c1c !important;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3) !important;
             transition: all 0.2s ease;
         }
 
-        /* Dark crimson text inside incomplete lines for maximum contrast */
+        /* Solid white text inside incomplete lines for absolute contrast against pure red */
         .score-card.incomplete *, 
         .scorecard.incomplete *, 
         .score-row.incomplete * {
-            color: #7f1d1d !important;
-            font-weight: 700;
+            color: #ffffff !important;
+            font-weight: 800 !important;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
         }
 
         /* Inputs inside incomplete rows stand out boldly */
         .score-card.incomplete input, 
         .scorecard.incomplete input, 
         .score-row.incomplete input {
-            border: 2px solid #ef4444 !important;
+            border: 2px solid #7f1d1d !important;
             background-color: #ffffff !important;
             color: #000000 !important;
-            box-shadow: inset 0 2px 4px rgba(239, 68, 68, 0.05) !important;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2) !important;
         }
 
         .score-card.incomplete input::placeholder, 
         .scorecard.incomplete input::placeholder, 
         .score-row.incomplete input::placeholder {
-            color: #f87171 !important;
+            color: #991b1b !important;
         }
 
         /* Warning alert for logical score discrepancies */
@@ -529,6 +530,7 @@
         🏆 TIE BREAK LEGEND: <span style="color: var(--accent); font-weight: 800;">Points</span> | Total Length (cm) / Fish Count / Biggest Fish (cm) / Species Count
     </div>
 
+    <!-- Sub-Navigation Dashboard Deck (Rounded Pills with Dark Base) -->
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-bottom: 25px; width: 100%;">
         <button id="subBtn-lbd1" class="tab-btn active" style="padding: 12px 16px; font-size: 12px; font-weight: 800; text-align: center; border-radius: 50px; width: 100%; background: #ffffff; color: #0f172a; border: 1px solid transparent; cursor: pointer; transition: all 0.2s;" onclick="switchLeaderboardSubTab('lbd1')">DAY 1 ZONES</button>
         <button id="subBtn-lbd2" class="tab-btn" style="padding: 12px 16px; font-size: 12px; font-weight: 800; text-align: center; border-radius: 50px; width: 100%; background: #1e293b; color: #94a3b8; border: 1px solid rgba(255,255,255,0.05); cursor: pointer; transition: all 0.2s;" onclick="switchLeaderboardSubTab('lbd2')">DAY 2 ZONES</button>
@@ -610,6 +612,7 @@
     </div>
 </div>
 
+<!-- ACCESSIBILITY-OPTIMIZED MODAL FOR LAPTOPS AND TABLETS -->
 <div id="manualModal" class="modal-overlay no-print" style="z-index: 10000; align-items: center; justify-content: center; padding: 15px;">
     <div class="modal-content" style="max-width: 1300px; width: 95%; height: 95vh; display: flex; flex-direction: column; padding: 0; overflow: hidden; border-radius: 20px; border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.3);">
         
@@ -623,6 +626,7 @@
             Scroll down to view all sections
         </div>
 
+        <!-- Tab Navigation Bar inside Modal -->
         <div class="modal-tabs">
             <button class="modal-tab-btn active" onclick="switchModalTab(event, 'tab-guide')">
                 <span>📖 App Guide</span>
@@ -634,6 +638,7 @@
 
         <div style="flex-grow: 1; overflow-y: auto; background: #f8fafc; padding: 35px 30px; font-size: 18px; line-height: 1.8; color: var(--text-dark); text-transform: none !important;">
             
+            <!-- TAB 1: App Guide -->
             <div id="tab-guide" class="modal-tab-pane active" style="display: block;">
                 <div style="margin-bottom: 30px; background: white; padding: 30px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
                     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 15px;">
@@ -826,6 +831,7 @@
                 </div>
             </div>
 
+            <!-- TAB 2: Security, Math & Privacy -->
             <div id="tab-security" class="modal-tab-pane" style="display: none;">
                 <div class="security-section">
                     <h3>1. The Peg Draw: Absolute Randomness & Fairness</h3>
@@ -1005,6 +1011,94 @@
                 });
             });
             configObserver.observe(scoreContainer, { childList: true, subtree: true });
+        }
+    });
+
+    // --- ACTIVE DAY MEMORY AND LIVE PROGRESS COMPLETION CHECKS ---
+    window.addEventListener('DOMContentLoaded', function() {
+        // Intercept/wrap the existing switchScoreDay function
+        const originalSwitchScoreDay = window.switchScoreDay;
+        window.switchScoreDay = function(day) {
+            if (typeof originalSwitchScoreDay === 'function') {
+                originalSwitchScoreDay(day);
+            } else {
+                // Fallback toggle in case app.js loads slowly
+                const btn1 = document.getElementById('subBtn-1');
+                const btn2 = document.getElementById('subBtn-2');
+                if (day === 1) {
+                    if (btn1) btn1.classList.add('active');
+                    if (btn2) btn2.classList.remove('active');
+                } else if (day === 2) {
+                    if (btn2) btn2.classList.add('active');
+                    if (btn1) btn1.classList.remove('active');
+                }
+            }
+            localStorage.setItem('activeScoreDay', day);
+        };
+
+        // Restore active score day on page load
+        const savedDay = localStorage.getItem('activeScoreDay');
+        if (savedDay) {
+            const dayNum = parseInt(savedDay);
+            if (dayNum === 1 || dayNum === 2) {
+                setTimeout(() => {
+                    if (typeof window.switchScoreDay === 'function') {
+                        window.switchScoreDay(dayNum);
+                    }
+                }, 100);
+            }
+        }
+
+        // --- OBSERVER FOR DAY COMPLETION PROGRESS ---
+        const targetNode = document.getElementById('scoreProgressText');
+        if (targetNode) {
+            const progressObserver = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    const text = (targetNode.textContent || "").toUpperCase();
+                    const badgeContainer = document.getElementById('scoreBadgeContainer');
+                    const isDay1 = text.includes('DAY 1');
+                    const isDay2 = text.includes('DAY 2');
+                    
+                    // A day is completed if remaining score count is strictly 0 and it's not a blank slate (0 entered)
+                    const isCompleted = text.includes('0 REMAINING') && !text.includes('0 ENTERED');
+                    
+                    if (isCompleted) {
+                        if (badgeContainer) {
+                            badgeContainer.style.backgroundColor = '#10b981'; // Celebratory Green
+                            badgeContainer.style.boxShadow = '0 4px 15px rgba(16, 185, 129, 0.4)';
+                            
+                            // Adjust the text to show completion celebrations dynamically
+                            const progressTextEl = document.getElementById('scoreProgressText');
+                            if (progressTextEl && !progressTextEl.textContent.includes('✓')) {
+                                if (isDay1) progressTextEl.innerHTML = '🎉 DAY 1 SCORES COMPLETED!';
+                                if (isDay2) progressTextEl.innerHTML = '🎉 DAY 2 SCORES COMPLETED!';
+                            }
+                        }
+                        
+                        // Dynamically update corresponding scoreboard day selection tab with checkmark
+                        if (isDay1) {
+                            const btn1 = document.getElementById('subBtn-1');
+                            if (btn1) btn1.innerHTML = '🟢 DAY 1 SCORES ✓';
+                        } else if (isDay2) {
+                            const btn2 = document.getElementById('subBtn-2');
+                            if (btn2) btn2.innerHTML = '🟢 DAY 2 SCORES ✓';
+                        }
+                    } else {
+                        // Revert progress badge design if entries are incomplete/missing
+                        if (badgeContainer) {
+                            badgeContainer.style.backgroundColor = '#1e293b'; // Default Slate Grey
+                            badgeContainer.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+                        }
+                        
+                        // Restore basic default text headers
+                        const btn1 = document.getElementById('subBtn-1');
+                        if (btn1 && btn1.innerHTML.includes('✓')) btn1.innerHTML = 'DAY 1 SCORES';
+                        const btn2 = document.getElementById('subBtn-2');
+                        if (btn2 && btn2.innerHTML.includes('✓')) btn2.innerHTML = 'DAY 2 SCORES';
+                    }
+                });
+            });
+            progressObserver.observe(targetNode, { characterData: true, childList: true, subtree: true });
         }
     });
 </script>
