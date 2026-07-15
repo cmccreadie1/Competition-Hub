@@ -162,6 +162,39 @@
             width: calc(100% - 20px);
             box-sizing: border-box;
         }
+        /* --- HIGH-VISIBILITY ACCESSIBLE PEGS TOGGLE --- */
+#accToggleBtn {
+    background-color: #ffffff !important; /* Solid bright white background */
+    border: 3px solid #cbd5e1 !important; /* Distinct, clean border */
+    border-radius: 14px !important; /* Rounded corners */
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25) !important; /* Strong physical shadow to pop off the slate background */
+    cursor: pointer;
+    transition: all 0.2s ease-in-out !important;
+}
+
+/* Highly responsive hover and tap effects */
+#accToggleBtn:hover {
+    background-color: #f1f5f9 !important; /* Changes to soft light gray on hover */
+    border-color: #94a3b8 !important;
+    transform: translateY(-2px); /* Lifts up slightly */
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3) !important;
+}
+
+#accToggleBtn:active {
+    transform: translateY(1px); /* Sinks slightly when clicked */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Force stark, high-contrast dark text for maximum legibility */
+#accToggleTitle {
+    color: #0f172a !important; /* Deep dark slate */
+    font-weight: 900 !important;
+}
+
+#accToggleSub {
+    color: #475569 !important; /* Readable medium slate gray subtext */
+    font-weight: 800 !important;
+}
     </style>
 </head>
 <body class="stage-draw">
