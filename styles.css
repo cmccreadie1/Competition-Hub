@@ -551,31 +551,37 @@
     border: 2px solid #2ecc71 !important; /* Vibrant thin green border */
     box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3) !important; /* Clean glowing drop shadow */
 }
-
-
 /* ==========================================================================
-   📁 CLEAN MATCHING SLATE BORDERS FOR THE 4 MAIN TABS (NO GREEN)
+   📁 UNIFIED DARK SLATE HIGH-CONTRAST LOOK FOR ALL 4 MAIN TABS
    ========================================================================== */
 
-/* Resting state: Clean slate-grey frame */
+/* Resting state for all 4 tabs: Clean slate-grey frame with grey text */
 .tab-btn {
+    background: #cbd5e1 !important;
+    color: #475569 !important;
     border: 2px solid #cbd5e1 !important;
     border-bottom: none !important;
     box-shadow: inset 0 -4px 10px rgba(0,0,0,0.05) !important;
+    transition: all 0.2s ease !important;
 }
 
-/* Selected Draw & Pairs & Leaderboard Tabs: Blends perfectly into the Slate Blue background */
-#tabBtn-draw.active, 
-#tabBtn-pairs.active,
-.tab-btn.active:not(#tabBtn-score) { 
-    border: 2px solid #334155 !important;
-    border-bottom: none !important;
-    box-shadow: none !important;
+/* Hover state for resting tabs */
+.tab-btn:hover:not(.active) {
+    background: #e2e8f0 !important;
+    color: #0f172a !important;
 }
 
-/* Selected Scorecard Tab: Blends perfectly into the Dark Slate background */
-#tabBtn-score.active { 
-    border: 2px solid #1e293b !important;
+/* Active state for ALL 4 tabs: Matches the clean dark slate theme of the scorecard tab */
+.tab-btn.active,
+#tabBtn-draw.active,
+#tabBtn-score.active,
+#tabBtn-pairs.active {
+    background: #1e293b !important; /* Solid dark slate */
+    color: #ffffff !important; /* Clean white text */
+    border: 2px solid #1e293b !important; /* Matching frame */
     border-bottom: none !important;
-    box-shadow: 0 -4px 15px rgba(0,0,0,0.2) !important;
+    box-shadow: 0 -4px 15px rgba(0,0,0,0.2) !important; /* Elegant 3D drop shadow */
+    padding-bottom: 12px !important;
+    margin-bottom: -2px !important;
+    z-index: 10 !important;
 }
