@@ -107,39 +107,39 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* --- HIGH-VISIBILITY INCOMPLETE SCORECARD ROW ALERTS --- */
-        .score-card.incomplete, 
-        .scorecard.incomplete, 
-        .score-row.incomplete, 
-        .row-incomplete,
-        [class*="incomplete"] {
-            background-color: #ef4444 !important; /* Rich High-Contrast Warning Red */
-            border-left: 10px solid #7f1d1d !important; /* Thick Dark Blood-Red Side Flag */
-            border-top: 2px solid #b91c1c !important;
-            border-right: 2px solid #b91c1c !important;
-            border-bottom: 2px solid #b91c1c !important;
-            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3) !important;
-            transition: all 0.2s ease;
-        }
+    /* --- HIGH-VISIBILITY INCOMPLETE SCORECARD ROW ALERTS --- */
+.score-card.incomplete, 
+.scorecard.incomplete, 
+.score-row.incomplete, 
+.row-incomplete,
+[class*="incomplete"] {
+    background-color: #991b1b !important; /* Rich deep crimson warning red */
+    border-left: 10px solid #4c0519 !important; /* Thick dark maroon edge indicator */
+    border-top: 2px solid #7f1d1d !important;
+    border-right: 2px solid #7f1d1d !important;
+    border-bottom: 2px solid #7f1d1d !important;
+    box-shadow: 0 4px 15px rgba(153, 27, 27, 0.4) !important;
+    transition: all 0.2s ease;
+}
 
-        /* Solid white text inside incomplete lines for absolute contrast against pure red */
-        .score-card.incomplete *, 
-        .scorecard.incomplete *, 
-        .score-row.incomplete * {
-            color: #ffffff !important;
-            font-weight: 800 !important;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-        }
+/* Bright white text for absolute legibility against the dark crimson */
+.score-card.incomplete *, 
+.scorecard.incomplete *, 
+.score-row.incomplete * {
+    color: #ffffff !important;
+    font-weight: 900 !important;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8) !important;
+}
 
-        /* Inputs inside incomplete rows stand out boldly */
-        .score-card.incomplete input, 
-        .scorecard.incomplete input, 
-        .score-row.incomplete input {
-            border: 2px solid #7f1d1d !important;
-            background-color: #ffffff !important;
-            color: #000000 !important;
-            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2) !important;
-        }
+/* Stark white inputs with black text inside the row so they remain easy to read and edit */
+.score-card.incomplete input, 
+.scorecard.incomplete input, 
+.score-row.incomplete input {
+    border: 2px solid #4c0519 !important;
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    font-weight: bold !important;
+}
 
         .score-card.incomplete input::placeholder, 
         .scorecard.incomplete input::placeholder, 
