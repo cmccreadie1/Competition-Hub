@@ -644,3 +644,21 @@ body.stage-draw { background: #334155 !important; }
     color: var(--green-color) !important;
     font-weight: 900 !important;
 }
+
+/* Enhanced Definition for Day 1 / Day 2 Sub-Tabs */
+.day-tab-btn {
+    background: rgba(30, 41, 59, 0.7) !important; /* Solidifies against background */
+    border: 1px solid #475569 !important;        /* Clear outline boundary */
+    color: #94a3b8 !important;                   /* Clear text visibility */
+    padding: 8px 16px !important;
+    border-radius: 6px !important;
+    transition: all 0.2s ease-in-out !important;
+}
+
+/* Active Day Tab Definition State */
+.day-tab-btn.active {
+    background: #334155 !important;               /* Lighter container slate */
+    border-color: #f8fafc !important;            /* High contrast border outline */
+    color: #ffffff !important;                   /* Bright crisp white text */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
+}
