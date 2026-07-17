@@ -90,34 +90,60 @@
     // --- SCORE PROGRESS TALLY LOGIC ---
     // ====================================================
     function updateScoreProgress() {
-        let totalExpected = 0;
-        let completelyFilled = 0;
+        // Track stats for both days independently to toggle markers
+        let d1Expected = 0, d1Filled = 0;
+        let d2Expected = 0, d2Filled = 0;
 
         appState.forEach(e => {
             e.anglers.forEach((a, aIdx) => {
-                let targetZ = currentScoreDay === 1 ? a.z1 : a.z2;
-                if (a.name && targetZ) {
-                    totalExpected++;
-                    let key = `${e.id}_${aIdx}_${currentScoreDay}`;
-                    let s = scoreState[key] || {};
-                    let filled = (s.len ? 1 : 0) + (s.count ? 1 : 0) + (s.big ? 1 : 0) + (s.spec ? 1 : 0);
-                    if (filled === 4) { completelyFilled++; }
+                // Evaluate Day 1 Completeness
+                if (a.name && a.z1) {
+                    d1Expected++;
+                    let key1 = `${e.id}_${aIdx}_1`;
+                    let s1 = scoreState[key1] || {};
+                    let filled1 = (s1.len ? 1 : 0) + (s1.count ? 1 : 0) + (s1.big ? 1 : 0) + (s1.spec ? 1 : 0);
+                    if (filled1 === 4) d1Filled++;
+                }
+                // Evaluate Day 2 Completeness
+                if (a.name && a.z2) {
+                    d2Expected++;
+                    let key2 = `${e.id}_${aIdx}_2`;
+                    let s2 = scoreState[key2] || {};
+                    let filled2 = (s2.len ? 1 : 0) + (s2.count ? 1 : 0) + (s2.big ? 1 : 0) + (s2.spec ? 1 : 0);
+                    if (filled2 === 4) d2Filled++;
                 }
             });
         });
+
+        // Toggle the visual completion styles on the sub-tab selectors
+        const subBtn1 = document.getElementById('subBtn-1');
+        const subBtn2 = document.getElementById('subBtn-2');
         
+        if (subBtn1) {
+            if (d1Filled === d1Expected && d1Expected > 0) subBtn1.classList.add('completed');
+            else subBtn1.classList.remove('completed');
+        }
+        if (subBtn2) {
+            if (d2Filled === d2Expected && d2Expected > 0) subBtn2.classList.add('completed');
+            else subBtn2.classList.remove('completed');
+        }
+        
+        // Render the active progress tracking bar labels safely
         const progText = document.getElementById('scoreProgressText');
         const progContainer = document.getElementById('scoreBadgeContainer');
         const progBar = document.getElementById('scoreProgressBar');
         
         if (progText && progContainer && progBar) {
-            let remaining = totalExpected - completelyFilled;
-            progText.innerText = `DAY ${currentScoreDay} SCORES: ${completelyFilled} ENTERED | ${remaining} REMAINING`;
+            let activeExpected = currentScoreDay === 1 ? d1Expected : d2Expected;
+            let activeFilled = currentScoreDay === 1 ? d1Filled : d2Filled;
+            let remaining = activeExpected - activeFilled;
             
-            let pct = totalExpected === 0 ? 0 : (completelyFilled / totalExpected) * 100;
+            progText.innerText = `DAY ${currentScoreDay} SCORES: ${activeFilled} ENTERED | ${remaining} REMAINING`;
+            
+            let pct = activeExpected === 0 ? 0 : (activeFilled / activeExpected) * 100;
             progBar.style.width = pct + '%';
             
-            if (completelyFilled === totalExpected && totalExpected > 0) {
+            if (activeFilled === activeExpected && activeExpected > 0) {
                 progContainer.style.background = 'var(--green-color)';
                 progBar.style.display = 'none'; 
             } else {
