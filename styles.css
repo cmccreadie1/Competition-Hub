@@ -640,7 +640,7 @@ body.stage-draw { background: #334155 !important; }
     box-shadow: 0 0 10px rgba(16, 185, 129, 0.2) !important;
 }
 .day-tab-btn.completed::after {
-    content: " ✓";
+    content: " (COMPLETE)";
     color: var(--green-color) !important;
     font-weight: 900 !important;
 }
