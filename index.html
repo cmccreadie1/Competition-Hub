@@ -233,21 +233,50 @@
         }
 
         /* --- MUTED LEADERBOARD ZONE POINTS COLUMN BACKGROUND --- */
+        /* Day 1 & Day 2 Standard Points Columns */
         .col-points-shaded {
-            background: rgba(255, 255, 255, 0.05) !important; /* Subtle dark-mode shading */
-            border-left: 1px solid rgba(255, 255, 255, 0.08) !important;
-            border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
+            background: rgba(255, 255, 255, 0.08) !important; /* Clean 8% dark mode shading */
+            border-left: 1px solid rgba(255, 255, 255, 0.12) !important;
+            border-right: 1px solid rgba(255, 255, 255, 0.12) !important;
             font-weight: 900 !important;
             text-align: center;
-            color: var(--accent) !important; /* Highlight points with your theme's active accent color */
+            color: var(--accent) !important; /* Highlights points in blue */
         }
 
-        /* Fallback styling for a lighter layout stage */
+        /* Cumulative Points Column (stands out as decider) */
+        .col-cumulative-points-shaded {
+            background: rgba(255, 255, 255, 0.15) !important; /* Richer 15% shading */
+            border-left: 2px solid rgba(255, 255, 255, 0.2) !important;
+            border-right: 2px solid rgba(255, 255, 255, 0.2) !important;
+            font-weight: 900 !important;
+            text-align: center;
+            color: var(--accent) !important; /* Highlights points in blue */
+        }
+
+        /* Resets cumulative length column back to default white */
+        .col-length-reset {
+            color: #ffffff !important;
+            font-weight: normal !important;
+        }
+
+        /* Fallback styling for light-theme stages */
         body.light-theme .col-points-shaded {
-            background: rgba(15, 23, 42, 0.04) !important;
-            border-left: 1px solid rgba(15, 23, 42, 0.08) !important;
-            border-right: 1px solid rgba(15, 23, 42, 0.08) !important;
+            background: rgba(15, 23, 42, 0.06) !important;
+            border-left: 1px solid rgba(15, 23, 42, 0.1) !important;
+            border-right: 1px solid rgba(15, 23, 42, 0.1) !important;
+            color: #0284c7 !important; /* High contrast blue on light layout */
+        }
+
+        body.light-theme .col-cumulative-points-shaded {
+            background: rgba(15, 23, 42, 0.12) !important;
+            border-left: 2px solid rgba(15, 23, 42, 0.18) !important;
+            border-right: 2px solid rgba(15, 23, 42, 0.18) !important;
+            color: #0284c7 !important;
+        }
+
+        body.light-theme .col-length-reset {
             color: #0f172a !important;
+            font-weight: normal !important;
         }
     </style>
 </head>
@@ -1279,26 +1308,46 @@
         const tables = leaderboard.querySelectorAll('table');
         tables.forEach(table => {
             const headers = Array.from(table.querySelectorAll('th'));
-            const matchingIndices = [];
             
-            // Loop and identify all matching column indexes containing points data
-            headers.forEach((th, idx) => {
+            headers.forEach((th, colIdx) => {
                 const txt = th.textContent.toUpperCase().trim();
-                if (txt.includes('POINTS') || txt.includes('PTS') || txt === 'CUMULATED' || txt === 'CUM.') {
-                    matchingIndices.push(idx);
-                }
-            });
+                
+                // Identify target columns
+                const isPoints = txt.includes('POINTS') || txt.includes('PTS');
+                const isCumulative = txt.includes('CUMULATED') || txt.includes('CUM.') || txt.includes('CUMULATIVE');
+                const isLength = txt.includes('LENGTH') || txt.includes('LEN') || txt.includes('(CM)');
 
-            // Shade the corresponding headers and rows
-            matchingIndices.forEach(colIdx => {
-                if (!headers[colIdx].classList.contains('col-points-shaded')) {
-                    headers[colIdx].classList.add('col-points-shaded');
+                // Clear previous shading and styling states
+                th.classList.remove('col-points-shaded', 'col-cumulative-points-shaded', 'col-length-reset');
+                
+                let targetClass = '';
+                if (isPoints) {
+                    if (isCumulative) {
+                        targetClass = 'col-cumulative-points-shaded';
+                    } else {
+                        targetClass = 'col-points-shaded';
+                    }
+                } else if (isLength && isCumulative) {
+                    targetClass = 'col-length-reset';
                 }
+
+                if (targetClass) {
+                    th.classList.add(targetClass);
+                }
+
+                // Process every cell in the column
                 const rows = table.querySelectorAll('tbody tr');
                 rows.forEach(row => {
                     const cells = row.querySelectorAll('td');
-                    if (cells[colIdx] && !cells[colIdx].classList.contains('col-points-shaded')) {
-                        cells[colIdx].classList.add('col-points-shaded');
+                    if (cells[colIdx]) {
+                        cells[colIdx].classList.remove('col-points-shaded', 'col-cumulative-points-shaded', 'col-length-reset');
+                        if (targetClass) {
+                            cells[colIdx].classList.add(targetClass);
+                            
+                            // Strip forced inline color writes applied dynamically by app.js so our CSS takes full control
+                            cells[colIdx].style.color = '';
+                            cells[colIdx].style.setProperty('color', '', 'important');
+                        }
                     }
                 });
             });
