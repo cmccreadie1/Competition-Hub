@@ -616,3 +616,16 @@ body.stage-score-d2 .score-list-header {
     margin-bottom: -2px !important;
     z-index: 10 !important;
 }
+
+/* 1. Targets the Points column in the Combined section (the last column block) */
+/* The "nth-child" ensures we hit the correct column index for the PTS total */
+table tr td:nth-last-child(5) {
+    color: var(--accent) !important;
+    font-weight: 900;
+}
+
+/* 2. Ensures the Combined Points Heading remains blue */
+/* Adjust the index if your header structure differs */
+table thead tr:last-child th:nth-last-child(5) {
+    color: var(--accent) !important;
+}
