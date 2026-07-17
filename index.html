@@ -234,7 +234,7 @@
 
         /* --- MUTED LEADERBOARD ZONE POINTS COLUMN BACKGROUND --- */
         .col-points-shaded {
-            background: rgba(255, 255, 255, 0.10) !important; /* Subtle dark-mode shading */
+            background: rgba(255, 255, 255, 0.05) !important; /* Subtle dark-mode shading */
             border-left: 1px solid rgba(255, 255, 255, 0.08) !important;
             border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
             font-weight: 900 !important;
@@ -1279,24 +1279,29 @@
         const tables = leaderboard.querySelectorAll('table');
         tables.forEach(table => {
             const headers = Array.from(table.querySelectorAll('th'));
-            const pointsIdx = headers.findIndex(th => {
+            const matchingIndices = [];
+            
+            // Loop and identify all matching column indexes containing points data
+            headers.forEach((th, idx) => {
                 const txt = th.textContent.toUpperCase().trim();
-                return txt === 'POINTS' || txt === 'PTS' || txt === 'ZONE POINTS';
-            });
-            if (pointsIdx !== -1) {
-                // Style header column if not already done
-                if (!headers[pointsIdx].classList.contains('col-points-shaded')) {
-                    headers[pointsIdx].classList.add('col-points-shaded');
+                if (txt.includes('POINTS') || txt.includes('PTS') || txt === 'CUMULATED' || txt === 'CUM.') {
+                    matchingIndices.push(idx);
                 }
-                // Style all cells inside body under this column index
+            });
+
+            // Shade the corresponding headers and rows
+            matchingIndices.forEach(colIdx => {
+                if (!headers[colIdx].classList.contains('col-points-shaded')) {
+                    headers[colIdx].classList.add('col-points-shaded');
+                }
                 const rows = table.querySelectorAll('tbody tr');
                 rows.forEach(row => {
                     const cells = row.querySelectorAll('td');
-                    if (cells[pointsIdx] && !cells[pointsIdx].classList.contains('col-points-shaded')) {
-                        cells[pointsIdx].classList.add('col-points-shaded');
+                    if (cells[colIdx] && !cells[colIdx].classList.contains('col-points-shaded')) {
+                        cells[colIdx].classList.add('col-points-shaded');
                     }
                 });
-            }
+            });
         });
     }
 
@@ -1310,7 +1315,7 @@
             const lbObserver = new MutationObserver(function() {
                 shadePointsColumns();
             });
-            // Only watch childList and subtree elements so changes to class attributes won't trigger infinite recursion loops
+            // Only watch childList and subtree elements so changes to class attributes won't trigger infinite loops
             lbObserver.observe(lbTab, { childList: true, subtree: true });
         }
     });
