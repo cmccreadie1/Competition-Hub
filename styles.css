@@ -630,3 +630,17 @@ table tr td:nth-last-child(5) {
 table thead tr:last-child th:nth-last-child(5) {
     color: var(--accent) !important;
 }
+
+/* Lock in Draw Page Base Background to Prevent Initial Loading Flash */
+body.stage-draw { background: #334155 !important; }
+
+/* Dynamic Sub-Tab Completion Indicator Markers */
+.day-tab-btn.completed {
+    border-color: var(--green-color) !important;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.2) !important;
+}
+.day-tab-btn.completed::after {
+    content: " ✓";
+    color: var(--green-color) !important;
+    font-weight: 900 !important;
+}
