@@ -396,6 +396,7 @@ body.stage-score-d2 .score-list-header {
         /* Dynamic Backgrounds */
         body.stage-score-d1 { background: var(--bg-score-d1) !important; }
         body.stage-score-d2 { background: var(--bg-score-d2) !important; }
+body.stage-draw { background: #334155 !important; }
 
         /* Active Day Tab Highlights */
         body.stage-score-d1 #subBtn-1 { background: var(--card); color: var(--accent); }
