@@ -2325,22 +2325,21 @@ function calculateAndRenderIndividualLeaderboard(containerId) {
                         </div>
                     </td>
                     <td style="padding: 12px 8px; font-family:monospace; font-size:16px; background: rgba(59, 130, 246, 0.02); border-left: 1px solid rgba(255,255,255,0.05); border-right: 1px solid rgba(255,255,255,0.05); letter-spacing: 0.5px;">
-                        <span style="display:inline-block; width:55px; color:var(--accent); font-weight:900; font-size:17px;">${row.d1.pts}</span> 
-                        <span style="display:inline-block; width:65px; color:#ffffff; font-weight:700;">${row.d1.len}</span> 
+                         <span style="display:inline-block; width:55px; color:var(--accent); font-weight:900; background:rgba(255, 255, 255, 0.08); backdrop-filter:blur(6px); border-radius:4px; padding:2px 0;">${row.d1.pts}</span>                        <span style="display:inline-block; width:65px; color:#ffffff; font-weight:700;">${row.d1.len}</span> 
                         <span style="display:inline-block; width:45px; color:#cbd5e1;">${row.d1.cnt}</span> 
                         <span style="display:inline-block; width:55px; color:#cbd5e1;">${row.d1.big}</span> 
                         <span style="display:inline-block; width:45px; color:#94a3b8;">${row.d1.spc}</span>
                     </td>
                     ${isTwoDayMatch ? `
                     <td style="padding: 12px 8px; font-family:monospace; font-size:16px; background: rgba(16, 185, 129, 0.02); border-right: 1px solid rgba(255,255,255,0.05); letter-spacing: 0.5px;">
-                        <span style="display:inline-block; width:55px; color:var(--accent); font-weight:900; font-size:17px;">${row.d2.pts}</span> 
+                        <span style="display:inline-block; width:55px; color:var(--accent); font-weight:900; background:rgba(255, 255, 255, 0.08); backdrop-filter:blur(6px); border-radius:4px; padding:2px 0;">${row.d2.pts}</span>
                         <span style="display:inline-block; width:65px; color:#ffffff; font-weight:700;">${row.d2.len}</span> 
                         <span style="display:inline-block; width:45px; color:#cbd5e1;">${row.d2.cnt}</span> 
                         <span style="display:inline-block; width:55px; color:#cbd5e1;">${row.d2.big}</span> 
                         <span style="display:inline-block; width:45px; color:#94a3b8;">${row.d2.spc}</span>
                     </td>
                     <td style="padding: 12px 8px; font-family:monospace; font-size:16px; background: rgba(234, 179, 8, 0.04); letter-spacing: 0.5px;">
-                       <span style="display:inline-block; width:55px; color:var(--accent); font-weight:900; font-size:17px;">${row.comb.pts}</span>
+                      <span style="display:inline-block; width:55px; color:var(--accent); font-weight:900; font-size:17px; background:rgba(255, 255, 255, 0.08); backdrop-filter:blur(6px); border-radius:4px; padding:2px 0;">${row.comb.pts}</span>
 <span style="display:inline-block; width:65px; color:#ffffff; font-weight:900; font-size:17px;">${row.comb.len}</span>
 <span style="display:inline-block; width:45px; color:#ffffff; font-weight:800;">${row.comb.cnt}</span>
 <span style="display:inline-block; width:55px; color:#ffffff; font-weight:800;">${row.comb.big}</span>
