@@ -1334,109 +1334,89 @@
     // ==========================================
     // DYNAMIC LEADERBOARD COLUMN SHADING ENGINE
     // ==========================================
-    function shadePointsColumns() {
+   function shadePointsColumns() {
         const leaderboard = document.getElementById('leaderboardTab');
         if (!leaderboard) return;
+        
         const tables = leaderboard.querySelectorAll('table');
         tables.forEach(table => {
-            const rowsInThead = Array.from(table.querySelectorAll('thead tr'));
-            if (rowsInThead.length === 0) return;
+            const theadTrs = table.querySelectorAll('thead tr');
+            if (theadTrs.length === 0) return;
             
-            // Get the final bottom row of headers (the leaf headers)
-            const leafHeaders = Array.from(rowsInThead[rowsInThead.length - 1].querySelectorAll('th'));
-            const firstRowHeaders = Array.from(rowsInThead[0].querySelectorAll('th'));
-            
-            // Check the width of the body to detect any unmapped column spans
-            const sampleRow = table.querySelector('tbody tr');
-            const numBodyCells = sampleRow ? sampleRow.querySelectorAll('td').length : 0;
-            
-            // Build the base mapping from the leaf row
-            const cellToHeaderMap = [];
-            leafHeaders.forEach(th => {
-                const colSpan = parseInt(th.getAttribute('colspan')) || 1;
-                for (let i = 0; i < colSpan; i++) {
-                    cellToHeaderMap.push(th);
-                }
-            });
-            
-            // If the body has more columns than headers (e.g. Pos & Angler split),
-            // pad the mapping at the front to realign the columns perfectly
-            if (numBodyCells > cellToHeaderMap.length) {
-                const diff = numBodyCells - cellToHeaderMap.length;
-                const firstHeader = leafHeaders[0] || firstRowHeaders[0];
-                for (let i = 0; i < diff; i++) {
-                    cellToHeaderMap.unshift(firstHeader);
-                }
-            }
-            
-            // Clear prior styling classes on headers
-            table.querySelectorAll('th').forEach(th => {
-                th.classList.remove('col-points-shaded', 'col-cumulative-points-shaded', 'col-length-reset');
-            });
-            
-            // Determine styling classes for each column index based on aligned headers
-            const colClasses = [];
-            for (let cIdx = 0; cIdx < numBodyCells; cIdx++) {
-                const leafTh = cellToHeaderMap[cIdx];
-                if (!leafTh) continue;
-                
-                const leafText = leafTh.textContent.toUpperCase().trim();
-                const isPoints = leafText === 'PTS' || leafText.includes('POINTS');
-                
-                // Trace up to see if this column falls under a cumulative/combined section
-                let isCumulative = false;
-                firstRowHeaders.forEach(th => {
-                    const thText = th.textContent.toUpperCase().trim();
-                    const colSpan = parseInt(th.getAttribute('colspan')) || 1;
-                    
-                    // Simple check: if the leaf header is physically positioned inside this span
-                    const thIdx = firstRowHeaders.indexOf(th);
-                    let startCol = 0;
-                    for (let i = 0; i < thIdx; i++) {
-                        startCol += parseInt(firstRowHeaders[i].getAttribute('colspan')) || 1;
-                    }
-                    const endCol = startCol + colSpan;
-                    
-                    if (cIdx >= startCol && cIdx < endCol) {
-                        if (thText.includes('CUMULATED') || thText.includes('CUM.') || thText.includes('CUMULATIVE') || thText.includes('COMBINED') || thText.includes('TOTALS')) {
-                            isCumulative = true;
-                        }
-                    }
-                });
-                
-                let targetClass = '';
-                if (isPoints) {
-                    if (isCumulative) {
-                        targetClass = 'col-cumulative-points-shaded';
+            // Calculate structural offset caused by rowspans (e.g. 'POS & ANGLER')
+            let frontOffset = 0;
+            if (theadTrs.length > 1) {
+                const firstRowThs = Array.from(theadTrs[0].querySelectorAll('th'));
+                for (let th of firstRowThs) {
+                    const rs = parseInt(th.getAttribute('rowspan')) || 1;
+                    const cs = parseInt(th.getAttribute('colspan')) || 1;
+                    if (rs > 1) {
+                        frontOffset += cs;
                     } else {
-                        targetClass = 'col-points-shaded';
+                        break; // Stop once we hit the normal tiered headers
                     }
-                }
-                
-                colClasses[cIdx] = targetClass;
-                
-                if (targetClass) {
-                    leafTh.classList.add(targetClass);
                 }
             }
             
-            // Apply targeted styles directly to tbody cells
+            // Get the bottom-most row of headers (PTS, CM, CT, etc)
+            const leafHeaders = Array.from(theadTrs[theadTrs.length - 1].querySelectorAll('th'));
+            
+            // Find the exact mathematical indices of the PTS headers
+            const ptsIndices = [];
+            leafHeaders.forEach((th, idx) => {
+                // Strip rogue classes from headers
+                th.classList.remove('col-points-shaded', 'col-cumulative-points-shaded', 'col-length-reset');
+                th.style.setProperty('color', '#ffffff', 'important'); // Default high-contrast white
+                
+                const txt = th.textContent.toUpperCase().trim();
+                if (txt === 'PTS' || txt.includes('POINTS')) {
+                    ptsIndices.push(idx);
+                }
+            });
+            
+            // Apply correct blue styling to the PTS headers
+            ptsIndices.forEach((idx, i) => {
+                const th = leafHeaders[idx];
+                const isLast = (i === ptsIndices.length - 1 && ptsIndices.length > 1); // Combined is always the final PTS column
+                
+                th.style.setProperty('color', 'var(--accent)', 'important');
+                if (isLast) {
+                    th.classList.add('col-cumulative-points-shaded');
+                } else {
+                    th.classList.add('col-points-shaded');
+                }
+            });
+            
+            // Fix the body rows and obliterate any app.js bugs
             const rows = table.querySelectorAll('tbody tr');
             const isLightTheme = document.body.classList.contains('light-theme');
             const defaultTextColor = isLightTheme ? '#0f172a' : '#ffffff';
             
             rows.forEach(row => {
-                const cells = row.querySelectorAll('td');
-                cells.forEach((cell, cIdx) => {
-                    cell.classList.remove('col-points-shaded', 'col-cumulative-points-shaded', 'col-length-reset');
+                const cells = Array.from(row.querySelectorAll('td'));
+                if (cells.length === 0) return;
+                
+                cells.forEach((cell, idx) => {
+                    // 1. Nuke any and all buggy formatting classes app.js might have wrongfully applied
+                    cell.classList.remove('col-points-shaded', 'col-cumulative-points-shaded', 'col-length-reset', 'cell-points', 'cell-cumulative-points', 'cell-tiebreaker');
                     
-                    const targetClass = colClasses[cIdx];
-                    if (targetClass) {
-                        cell.classList.add(targetClass);
+                    // 2. Map the body cell to the correct header, accounting for the front offset
+                    const mappedHeaderIdx = idx - frontOffset;
+                    
+                    if (ptsIndices.includes(mappedHeaderIdx)) {
+                        // This IS a Points column. Make it blue!
                         cell.style.setProperty('color', 'var(--accent)', 'important');
+                        
+                        const isLast = (mappedHeaderIdx === ptsIndices[ptsIndices.length - 1] && ptsIndices.length > 1);
+                        if (isLast) {
+                            cell.classList.add('col-cumulative-points-shaded');
+                        } else {
+                            cell.classList.add('col-points-shaded');
+                        }
                     } else {
-                        // Force non-points cells back to default clean high-contrast text colors
+                        // This IS NOT a points column (e.g., CM, CT, BIG). Force it to standard text!
                         cell.style.setProperty('color', defaultTextColor, 'important');
+                        cell.style.background = 'transparent'; // Kill any rogue background shading
                     }
                 });
             });
