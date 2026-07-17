@@ -2340,11 +2340,11 @@ function calculateAndRenderIndividualLeaderboard(containerId) {
                         <span style="display:inline-block; width:45px; color:#94a3b8;">${row.d2.spc}</span>
                     </td>
                     <td style="padding: 12px 8px; font-family:monospace; font-size:16px; background: rgba(234, 179, 8, 0.04); letter-spacing: 0.5px;">
-                        <span style="display:inline-block; width:55px; color:#ffffff; font-weight:900; font-size:17px;">${row.comb.pts}</span> 
-                        <span style="display:inline-block; width:65px; color:var(--accent); font-weight:900; font-size:17px;">${row.comb.len}</span> 
-                        <span style="display:inline-block; width:45px; color:#ffffff; font-weight:800;">${row.comb.cnt}</span> 
-                        <span style="display:inline-block; width:55px; color:#ffffff; font-weight:800;">${row.comb.big}</span> 
-                        <span style="display:inline-block; width:45px; color:#cbd5e1; font-weight:700;">${row.comb.spc}</span>
+                       <span style="display:inline-block; width:55px;">${row.comb.pts}</span>
+<span style="display:inline-block; width:65px;">${row.comb.len}</span>
+<span style="display:inline-block; width:45px;">${row.comb.cnt}</span>
+<span style="display:inline-block; width:55px;">${row.comb.big}</span>
+<span style="display:inline-block; width:45px;">${row.comb.spc}</span>
                     </td>` : ''}
                 </tr>
             `;
