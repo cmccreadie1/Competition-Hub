@@ -662,3 +662,10 @@ body.stage-draw { background: #334155 !important; }
     color: #ffffff !important;                   /* Bright crisp white text */
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
 }
+
+/* High-Impact Incomplete Scorecard Warning Override */
+.score-row.incomplete, 
+[data-status="incomplete"] {
+    background-color: #991b1b !important; /* Deep crimson red instead of light pink */
+    color: #ffffff !important;            /* High-contrast white text */
+}
