@@ -1339,18 +1339,65 @@
         if (!leaderboard) return;
         const tables = leaderboard.querySelectorAll('table');
         tables.forEach(table => {
-            const headers = Array.from(table.querySelectorAll('th'));
+            const rowsInThead = Array.from(table.querySelectorAll('thead tr'));
+            if (rowsInThead.length === 0) return;
             
-            headers.forEach((th, colIdx) => {
-                const txt = th.textContent.toUpperCase().trim();
-                
-                // Identify target columns
-                const isPoints = txt.includes('POINTS') || txt.includes('PTS');
-                const isCumulative = txt.includes('CUMULATED') || txt.includes('CUM.') || txt.includes('CUMULATIVE');
-                const isLength = txt.includes('LENGTH') || txt.includes('LEN') || txt.includes('(CM)');
-
-                // Clear previous shading and styling states
+            // Compile a colspan/rowspan aware virtual header grid
+            const headerGrid = [];
+            rowsInThead.forEach((tr, rIdx) => {
+                headerGrid[rIdx] = [];
+            });
+            
+            rowsInThead.forEach((tr, rIdx) => {
+                const ths = Array.from(tr.querySelectorAll('th'));
+                let colIdx = 0;
+                ths.forEach(th => {
+                    while (headerGrid[rIdx][colIdx] !== undefined) {
+                        colIdx++;
+                    }
+                    const colSpan = parseInt(th.getAttribute('colspan')) || 1;
+                    const rowSpan = parseInt(th.getAttribute('rowspan')) || 1;
+                    for (let r = 0; r < rowSpan; r++) {
+                        for (let c = 0; c < colSpan; c++) {
+                            if (headerGrid[rIdx + r]) {
+                                headerGrid[rIdx + r][colIdx + c] = th;
+                            }
+                        }
+                    }
+                    colIdx += colSpan;
+                });
+            });
+            
+            const numCols = headerGrid[0] ? headerGrid[0].length : 0;
+            if (numCols === 0) return;
+            
+            // Clear prior styling states on headers
+            table.querySelectorAll('th').forEach(th => {
                 th.classList.remove('col-points-shaded', 'col-cumulative-points-shaded', 'col-length-reset');
+            });
+            
+            const colClasses = [];
+            for (let c = 0; c < numCols; c++) {
+                const thsInCol = [];
+                for (let r = 0; r < headerGrid.length; r++) {
+                    if (headerGrid[r][c] && !thsInCol.includes(headerGrid[r][c])) {
+                        thsInCol.push(headerGrid[r][c]);
+                    }
+                }
+                
+                const leafTh = headerGrid[headerGrid.length - 1][c];
+                if (!leafTh) continue;
+                
+                const leafText = leafTh.textContent.toUpperCase().trim();
+                const isPoints = leafText === 'PTS' || leafText.includes('POINTS');
+                
+                let isCumulative = false;
+                thsInCol.forEach(th => {
+                    const thText = th.textContent.toUpperCase().trim();
+                    if (thText.includes('CUMULATED') || thText.includes('CUM.') || thText.includes('CUMULATIVE') || thText.includes('COMBINED')) {
+                        isCumulative = true;
+                    }
+                });
                 
                 let targetClass = '';
                 if (isPoints) {
@@ -1359,27 +1406,31 @@
                     } else {
                         targetClass = 'col-points-shaded';
                     }
-                } else if (isLength && isCumulative) {
-                    targetClass = 'col-length-reset';
                 }
-
+                
+                colClasses[c] = targetClass;
+                
                 if (targetClass) {
-                    th.classList.add(targetClass);
+                    leafTh.classList.add(targetClass);
                 }
-
-                // Process every cell in the column
-                const rows = table.querySelectorAll('tbody tr');
-                rows.forEach(row => {
-                    const cells = row.querySelectorAll('td');
-                    if (cells[colIdx]) {
-                        cells[colIdx].classList.remove('col-points-shaded', 'col-cumulative-points-shaded', 'col-length-reset');
-                        if (targetClass) {
-                            cells[colIdx].classList.add(targetClass);
-                            
-                            // Strip forced inline color writes applied dynamically by app.js so our CSS takes full control
-                            cells[colIdx].style.color = '';
-                            cells[colIdx].style.setProperty('color', '', 'important');
-                        }
+            }
+            
+            // Enforce clean alignments across body cells
+            const rows = table.querySelectorAll('tbody tr');
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                cells.forEach((cell, cIdx) => {
+                    cell.classList.remove('col-points-shaded', 'col-cumulative-points-shaded', 'col-length-reset');
+                    
+                    const targetClass = colClasses[cIdx];
+                    if (targetClass) {
+                        cell.classList.add(targetClass);
+                        cell.style.color = '';
+                        cell.style.setProperty('color', '', 'important');
+                    } else {
+                        // Strips any styling applied to tie-breakers by app.js to keep them standard high-contrast white
+                        cell.style.color = '';
+                        cell.style.setProperty('color', '', 'important');
                     }
                 });
             });
