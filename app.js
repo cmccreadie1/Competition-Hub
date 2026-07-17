@@ -953,10 +953,12 @@ for (let i = 0; i < Math.min(3, standings.length); i++) {
                     }
                 }
 
-                if (filledAnglers > 0 && filledAnglers < 4) {
-                    let tDisp = tName !== '' ? `'${tName}'` : 'An unnamed team';
-                    errors.push(`INCOMPLETE TEAM: ${tDisp} only has ${filledAnglers} out of 4 anglers.`);
-                }
+                /* 
+if (filledAnglers > 0 && filledAnglers < 4) {
+    let tDisp = tName !== '' ? `'${tName}'` : 'An unnamed team';
+    errors.push(`INCOMPLETE TEAM: ${tDisp} only has ${filledAnglers} out of 4 anglers.`);
+}
+*/
             }
 
             entry.anglers.forEach((a) => {
