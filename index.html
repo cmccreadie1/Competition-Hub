@@ -163,74 +163,92 @@
             box-sizing: border-box;
         }
         /* --- HIGH-VISIBILITY ACCESSIBLE PEGS TOGGLE --- */
-#accToggleBtn {
-    background-color: #ffffff !important; /* Solid bright white background */
-    border: 3px solid #cbd5e1 !important; /* Distinct, clean border */
-    border-radius: 14px !important; /* Rounded corners */
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25) !important; /* Strong physical shadow to pop off the slate background */
-    cursor: pointer;
-    transition: all 0.2s ease-in-out !important;
-}
+        #accToggleBtn {
+            background-color: #ffffff !important; /* Solid bright white background */
+            border: 3px solid #cbd5e1 !important; /* Distinct, clean border */
+            border-radius: 14px !important; /* Rounded corners */
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25) !important; /* Strong physical shadow to pop off the slate background */
+            cursor: pointer;
+            transition: all 0.2s ease-in-out !important;
+        }
 
-/* Highly responsive hover and tap effects */
-#accToggleBtn:hover {
-    background-color: #f1f5f9 !important; /* Changes to soft light gray on hover */
-    border-color: #94a3b8 !important;
-    transform: translateY(-2px); /* Lifts up slightly */
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3) !important;
-}
+        /* Highly responsive hover and tap effects */
+        #accToggleBtn:hover {
+            background-color: #f1f5f9 !important; /* Changes to soft light gray on hover */
+            border-color: #94a3b8 !important;
+            transform: translateY(-2px); /* Lifts up slightly */
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3) !important;
+        }
 
-#accToggleBtn:active {
-    transform: translateY(1px); /* Sinks slightly when clicked */
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
-}
+        #accToggleBtn:active {
+            transform: translateY(1px); /* Sinks slightly when clicked */
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+        }
 
-/* Force stark, high-contrast dark text for maximum legibility */
-#accToggleTitle {
-    color: #0f172a !important; /* Deep dark slate */
-    font-weight: 900 !important;
-}
+        /* Force stark, high-contrast dark text for maximum legibility */
+        #accToggleTitle {
+            color: #0f172a !important; /* Deep dark slate */
+            font-weight: 900 !important;
+        }
 
-#accToggleSub {
-    color: #475569 !important; /* Readable medium slate gray subtext */
-    font-weight: 800 !important;
-}
+        #accToggleSub {
+            color: #475569 !important; /* Readable medium slate gray subtext */
+            font-weight: 800 !important;
+        }
         /* --- HIGH-VISIBILITY DURATION TOGGLE (1 DAY / 2 DAYS) --- */
-.duration-toggle {
-    background-color: #f1f5f9 !important; /* Soft gray background track */
-    border: 3px solid #cbd5e1 !important; /* Strong outer boundary */
-    border-radius: 50px !important;
-    padding: 6px !important;
-    display: inline-flex !important;
-    align-items: center;
-    gap: 6px !important;
-}
+        .duration-toggle {
+            background-color: #f1f5f9 !important; /* Soft gray background track */
+            border: 3px solid #cbd5e1 !important; /* Strong outer boundary */
+            border-radius: 50px !important;
+            padding: 6px !important;
+            display: inline-flex !important;
+            align-items: center;
+            gap: 6px !important;
+        }
 
-/* Base style for both options when inactive */
-.dt-opt {
-    background-color: transparent !important;
-    color: #475569 !important; /* Readable dark gray for the unselected option */
-    font-weight: 800 !important;
-    font-size: 14px !important;
-    padding: 12px 28px !important;
-    border-radius: 50px !important;
-    cursor: pointer;
-    transition: all 0.2s ease-in-out !important;
-}
+        /* Base style for both options when inactive */
+        .dt-opt {
+            background-color: transparent !important;
+            color: #475569 !important; /* Readable dark gray for the unselected option */
+            font-weight: 800 !important;
+            font-size: 14px !important;
+            padding: 12px 28px !important;
+            border-radius: 50px !important;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out !important;
+        }
 
-/* Active Option: High-contrast white text on deep slate background */
-.dt-opt.active {
-    background-color: #0f172a !important; /* Deep dark slate */
-    color: #ffffff !important; /* Crisp white text */
-    font-weight: 900 !important;
-    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.35) !important; /* Makes the active choice pop out */
-}
+        /* Active Option: High-contrast white text on deep slate background */
+        .dt-opt.active {
+            background-color: #0f172a !important; /* Deep dark slate */
+            color: #ffffff !important; /* Crisp white text */
+            font-weight: 900 !important;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.35) !important; /* Makes the active choice pop out */
+        }
 
-/* Quick hover effect for the inactive option */
-.dt-opt:not(.active):hover {
-    background-color: #e2e8f0 !important;
-    color: #0f172a !important;
-}
+        /* Quick hover effect for the inactive option */
+        .dt-opt:not(.active):hover {
+            background-color: #e2e8f0 !important;
+            color: #0f172a !important;
+        }
+
+        /* --- MUTED LEADERBOARD ZONE POINTS COLUMN BACKGROUND --- */
+        .col-points-shaded {
+            background: rgba(255, 255, 255, 0.05) !important; /* Subtle dark-mode shading */
+            border-left: 1px solid rgba(255, 255, 255, 0.08) !important;
+            border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
+            font-weight: 900 !important;
+            text-align: center;
+            color: var(--accent) !important; /* Highlight points with your theme's active accent color */
+        }
+
+        /* Fallback styling for a lighter layout stage */
+        body.light-theme .col-points-shaded {
+            background: rgba(15, 23, 42, 0.04) !important;
+            border-left: 1px solid rgba(15, 23, 42, 0.08) !important;
+            border-right: 1px solid rgba(15, 23, 42, 0.08) !important;
+            color: #0f172a !important;
+        }
     </style>
 </head>
 <body class="stage-draw">
@@ -1170,20 +1188,9 @@
             progressObserver.observe(targetNode, { characterData: true, childList: true, subtree: true });
         }
     });
-    if (isLength) input.setAttribute('maxlength', '4');
-                        else if (isBiggest) input.setAttribute('maxlength', '3');
-                        else if (isCount || isSpecies) input.setAttribute('maxlength', '2');
-                        
-                        input.dataset.safeguardsApplied = "true";
-                    }
-                });
-            });
-            configObserver.observe(scoreContainer, { childList: true, subtree: true });
-        }
-    });
 
     // ==========================================
-    // PASTE THE NEW MEMORY CODE DIRECTLY HERE:
+    // SCORE CARD DAY MEMORY & LIVE COMPLETION TRACKING
     // ==========================================
     document.addEventListener('DOMContentLoaded', function() {
         const originalSwitch = window.switchScoreDay;
@@ -1262,13 +1269,53 @@
             observer.observe(progressEl, { childList: true, characterData: true, subtree: true });
         }
     });
+
     // ==========================================
+    // DYNAMIC LEADERBOARD COLUMN SHADING ENGINE
+    // ==========================================
+    function shadePointsColumns() {
+        const leaderboard = document.getElementById('leaderboardTab');
+        if (!leaderboard) return;
+        const tables = leaderboard.querySelectorAll('table');
+        tables.forEach(table => {
+            const headers = Array.from(table.querySelectorAll('th'));
+            const pointsIdx = headers.findIndex(th => {
+                const txt = th.textContent.toUpperCase().trim();
+                return txt === 'POINTS' || txt === 'PTS' || txt === 'ZONE POINTS';
+            });
+            if (pointsIdx !== -1) {
+                // Style header column if not already done
+                if (!headers[pointsIdx].classList.contains('col-points-shaded')) {
+                    headers[pointsIdx].classList.add('col-points-shaded');
+                }
+                // Style all cells inside body under this column index
+                const rows = table.querySelectorAll('tbody tr');
+                rows.forEach(row => {
+                    const cells = row.querySelectorAll('td');
+                    if (cells[pointsIdx] && !cells[pointsIdx].classList.contains('col-points-shaded')) {
+                        cells[pointsIdx].classList.add('col-points-shaded');
+                    }
+                });
+            }
+        });
+    }
 
-</script> <!-- THIS IS THE END OF YOUR SCRIPT tag -->
-
-<div id="exportGuideModal" class="export-modal" style="display: none;">
-...
+    document.addEventListener('DOMContentLoaded', function() {
+        // Run once initially
+        shadePointsColumns();
+        
+        // Setup observer to apply the styles whenever dynamic data loads into the tables
+        const lbTab = document.getElementById('leaderboardTab');
+        if (lbTab) {
+            const lbObserver = new MutationObserver(function() {
+                shadePointsColumns();
+            });
+            // Only watch childList and subtree elements so changes to class attributes won't trigger infinite recursion loops
+            lbObserver.observe(lbTab, { childList: true, subtree: true });
+        }
+    });
 </script>
+
 <div id="exportGuideModal" class="export-modal" style="display: none;">
     <div class="export-modal-content">
         <img src="excel-export-guide.png" alt="Excel Export Next Steps" class="export-infographic">
