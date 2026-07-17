@@ -1,69 +1,70 @@
-// ========================================================================
-// APPLICATION SERVICE WORKER INTEGRATION SYSTEM LAYER (sw.js)
-// ========================================================================
-const COMP_HUB_OFFLINE_CACHE_SIGNATURE = 'competition-hub-cache-v7.5.0';
-const PERSISTENT_RESOURCES_MANIFEST = [
+const CACHE_NAME = 'shorematch-v1.6.1'; // Incrementing cache version clears old storage
+const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
-  '/excel-export-guide.png',
-  'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js',
-  'https://cdn.tailwindcss.com',
-  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
+  '/styles.css',
+  '/app.js',
+  '/manifest.json',
+  'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js'
 ];
 
-// Service Worker Verification Asset Cache Registration Cycle Hook
-self.addEventListener('install', (installEventTask) => {
-  installEventTask.waitUntil(
-    caches.open(COMP_HUB_OFFLINE_CACHE_SIGNATURE)
-      .then((openedCacheInstance) => {
-        console.log('Registering production app layer manifest mappings safely inside target sandbox caches.');
-        return openedCacheInstance.addAll(PERSISTENT_RESOURCES_MANIFEST);
-      })
-      .then(() => self.skipWaiting())
+// 1. Installation - Cache static assets
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => {
+      console.log('[Service Worker] Pre-caching offline assets');
+      return cache.addAll(ASSETS_TO_CACHE);
+    }).then(() => self.skipWaiting()) // Force immediate activation
   );
 });
 
-// Cache Eviction Validation Execution Cycles Lifecycle Phase
-self.addEventListener('activate', (activationEventTask) => {
-  activationEventTask.waitUntil(
-    caches.keys().then((registeredCacheKeysList) => {
+// 2. Activation - Evict and clean up any old cached versions immediately
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
       return Promise.all(
-        registeredCacheKeysList.map((uniqueKeyToken) => {
-          if (uniqueKeyToken !== COMP_HUB_OFFLINE_CACHE_SIGNATURE) {
-            console.log('Evicting historical deprecated cache entry profile data block:', uniqueKeyToken);
-            return caches.delete(uniqueKeyToken);
+        cacheNames.map((cache) => {
+          if (cache !== CACHE_NAME) {
+            console.log('[Service Worker] Clearing old cache:', cache);
+            return caches.delete(cache);
           }
         })
       );
-    }).then(() => self.clients.claim())
+    }).then(() => self.clients.claim()) // Take control of all open browser tabs immediately
   );
 });
 
-// Network Proxy Interception Evaluation Middleware Block Execution Logic
-self.addEventListener('fetch', (fetchInterceptorContext) => {
-  fetchInterceptorContext.respondWith(
-    caches.match(fetchInterceptorContext.request)
-      .then((matchingCacheResponseObject) => {
-        if (matchingCacheResponseObject) {
-          return matchingCacheResponseObject;
+// 3. Smart Fetching Strategy: Network-First with Offline Cache Fallback
+self.addEventListener('fetch', (event) => {
+  // Only intercept standard GET requests
+  if (event.request.method !== 'GET') return;
+
+  event.respondWith(
+    fetch(event.request)
+      .then((networkResponse) => {
+        // If the network request succeeds, clone the response and update the cache dynamically
+        if (networkResponse && networkResponse.status === 200) {
+          const responseToCache = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, responseToCache);
+          });
         }
-        return fetch(fetchInterceptorContext.request).then(
-          (liveNetworkResponsePayload) => {
-            if(!liveNetworkResponsePayload || liveNetworkResponsePayload.status !== 200 || liveNetworkResponsePayload.type !== 'basic') {
-              return liveNetworkResponsePayload;
-            }
-
-            const payloadClonedCopy = liveNetworkResponsePayload.clone();
-            caches.open(COMP_HUB_OFFLINE_CACHE_SIGNATURE)
-              .then((openedCacheInstance) => {
-                openedCacheInstance.put(fetchInterceptorContext.request, payloadClonedCopy);
-              });
-
-            return liveNetworkResponsePayload;
+        return networkResponse;
+      })
+      .catch(() => {
+        // If the network is completely dead (offline on the beach), serve the cached fallback
+        console.log('[Service Worker] Offline mode - Serving from Cache:', event.request.url);
+        return caches.match(event.request).then((cachedResponse) => {
+          if (cachedResponse) {
+            return cachedResponse;
           }
-        );
-      }).catch(() => {
-        return caches.match('/index.html');
+          // If a request is completely missing from cache and network is dead
+          return new Response('Offline content unavailable', {
+            status: 503,
+            statusText: 'Service Unavailable',
+            headers: new Headers({ 'Content-Type': 'text/plain' })
+          });
+        });
       })
   );
 });
