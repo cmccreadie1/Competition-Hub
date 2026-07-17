@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Competition Hub - v1.6.0</title>
+    <title>ShoreMatch - v1.6.0</title>
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -278,6 +278,38 @@
             color: #0f172a !important;
             font-weight: normal !important;
         }
+
+        /* --- INDIVIDUAL SCORECARD BLUE/WHITE HIGH-CONTRAST THEME --- */
+
+        /* Highlight Points inputs in deep blue with a soft blue background */
+        .score-card input[placeholder*="Points" i],
+        .score-card input[placeholder*="Pts" i],
+        .score-row input[placeholder*="Points" i],
+        .score-row input[placeholder*="Pts" i],
+        input[id*="points" i],
+        input[class*="points" i] {
+            border: 3px solid var(--accent) !important;
+            background-color: var(--accent-light) !important;
+            color: var(--accent) !important;
+            font-weight: 800 !important;
+        }
+
+        /* Ensure all tie-breaker inputs (Length, Fish, Biggest, Species) remain high-contrast white */
+        .score-card input:not([placeholder*="Points" i]):not([placeholder*="Pts" i]),
+        .score-row input:not([placeholder*="Points" i]):not([placeholder*="Pts" i]) {
+            background-color: #ffffff !important;
+            color: #0f172a !important;
+            border: 1px solid #cbd5e1 !important;
+            font-weight: normal !important;
+        }
+
+        /* Target Points label text to color them deep blue */
+        .score-card label[for*="points" i],
+        .score-row label[for*="points" i],
+        label[class*="points" i] {
+            color: var(--accent) !important;
+            font-weight: 800 !important;
+        }
     </style>
 </head>
 <body class="stage-draw">
@@ -290,7 +322,7 @@
 
 <div class="fixed-header no-print">
     <div class="header-content">
-        <div class="brand-name">COMPETITION HUB <span id="vTag" class="v-tag"></span></div>
+        <div class="brand-name">SHOREMATCH <span id="vTag" class="v-tag"></span></div>
         <div id="saveIndicator" style="position: fixed; top: 18px; right: 20px; background: var(--green-color); color: white; padding: 4px 10px; border-radius: 50px; font-weight: 800; font-size: 11px; opacity: 0; transition: opacity 0.3s; z-index: 9999; pointer-events: none; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);">✓ SAVED</div>
         
         <button id="masterResetBtn" onclick="showWipeModal()" class="btn-action-outline btn-danger-outline" style="padding: 10px 16px; font-size: 11px; font-weight: 900; background: white;">🏁 FINISH AND RESET COMPETITION</button>
