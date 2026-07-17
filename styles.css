@@ -1,5 +1,4 @@
-
-        :root {
+:root {
             /* Stage Backgrounds */
             --bg-base: #334155;
             --bg-score-d1: #334155; /* Day 1: Slate Blue */
@@ -373,13 +372,19 @@ body.stage-score-d2 .score-list-header {
             .a-name { color: black !important; font-weight: 900 !important; }
             .a-tag { color: black !important; border: 1px solid black !important; padding: 2px 4px !important; border-radius: 4px !important; }
             .print-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-            .print-table th { border: 2px solid black; padding: 12px; font-size: 14px; font-weight: 900; text-align: left; background: #f8fafc; }
-            .print-table td { border: 1px solid black; padding: 10px 12px; font-size: 13px; font-weight: 800; height: 25px; }
+            
+            /* INCREASED FONT SIZES & LOCKED LINE HEIGHTS FOR PRINT CELLS */
+            .print-table th { border: 2px solid black; padding: 10px 12px; font-size: 15.5px; font-weight: 900; text-align: left; background: #f8fafc; line-height: 1.1; }
+            .print-table td { border: 1px solid black; padding: 8px 12px; font-size: 14.5px; font-weight: 800; height: 25px; line-height: 1.1; }
+            
             .print-checkbox { display: inline-block; width: 18px; height: 18px; border: 2px solid black; margin: 0 auto; border-radius: 4px; }
             .dispatch-slip { padding: 25px; border: 3px solid black; margin-bottom: 25px; page-break-inside: avoid; border-radius: 16px; }
             .dispatch-header { border-bottom: 3px solid black; padding-bottom: 12px; margin-bottom: 20px; }
-            .dispatch-header h1 { font-size: 20px; margin: 0; }
-            .dispatch-header h2 { font-size: 16px; margin: 6px 0 0 0; }
+            
+            /* INCREASED FONT SIZES FOR DISPATCH SLIP HEADERS */
+            .dispatch-header h1 { font-size: 22px; margin: 0; line-height: 1.1; }
+            .dispatch-header h2 { font-size: 17.5px; margin: 6px 0 0 0; line-height: 1.1; }
+            
             .roster-page { page-break-after: always; padding: 20px; }
             .roster-header { border-bottom: 3px solid black; margin-bottom: 20px; padding-bottom: 12px; text-align: left; }
         }
@@ -649,7 +654,7 @@ body.stage-draw { background: #334155 !important; }
 .day-tab-btn {
     background: rgba(30, 41, 59, 0.7) !important; /* Solidifies against background */
     border: 1px solid #475569 !important;        /* Clear outline boundary */
-    color: #94a3b8 !important;                   /* Clear text visibility */
+    color: #94a3b8 !important;                    /* Clear text visibility */
     padding: 8px 16px !important;
     border-radius: 6px !important;
     transition: all 0.2s ease-in-out !important;
@@ -657,9 +662,9 @@ body.stage-draw { background: #334155 !important; }
 
 /* Active Day Tab Definition State */
 .day-tab-btn.active {
-    background: #334155 !important;               /* Lighter container slate */
-    border-color: #f8fafc !important;            /* High contrast border outline */
-    color: #ffffff !important;                   /* Bright crisp white text */
+    background: #334155 !important;                /* Lighter container slate */
+    border-color: #f8fafc !important;             /* High contrast border outline */
+    color: #ffffff !important;                    /* Bright crisp white text */
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
 }
 
@@ -667,5 +672,5 @@ body.stage-draw { background: #334155 !important; }
 .score-row.incomplete, 
 [data-status="incomplete"] {
     background-color: #991b1b !important; /* Deep crimson red instead of light pink */
-    color: #ffffff !important;            /* High-contrast white text */
+    color: #ffffff !important;             /* High-contrast white text */
 }
