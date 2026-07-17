@@ -11,6 +11,22 @@
 
     <link rel="stylesheet" href="styles.css">
     <style>
+        /* Force the specific ShoreMatch branding */
+.pts-val {
+    color: var(--accent) !important;
+    font-weight: 900;
+}
+
+/* Ensure data columns remain high-contrast white */
+.cm-val, .ct-val, .big-val, .spc-val {
+    color: #ffffff !important;
+}
+
+/* Handle the Combined Totals shading */
+.total-pts {
+    color: var(--accent) !important;
+    background: rgba(59, 130, 246, 0.1); /* Subtle blue tint for totals */
+}
         /* --- ACCESSIBILITY OPTIMIZED MODAL TAB BAR --- */
         .modal-tabs {
             display: flex;
