@@ -953,12 +953,22 @@ for (let i = 0; i < Math.min(3, standings.length); i++) {
                     }
                 }
 
-                /* 
-if (filledAnglers > 0 && filledAnglers < 4) {
+               // Only warn about incomplete teams if the user is not actively editing this specific team
+let activeElement = document.activeElement;
+let isCurrentTeamBeingEdited = false;
+
+if (activeElement && activeElement.closest('.team-row')) {
+    // Check if the team row being edited matches the current team entry loop
+    let currentEditingTName = activeElement.closest('.team-row').querySelector('.team-name-input')?.value || '';
+    if (currentEditingTName === tName) {
+        isCurrentTeamBeingEdited = true;
+    }
+}
+
+if (filledAnglers > 0 && filledAnglers < 4 && !isCurrentTeamBeingEdited) {
     let tDisp = tName !== '' ? `'${tName}'` : 'An unnamed team';
     errors.push(`INCOMPLETE TEAM: ${tDisp} only has ${filledAnglers} out of 4 anglers.`);
 }
-*/
             }
 
             entry.anglers.forEach((a) => {
