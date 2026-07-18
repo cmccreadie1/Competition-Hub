@@ -2575,8 +2575,8 @@ function calculateAndRenderTeamLeaderboard(containerId) {
                 team.members.forEach((m, idx) => {
                     breakdownHTML += `
                         <div style="display: inline-flex; flex-direction: column; align-items: flex-start; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.05); padding: 6px 12px; border-radius: 6px; margin: 4px; vertical-align: top;">
-                            <span style="font-weight: 800; color: #ffffff; font-size: 13px; line-height: 1.2;">${m.name}</span>
-                            <span class="team-matrix-subtext" style="color: #cbd5e1; font-family: monospace; font-size: 11px; margin-top: 3px; font-weight: 800; letter-spacing: 0.5px;">${m.pts}pts / ${m.len}cm / ${m.cnt}f</span>
+                            <span style="font-weight: 800; color: #ffffff; font-size: 15px; line-height: 1.2;">${m.name}</span>
+                            <span style="color: #94a3b8; font-family: monospace; font-size: 13px; margin-top: 3px; font-weight: 600; letter-spacing: 0.3px;">${m.pts}pts / ${m.len}cm / ${m.cnt}f</span>
                         </div>
                     `;
                 });
@@ -2588,15 +2588,15 @@ function calculateAndRenderTeamLeaderboard(containerId) {
                         <span style="font-weight: 900; color: #ffffff; font-size: 17px; letter-spacing: 0.5px;">${team.name}</span>
                     </td>
                     
-                    <td style="padding: 12px 4px; font-size: 17px; font-weight: 900; color: var(--accent); background: rgba(59, 130, 246, 0.02); border-left: 1px solid rgba(255,255,255,0.03); border-right: 1px solid rgba(255,255,255,0.03); font-family: monospace;">
+                    <td style="padding: 12px 4px; font-size: 20px; font-weight: 900; color: var(--accent); background: rgba(59, 130, 246, 0.02); border-left: 1px solid rgba(255,255,255,0.03); border-right: 1px solid rgba(255,255,255,0.03); font-family: monospace;">
                         ${team.pts}
                     </td>
                     
-                    <td style="padding: 12px 4px; font-size: 15px; font-weight: 800; color: #ffffff; background: rgba(16, 185, 129, 0.02); border-right: 1px solid rgba(255,255,255,0.03); font-family: monospace;">
+                    <td style="padding: 12px 4px; font-size: 18px; font-weight: 800; color: #ffffff; background: rgba(16, 185, 129, 0.02); border-right: 1px solid rgba(255,255,255,0.03); font-family: monospace;">
                         ${team.len}
                     </td>
                     
-                    <td style="padding: 12px 4px; font-size: 15px; font-weight: 800; color: #ffffff; background: rgba(234, 179, 8, 0.02); border-right: 1px solid rgba(255,255,255,0.03); font-family: monospace;">
+                    <td style="padding: 12px 4px; font-size: 18px; font-weight: 800; color: #ffffff; background: rgba(234, 179, 8, 0.02); border-right: 1px solid rgba(255,255,255,0.03); font-family: monospace;">
                         ${team.cnt}
                     </td>
                     
