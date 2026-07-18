@@ -168,11 +168,17 @@
         .scorecard-search {
             width: 100%; max-width: 600px; margin: 0 auto 25px; display: block;
             font-size: 16px; padding: 16px 80px 16px 24px; border-radius: 50px;
-            border: 2px solid var(--accent); box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-            background: rgba(255, 255, 255, 0.39); 
+            border: 2px solid var(--border); box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            /* HIGH CONTRAST GLASS EFFECT */
+            background: rgba(255, 255, 255, 0.85); 
             backdrop-filter: blur(8px);             
             -webkit-backdrop-filter: blur(8px);     
-            color: var(--text-dark); box-sizing: border-box;
+            color: #000000; font-weight: 900; box-sizing: border-box;
+        }
+
+        .scorecard-search::placeholder {
+            color: #475569; /* Darker placeholder so it is readable */
+            font-weight: 700;
         }
 
         /* Search Wrapper & Clear Button */
@@ -409,8 +415,9 @@ body.stage-draw { background: #334155 !important; }
         body.stage-score-d2 #subBtn-2 { background: var(--card); color: var(--green-color); }
 
         /* Dynamic Search Bar Borders for Day Identification */
-        body.stage-score-d1 .scorecard-search { border-color: var(--bg-score-d1); box-shadow: 0 0 0 4px rgba(51, 65, 85, 0.2); }
-        body.stage-score-d2 .scorecard-search { border-color: var(--bg-score-d2); box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.2); }
+        /* ADDED HIGH CONTRAST SOLID GLOW & ACCENT BORDERS */
+        body.stage-score-d1 .scorecard-search { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.3); }
+        body.stage-score-d2 .scorecard-search { border-color: var(--green-color); box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.3); }
 
         /* Excel Export Modal Styles */
         .export-modal {
