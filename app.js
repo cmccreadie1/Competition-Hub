@@ -1660,13 +1660,17 @@ if (filledAnglers > 0 && filledAnglers < 4 && !isCurrentTeamBeingEdited) {
         }
         const s = currentZoneSize;
 
-        let mapHtml = '';
+       let mapHtml = '';
         let masterLegend = `E = Empty Peg`;
         if (accEnabled) masterLegend += ` <span style="margin: 0 8px; opacity:0.5;">|</span> [A] = Accesable Pegs`;
-        mapHtml += `<div style="font-size:12px; font-weight:900; color:var(--text-light); text-align:center; margin-bottom:15px; letter-spacing: 0.5px;">${masterLegend}</div>`;
+        mapHtml += `<div style="font-size:12px; font-weight:900; color: #94a3b8; text-align:center; margin-bottom:15px; letter-spacing: 0.5px;">${masterLegend}</div>`;
         if (matchDays >= 1) {
-            mapHtml += `<div style="font-size:14px; font-weight:900; color:var(--text-dark); margin-bottom:6px; letter-spacing: 0.5px; margin-left:5px;">DAY 1</div>`;
+            mapHtml += `<div style="font-size:14px; font-weight:900; color: #ffffff; margin-bottom:6px; letter-spacing: 0.5px; margin-left:5px;">DAY 1</div>`;
             mapHtml += buildBeachMap(1, s);
+        }
+        if (matchDays === 2) {
+            mapHtml += `<div style="font-size:14px; font-weight:900; color: #ffffff; margin-bottom:6px; margin-top:10px; letter-spacing: 0.5px; margin-left:5px;">DAY 2</div>`;
+            mapHtml += buildBeachMap(2, s);
         }
         if (matchDays === 2) {
             mapHtml += `<div style="font-size:14px; font-weight:900; color:var(--text-dark); margin-bottom:6px; margin-top:10px; letter-spacing: 0.5px; margin-left:5px;">DAY 2</div>`;
