@@ -2122,7 +2122,7 @@ function calculateAndRenderZoneLeaderboard(dayNum, containerId) {
                         <tr style="border-bottom: 2px solid rgba(255,255,255,0.15); color: #94a3b8; font-weight: 800; font-size: 11px;">
                             <th style="padding: 6px 0px; text-align: center; width: 30px;">PTS</th>
                             <th style="padding: 6px 4px; width: auto;">ANGLER</th>
-                            <th style="padding: 6px 2px; text-align: right; width: 140px;">SCORES MATRIX (L/F/B/S)</th>
+                            <th style="padding: 6px 2px; text-align: right; width: 100px;">SCORES MATRIX (L/F/B/S)</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -2132,7 +2132,7 @@ function calculateAndRenderZoneLeaderboard(dayNum, containerId) {
             htmlOutput += `<tr><td colspan="3" style="text-align:center; padding:20px; color:#64748b; font-weight:700;">No anglers assigned to this zone</td></tr>`;
         } else {
             zoneAnglers.forEach(angler => {
-                const dataString = `${angler.length} / ${angler.count} / ${angler.max} / ${angler.species}`;
+                const dataString = `${angler.length}/${angler.count}/${angler.max}/${angler.species}`;
                 htmlOutput += `
                     <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.15); background: rgba(15, 23, 42, 0.1); font-weight: 600; height: 54px;">
                         <td style="padding: 6px 0px; text-align: center; color: var(--accent); font-weight: 900; font-size: 16px; font-family: monospace;">${angler.zonePoints}</td>
