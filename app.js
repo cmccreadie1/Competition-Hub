@@ -2569,13 +2569,14 @@ function calculateAndRenderTeamLeaderboard(containerId) {
             teamList.forEach((team, index) => {
                 const currentRank = index + 1;
 
+
                 // Build string layout for individual member contributions with stacked numbers
                 let breakdownHTML = '';
                 team.members.forEach((m, idx) => {
                     breakdownHTML += `
                         <div style="display: inline-flex; flex-direction: column; align-items: flex-start; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.05); padding: 6px 12px; border-radius: 6px; margin: 4px; vertical-align: top;">
                             <span style="font-weight: 800; color: #ffffff; font-size: 13px; line-height: 1.2;">${m.name}</span>
-                            <span style="color: #94a3b8; font-family: monospace; font-size: 11px; margin-top: 3px; font-weight: 600; letter-spacing: 0.3px;">${m.pts}pts / ${m.len}cm / ${m.cnt}f</span>
+                            <span class="team-matrix-subtext" style="color: #cbd5e1; font-family: monospace; font-size: 11px; margin-top: 3px; font-weight: 800; letter-spacing: 0.5px;">${m.pts}pts / ${m.len}cm / ${m.cnt}f</span>
                         </div>
                     `;
                 });
@@ -2608,7 +2609,6 @@ function calculateAndRenderTeamLeaderboard(containerId) {
                 `;
             });
         }
-
         html += `
                     </tbody>
                 </table>
