@@ -2116,13 +2116,13 @@ function calculateAndRenderZoneLeaderboard(dayNum, containerId) {
             <div style="background: ${activeColor}; color: #ffffff; padding: 12px; text-align: center; font-size: 14px; font-weight: 900; letter-spacing: 1px;">
                 ZONE ${zoneName}
             </div>
-            <div style="padding: 6px; overflow-x: auto;">
-                <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; color: #ffffff; table-layout: auto;">
+            <div style="padding: 4px; overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; color: #ffffff; table-layout: fixed;">
                     <thead>
                         <tr style="border-bottom: 2px solid rgba(255,255,255,0.15); color: #94a3b8; font-weight: 800; font-size: 11px;">
-                            <th style="padding: 6px 2px; text-align: center; width: 45px;">PTS</th>
-                            <th style="padding: 6px 6px;">ANGLER</th>
-                            <th style="padding: 6px 2px; text-align: right; width: 150px;">SCORES MATRIX (L/F/B/S)</th>
+                            <th style="padding: 6px 0px; text-align: center; width: 30px;">PTS</th>
+                            <th style="padding: 6px 4px; width: auto;">ANGLER</th>
+                            <th style="padding: 6px 2px; text-align: right; width: 140px;">SCORES MATRIX (L/F/B/S)</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -2135,12 +2135,12 @@ function calculateAndRenderZoneLeaderboard(dayNum, containerId) {
                 const dataString = `${angler.length} / ${angler.count} / ${angler.max} / ${angler.species}`;
                 htmlOutput += `
                     <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.15); background: rgba(15, 23, 42, 0.1); font-weight: 600; height: 54px;">
-                        <td style="padding: 6px 2px; text-align: center; color: var(--accent); font-weight: 900; font-size: 16px; font-family: monospace;">${angler.zonePoints}</td>
+                        <td style="padding: 6px 0px; text-align: center; color: var(--accent); font-weight: 900; font-size: 16px; font-family: monospace;">${angler.zonePoints}</td>
                         
-                        <td style="padding: 6px 6px; text-transform: uppercase;">
-                            <div style="display: flex; flex-direction: column; justify-content: center; gap: 2px;">
-                                <span style="font-weight: 800; color: #ffffff; font-size: 14px; letter-spacing: 0.3px; line-height: 1.2;">${angler.name}</span>
-                                <span style="font-size: 11px; color: #94a3b8; font-weight: 700; letter-spacing: 0.5px;">${angler.team}</span>
+                        <td style="padding: 6px 4px; text-transform: uppercase; max-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            <div style="display: flex; flex-direction: column; justify-content: center; gap: 2px; overflow: hidden;">
+                                <span style="font-weight: 800; color: #ffffff; font-size: 14px; letter-spacing: 0.3px; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${angler.name}">${angler.name}</span>
+                                <span style="font-size: 11px; color: #94a3b8; font-weight: 700; letter-spacing: 0.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${angler.team}">${angler.team}</span>
                             </div>
                         </td>
                         
@@ -2149,7 +2149,6 @@ function calculateAndRenderZoneLeaderboard(dayNum, containerId) {
                 `;
             });
         }
-
         htmlOutput += `
                     </tbody>
                 </table>
