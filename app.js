@@ -1672,10 +1672,7 @@ if (filledAnglers > 0 && filledAnglers < 4 && !isCurrentTeamBeingEdited) {
             mapHtml += `<div style="font-size:14px; font-weight:900; color: #ffffff; margin-bottom:6px; margin-top:10px; letter-spacing: 0.5px; margin-left:5px;">DAY 2</div>`;
             mapHtml += buildBeachMap(2, s);
         }
-        if (matchDays === 2) {
-            mapHtml += `<div style="font-size:14px; font-weight:900; color:var(--text-dark); margin-bottom:6px; margin-top:10px; letter-spacing: 0.5px; margin-left:5px;">DAY 2</div>`;
-            mapHtml += buildBeachMap(2, s);
-        }
+        
         
         const beachContainer = document.getElementById('beachMapContainer');
         beachContainer.innerHTML = mapHtml;
