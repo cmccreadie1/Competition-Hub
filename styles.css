@@ -733,18 +733,17 @@ backdrop-filter: blur(4px) !important;
 -webkit-backdrop-filter: blur(4px) !important;
 box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2) !important;
 }
-
 /* Replacement for inline-styled white pills */
 .peg-status-pill {
-    font-size: 10px;
+    font-size: 12px; /* Slightly larger for better readability */
     font-weight: 900;
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.15); /* Slightly more opaque to distinguish from the bar */
     color: #ffffff;
-    padding: 4px 8px;
+    padding: 4px 10px;
     border-radius: 50px;
     white-space: nowrap;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(0, 0, 0, 0.3); /* Thin dark border for contrast */
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Added a bit more shadow to lift it */
 }
