@@ -1624,11 +1624,11 @@ if (filledAnglers > 0 && filledAnglers < 4 && !isCurrentTeamBeingEdited) {
             let hasEmpty = emptyPegs.length > 0;
             let hasA = accEnabled && aPegs.length > 0;
 
-            if (hasEmpty) {
-                extraInfo += `<span style="font-size:10px; font-weight:900; background:white; color:var(--text-dark); padding:4px 8px; border-radius:50px; white-space:nowrap; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">E: ${emptyPegs.join(', ')}</span>`;
+         if (hasEmpty) {
+                extraInfo += `<span class="peg-status-pill">E: ${emptyPegs.join(', ')}</span>`;
             }
             if (hasA) {
-                extraInfo += `<span style="font-size:10px; font-weight:900; background:white; color:var(--text-dark); padding:4px 8px; border-radius:50px; white-space:nowrap; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">[A]: ${aPegs.join(', ')}</span>`;
+                extraInfo += `<span class="peg-status-pill">[A]: ${aPegs.join(', ')}</span>`;
             }
 
             html += `<div style="flex:1; background:${bg}; border-radius:12px; padding:6px 12px; color:white; font-weight:900; display:flex; flex-direction:row; flex-wrap:wrap; justify-content:center; align-items:center; gap:8px; min-height:26px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
