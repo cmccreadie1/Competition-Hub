@@ -1624,11 +1624,11 @@ if (filledAnglers > 0 && filledAnglers < 4 && !isCurrentTeamBeingEdited) {
             let hasEmpty = emptyPegs.length > 0;
             let hasA = accEnabled && aPegs.length > 0;
 
-         if (hasEmpty) {
-                extraInfo += `<span class="peg-status-pill">E: ${emptyPegs.join(', ')}</span>`;
+            if (hasEmpty) {
+                extraInfo += `<span style="font-size:10px; font-weight:900; background:white; color:var(--text-dark); padding:4px 8px; border-radius:50px; white-space:nowrap; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">E: ${emptyPegs.join(', ')}</span>`;
             }
             if (hasA) {
-                extraInfo += `<span class="peg-status-pill">[A]: ${aPegs.join(', ')}</span>`;
+                extraInfo += `<span style="font-size:10px; font-weight:900; background:white; color:var(--text-dark); padding:4px 8px; border-radius:50px; white-space:nowrap; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">[A]: ${aPegs.join(', ')}</span>`;
             }
 
             html += `<div style="flex:1; background:${bg}; border-radius:12px; padding:6px 12px; color:white; font-weight:900; display:flex; flex-direction:row; flex-wrap:wrap; justify-content:center; align-items:center; gap:8px; min-height:26px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
@@ -1660,19 +1660,18 @@ if (filledAnglers > 0 && filledAnglers < 4 && !isCurrentTeamBeingEdited) {
         }
         const s = currentZoneSize;
 
-       let mapHtml = '';
+        let mapHtml = '';
         let masterLegend = `E = Empty Peg`;
         if (accEnabled) masterLegend += ` <span style="margin: 0 8px; opacity:0.5;">|</span> [A] = Accesable Pegs`;
-        mapHtml += `<div style="font-size:12px; font-weight:900; color: #94a3b8; text-align:center; margin-bottom:15px; letter-spacing: 0.5px;">${masterLegend}</div>`;
+        mapHtml += `<div style="font-size:12px; font-weight:900; color:var(--text-light); text-align:center; margin-bottom:15px; letter-spacing: 0.5px;">${masterLegend}</div>`;
         if (matchDays >= 1) {
-            mapHtml += `<div style="font-size:14px; font-weight:900; color: #ffffff; margin-bottom:6px; letter-spacing: 0.5px; margin-left:5px;">DAY 1</div>`;
+            mapHtml += `<div style="font-size:14px; font-weight:900; color:var(--text-dark); margin-bottom:6px; letter-spacing: 0.5px; margin-left:5px;">DAY 1</div>`;
             mapHtml += buildBeachMap(1, s);
         }
         if (matchDays === 2) {
-            mapHtml += `<div style="font-size:14px; font-weight:900; color: #ffffff; margin-bottom:6px; margin-top:10px; letter-spacing: 0.5px; margin-left:5px;">DAY 2</div>`;
+            mapHtml += `<div style="font-size:14px; font-weight:900; color:var(--text-dark); margin-bottom:6px; margin-top:10px; letter-spacing: 0.5px; margin-left:5px;">DAY 2</div>`;
             mapHtml += buildBeachMap(2, s);
         }
-        
         
         const beachContainer = document.getElementById('beachMapContainer');
         beachContainer.innerHTML = mapHtml;
@@ -2117,13 +2116,13 @@ function calculateAndRenderZoneLeaderboard(dayNum, containerId) {
             <div style="background: ${activeColor}; color: #ffffff; padding: 12px; text-align: center; font-size: 14px; font-weight: 900; letter-spacing: 1px;">
                 ZONE ${zoneName}
             </div>
-            <div style="padding: 4px; overflow-x: auto;">
-                <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; color: #ffffff; table-layout: fixed;">
+            <div style="padding: 6px; overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; color: #ffffff; table-layout: auto;">
                     <thead>
                         <tr style="border-bottom: 2px solid rgba(255,255,255,0.15); color: #94a3b8; font-weight: 800; font-size: 11px;">
-                            <th style="padding: 6px 0px; text-align: center; width: 30px;">PTS</th>
-                            <th style="padding: 6px 4px; width: auto;">ANGLER</th>
-                            <th style="padding: 6px 2px; text-align: right; width: 100px;">SCORES MATRIX (L/F/B/S)</th>
+                            <th style="padding: 6px 2px; text-align: center; width: 45px;">PTS</th>
+                            <th style="padding: 6px 6px;">ANGLER</th>
+                            <th style="padding: 6px 2px; text-align: right; width: 150px;">SCORES MATRIX (L/F/B/S)</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -2133,15 +2132,15 @@ function calculateAndRenderZoneLeaderboard(dayNum, containerId) {
             htmlOutput += `<tr><td colspan="3" style="text-align:center; padding:20px; color:#64748b; font-weight:700;">No anglers assigned to this zone</td></tr>`;
         } else {
             zoneAnglers.forEach(angler => {
-                const dataString = `${angler.length}/${angler.count}/${angler.max}/${angler.species}`;
+                const dataString = `${angler.length} / ${angler.count} / ${angler.max} / ${angler.species}`;
                 htmlOutput += `
                     <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.15); background: rgba(15, 23, 42, 0.1); font-weight: 600; height: 54px;">
-                        <td style="padding: 6px 0px; text-align: center; color: var(--accent); font-weight: 900; font-size: 16px; font-family: monospace;">${angler.zonePoints}</td>
+                        <td style="padding: 6px 2px; text-align: center; color: var(--accent); font-weight: 900; font-size: 16px; font-family: monospace;">${angler.zonePoints}</td>
                         
-                        <td style="padding: 6px 4px; text-transform: uppercase; max-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                            <div style="display: flex; flex-direction: column; justify-content: center; gap: 2px; overflow: hidden;">
-                                <span style="font-weight: 800; color: #ffffff; font-size: 14px; letter-spacing: 0.3px; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${angler.name}">${angler.name}</span>
-                                <span style="font-size: 11px; color: #94a3b8; font-weight: 700; letter-spacing: 0.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${angler.team}">${angler.team}</span>
+                        <td style="padding: 6px 6px; text-transform: uppercase;">
+                            <div style="display: flex; flex-direction: column; justify-content: center; gap: 2px;">
+                                <span style="font-weight: 800; color: #ffffff; font-size: 14px; letter-spacing: 0.3px; line-height: 1.2;">${angler.name}</span>
+                                <span style="font-size: 11px; color: #94a3b8; font-weight: 700; letter-spacing: 0.5px;">${angler.team}</span>
                             </div>
                         </td>
                         
@@ -2150,6 +2149,7 @@ function calculateAndRenderZoneLeaderboard(dayNum, containerId) {
                 `;
             });
         }
+
         htmlOutput += `
                     </tbody>
                 </table>
@@ -2569,14 +2569,13 @@ function calculateAndRenderTeamLeaderboard(containerId) {
             teamList.forEach((team, index) => {
                 const currentRank = index + 1;
 
-
                 // Build string layout for individual member contributions with stacked numbers
                 let breakdownHTML = '';
                 team.members.forEach((m, idx) => {
                     breakdownHTML += `
                         <div style="display: inline-flex; flex-direction: column; align-items: flex-start; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.05); padding: 6px 12px; border-radius: 6px; margin: 4px; vertical-align: top;">
-                            <span style="font-weight: 800; color: #ffffff; font-size: 15px; line-height: 1.2;">${m.name}</span>
-                            <span style="color: #94a3b8; font-family: monospace; font-size: 13px; margin-top: 3px; font-weight: 600; letter-spacing: 0.3px;">${m.pts}pts / ${m.len}cm / ${m.cnt}f</span>
+                            <span style="font-weight: 800; color: #ffffff; font-size: 13px; line-height: 1.2;">${m.name}</span>
+                            <span style="color: #94a3b8; font-family: monospace; font-size: 11px; margin-top: 3px; font-weight: 600; letter-spacing: 0.3px;">${m.pts}pts / ${m.len}cm / ${m.cnt}f</span>
                         </div>
                     `;
                 });
@@ -2588,15 +2587,15 @@ function calculateAndRenderTeamLeaderboard(containerId) {
                         <span style="font-weight: 900; color: #ffffff; font-size: 17px; letter-spacing: 0.5px;">${team.name}</span>
                     </td>
                     
-                    <td style="padding: 12px 4px; font-size: 20px; font-weight: 900; color: var(--accent); background: rgba(59, 130, 246, 0.02); border-left: 1px solid rgba(255,255,255,0.03); border-right: 1px solid rgba(255,255,255,0.03); font-family: monospace;">
+                    <td style="padding: 12px 4px; font-size: 17px; font-weight: 900; color: var(--accent); background: rgba(59, 130, 246, 0.02); border-left: 1px solid rgba(255,255,255,0.03); border-right: 1px solid rgba(255,255,255,0.03); font-family: monospace;">
                         ${team.pts}
                     </td>
                     
-                    <td style="padding: 12px 4px; font-size: 18px; font-weight: 800; color: #ffffff; background: rgba(16, 185, 129, 0.02); border-right: 1px solid rgba(255,255,255,0.03); font-family: monospace;">
+                    <td style="padding: 12px 4px; font-size: 15px; font-weight: 800; color: #ffffff; background: rgba(16, 185, 129, 0.02); border-right: 1px solid rgba(255,255,255,0.03); font-family: monospace;">
                         ${team.len}
                     </td>
                     
-                    <td style="padding: 12px 4px; font-size: 18px; font-weight: 800; color: #ffffff; background: rgba(234, 179, 8, 0.02); border-right: 1px solid rgba(255,255,255,0.03); font-family: monospace;">
+                    <td style="padding: 12px 4px; font-size: 15px; font-weight: 800; color: #ffffff; background: rgba(234, 179, 8, 0.02); border-right: 1px solid rgba(255,255,255,0.03); font-family: monospace;">
                         ${team.cnt}
                     </td>
                     
@@ -2609,6 +2608,7 @@ function calculateAndRenderTeamLeaderboard(containerId) {
                 `;
             });
         }
+
         html += `
                     </tbody>
                 </table>
