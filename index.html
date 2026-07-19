@@ -326,68 +326,6 @@
             color: var(--accent) !important;
             font-weight: 800 !important;
         }
-        /* --- ACCESSIBILITY AND ENTRY CONTRAST FIXES --- */
-        #accPanelWrapper label,
-        #accPanelWrapper span,
-        #accPanelWrapper div {
-            color: #0f172a !important;
-        }
-
-        #accPanelWrapper select {
-            background-color: #ffffff !important;
-            color: #0f172a !important;
-            border: 2px solid #cbd5e1 !important;
-            padding: 8px 12px !important;
-            border-radius: 8px !important;
-            font-weight: 800 !important;
-            font-size: 16px !important;
-        }
-
-        #rosterEntryZone {
-            display: block !important;
-            opacity: 1 !important;
-            visibility: visible !important;
-        }
-
-        #rosterEntryZone .entry-group-label,
-        #rosterEntryZone h4 {
-            color: #ffffff !important;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
-        }
-        /* --- BUTTON CONTRAST, ALIGNMENT, AND MANUAL ENTRY FIXES --- */
-        #accPanelWrapper button.active,
-        #accPanelWrapper .btn-primary.active,
-        #accPanelWrapper [class*="active"] {
-            color: #ffffff !important;
-        }
-
-        #accPanelWrapper > div > div[style*="flex"] {
-            flex-direction: column !important;
-            align-items: stretch !important;
-            gap: 15px !important;
-        }
-
-        #accPanelWrapper select {
-            width: 100% !important;
-            box-sizing: border-box !important;
-        }
-
-        #rosterEntryZone div[style*="background: #ffffff"],
-        #rosterEntryZone div[style*="background:#ffffff"],
-        #rosterEntryZone .bg-white {
-            color: #0f172a !important;
-        }
-
-        #rosterEntryZone h4, 
-        #rosterEntryZone .entry-group-label {
-            color: #0f172a !important;
-            text-shadow: none !important;
-        }
-
-        #rosterEntryZone label,
-        #rosterEntryZone p {
-            color: #334155 !important;
-        }
     </style>
 </head>
 <body class="stage-draw">
@@ -404,7 +342,7 @@
         <div id="saveIndicator" style="position: fixed; top: 18px; right: 20px; background: var(--green-color); color: white; padding: 4px 10px; border-radius: 50px; font-weight: 800; font-size: 11px; opacity: 0; transition: opacity 0.3s; z-index: 9999; pointer-events: none; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);">✓ SAVED</div>
         
         <button id="masterResetBtn" onclick="showWipeModal()" class="btn-action-outline btn-danger-outline" style="padding: 10px 16px; font-size: 11px; font-weight: 900; background: white;">🏁 FINISH AND RESET COMPETITION</button>
-       <button id="globalHelpBtn" onclick="openManualModal()" class="btn-action-outline" style="padding: 10px 16px; font-size: 13px; font-weight: 900; background: #0ea5e9; color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.2); margin-left: 8px; text-transform: uppercase;">📖 GUIDE & DRAW SECURITY</button>
+        <button id="globalHelpBtn" onclick="openManualModal()" class="btn-action-outline" style="padding: 10px 16px; font-size: 11px; font-weight: 900; background: #e0f2fe; color: #0369a1; border-color: #bae6fd; margin-left: 8px;">📖 Guide & Draw Security</button>
     </div>
     
     <div class="tab-nav">
@@ -549,17 +487,17 @@
             <ul id="anomalyList"></ul>
         </div>
 
-        <h1 id="resTitle" style="color: #ffffff; text-align:center; font-size:22px; font-weight:900; margin: 0 0 20px; letter-spacing: 1px;"></h1>
+        <h1 id="resTitle" style="text-align:center; font-size:22px; font-weight:900; margin: 0 0 20px;"></h1>
         
         <div id="beachMapContainer" class="no-print" style="margin-bottom: 20px; width: 100%;"></div>
 
         <div id="resultsArea">
             <div id="teamsBucketContainer" style="display:none;">
-                <div class="group-label" style="color: #ffffff; font-weight: 900; letter-spacing: 2px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 8px; margin-bottom: 20px;">TEAMS</div>
+                <div class="group-label">TEAMS</div>
                 <div id="teamsBucket" class="bucket-grid"></div>
             </div>
             <div id="solosBucketContainer" style="display:none; margin-top:40px;">
-                <div class="group-label" style="color: #ffffff; font-weight: 900; letter-spacing: 2px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 8px; margin-bottom: 20px;">SOLOS</div>
+                <div class="group-label">SOLOS</div>
                 <div id="solosBucket" class="bucket-grid"></div>
             </div>
         </div>
@@ -668,7 +606,7 @@
 </div>
 
 <div id="scoreTab" class="tab-content" style="display:none;">
-    <div style="max-width: 99%; margin: 0 auto; text-align: center; padding-bottom: 10px;">
+    <div style="max-width: 96%; margin: 0 auto; text-align: center; padding-bottom: 10px;">
        <div id="scoreBadgeContainer" style="display: inline-block; background: #1e293b; border-radius: 50px; padding: 6px 20px; margin-bottom: 15px; position: relative; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: background-color 0.4s;">
             <div id="scoreProgressText" style="font-size: 11px; font-weight: 900; color: #ffffff; text-align: center; position: relative; z-index: 2; letter-spacing: 0.5px;">DAY 1 SCORES: 0 ENTERED | 0 REMAINING</div>
             <div id="scoreProgressBar" style="position: absolute; bottom: 0; left: 0; height: 4px; background: var(--accent); width: 0%; transition: width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); z-index: 1;"></div>
