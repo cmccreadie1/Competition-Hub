@@ -184,7 +184,7 @@
         }
     }
 
-    function renderScorecards() {
+  function renderScorecards() {
         const container = document.getElementById('scoreListContainer');
         container.innerHTML = '';
         
@@ -193,14 +193,13 @@
         let headerRow = document.createElement('div');
         headerRow.className = 'score-list-header';
         headerRow.innerHTML = `
-            <div>ANGLER</div>
-            <div>TEAM</div>
-            <div>PEG</div>
-            <div style="text-align:center;">LENGTH</div>
-            <div style="text-align:center;">FISH CT</div>
-            <div style="text-align:center;">BIGGEST</div>
-            <div style="text-align:center;">SPECIES</div>
-        
+            <div style="color: #cbd5e1;">ANGLER</div>
+            <div style="color: #cbd5e1;">TEAM</div>
+            <div style="color: #cbd5e1;">PEG</div>
+            <div style="text-align:center; color: #cbd5e1;">LENGTH</div>
+            <div style="text-align:center; color: #cbd5e1;">FISH CT</div>
+            <div style="text-align:center; color: #cbd5e1;">BIGGEST</div>
+            <div style="text-align:center; color: #cbd5e1;">SPECIES</div>
         `;
         container.appendChild(headerRow);
 
@@ -223,14 +222,19 @@
                 row.className = 'score-row';
                 row.id = 'row_' + key;
                 
+                // Apply inline slate grey Glassmorphism styles directly to the row
+                row.style.background = '#1e293b';
+                row.style.border = '1px solid rgba(255, 255, 255, 0.15)';
+                row.style.borderRadius = '8px';
+                
                 let filledCount = (s.len ? 1 : 0) + (s.count ? 1 : 0) + (s.big ? 1 : 0) + (s.spec ? 1 : 0);
                 if (filledCount > 0 && filledCount < 4) {
                     row.classList.add('incomplete-row');
                 }
 
                 row.innerHTML = `
-                    <div class="s-name">${a.name}</div>
-                    <div class="s-team">${tName}</div>
+                    <div class="s-name" style="color: #ffffff;">${a.name}</div>
+                    <div class="s-team" style="color: #cbd5e1;">${tName}</div>
                     <div class="s-peg" style="color: ${zColor};">${targetZ} ${targetP}</div>
                     <input type="number" placeholder="LEN" value="${s.len}" 
                         oninput="enforceLimits(this, 4)" 
@@ -252,7 +256,6 @@
                         onchange="saveScore('${key}', 'spec', this.value)" 
                         onkeydown="handleScoreEnter(event)"
                         onfocus="highlightRow(this)" onblur="unhighlightRow(this)">
-                   
                 `;
                 container.appendChild(row);
             });
