@@ -326,34 +326,6 @@
             color: var(--accent) !important;
             font-weight: 800 !important;
         }
-        /* --- VISIBILITY AND CONTRAST FIXES --- */
-        #accPanelWrapper label,
-        #accPanelWrapper span,
-        #accPanelWrapper div {
-            color: #0f172a !important;
-        }
-
-        #accPanelWrapper select {
-            background-color: #ffffff !important;
-            color: #0f172a !important;
-            border: 2px solid #cbd5e1 !important;
-            padding: 8px 12px !important;
-            border-radius: 8px !important;
-            font-weight: 800 !important;
-            font-size: 16px !important;
-        }
-
-        #rosterEntryZone {
-            display: block !important;
-            opacity: 1 !important;
-            visibility: visible !important;
-        }
-
-        #rosterEntryZone .entry-group-label,
-        #rosterEntryZone h4 {
-            color: #ffffff !important;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
-        }
     </style>
 </head>
 <body class="stage-draw">
@@ -438,28 +410,30 @@
                 </div>
 
                 <div id="modeBSetup" style="display:none; flex-direction:column; gap:12px; width:100%; margin-top:8px;">
-    <label style="font-size:14px; font-weight:900; margin-bottom:-6px;">DAY 1 FULL ZONE ANCHOR</label>
-    <div style="display:flex; gap:10px;">
-        <select id="anchorZoneSelect" style="width: 100%;">
-            <option value="RED">RED ZONE</option>
-            <option value="YELLOW">YELLOW ZONE</option>
-            <option value="GREEN">GREEN ZONE</option>
-            <option value="BLUE">BLUE ZONE</option>
-        </select>
-    </div>
-    
-    <div id="day2AnchorContainer" style="display:flex; flex-direction:column; gap:12px; width:100%;">
-        <label style="font-size:14px; font-weight:900; margin-bottom:-6px; margin-top:8px;">DAY 2 FULL ZONE ANCHOR</label>
-        <div style="display:flex; gap:10px;">
-            <select id="anchorZoneSelect2" style="width: 100%;">
-                <option value="RED">RED ZONE</option>
-                <option value="YELLOW">YELLOW ZONE</option>
-                <option value="GREEN">GREEN ZONE</option>
-                <option value="BLUE">BLUE ZONE</option>
-            </select>
-        </div>
-    </div>
-</div>
+                    <label style="font-size:11px; font-weight:900; color:var(--text-dark); text-align:left; margin-bottom:-6px;">DAY 1 FULL ZONE ANCHOR</label>
+                    <div style="display:flex; gap:10px;">
+                        <select id="anchorZoneSelect" style="flex: 1; background: #ffffff; color: var(--text-dark); border: 1px solid var(--border);">
+                            <option value="RED">RED</option>
+                            <option value="YELLOW">YELLOW</option>
+                            <option value="GREEN">GREEN</option>
+                            <option value="BLUE">BLUE</option>
+                        </select>
+                    </div>
+                    
+                    <div id="day2AnchorContainer" style="display:flex; flex-direction:column; gap:12px; width:100%;">
+                        <label style="font-size:11px; font-weight:900; color:var(--text-dark); text-align:left; margin-bottom:-6px; margin-top:8px;">DAY 2 FULL ZONE ANCHOR</label>
+                        <div style="display:flex; gap:10px;">
+                            <select id="anchorZoneSelect2" style="flex: 1; background: #ffffff; color: var(--text-dark); border: 1px solid var(--border);">
+                                <option value="RED">RED</option>
+                                <option value="YELLOW">YELLOW</option>
+                                <option value="GREEN">GREEN</option>
+                                <option value="BLUE">BLUE</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div id="rosterEntryZone">
                 <div style="margin: 25px 0; border-bottom: 2px dashed var(--border);"></div>
                 <div class="entry-group-label" style="text-align: center; margin-bottom: 20px; color: var(--text-dark);">COMPETITOR ENTRY</div>
