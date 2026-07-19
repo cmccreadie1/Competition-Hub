@@ -928,19 +928,8 @@ for (let i = 0; i < Math.min(3, standings.length); i++) {
         let anglerNames = {};
         let teamNames = {};
 
-       document.querySelectorAll('.a-name-input, .t-name').forEach(el => el.classList.remove('input-error'));
-
-// Scan the appState array to find the very last row being actively worked on
-let lastActiveTeamIndex = -1;
-appState.forEach((entry, idx) => {
-    let tempTName = (entry.tName || '').trim();
-    let hasAnglerData = entry.anglers.some(a => (a.name || '').trim() !== '');
-    if (tempTName !== '' || hasAnglerData) {
-        lastActiveTeamIndex = idx;
-    }
-});
-
-appState.forEach((entry, index) => {
+        document.querySelectorAll('.a-name-input, .t-name').forEach(el => el.classList.remove('input-error'));
+        appState.forEach((entry) => {
             if (entry.isTeam) {
                 let tName = (entry.tName || '').trim();
                 let filledAnglers = entry.anglers.filter(a => (a.name || '').trim() !== '').length;
@@ -976,11 +965,7 @@ if (activeElement && activeElement.closest('.team-row')) {
     }
 }
 
-let isBehindLastActiveTeam = (index < lastActiveTeamIndex); 
-
-let isBehindLastActiveTeam = (index < lastActiveTeamIndex); 
-
-if (filledAnglers > 0 && filledAnglers < 4 && !isCurrentTeamBeingEdited && isBehindLastActiveTeam) {
+if (filledAnglers > 0 && filledAnglers < 4 && !isCurrentTeamBeingEdited) {
     let tDisp = tName !== '' ? `'${tName}'` : 'An unnamed team';
     errors.push(`INCOMPLETE TEAM: ${tDisp} only has ${filledAnglers} out of 4 anglers.`);
 }
