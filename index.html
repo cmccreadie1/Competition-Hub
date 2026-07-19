@@ -585,18 +585,17 @@
         <div id="actionBtnArea" style="display:flex; flex-direction:column; align-items:flex-end;">
             <div id="teamClashWarning" style="display:none; color:var(--red-color); font-size:12px; font-weight:800; margin-bottom:10px;">⚠️ STATIC MODE CLASH: MAX 1 [A] PER TEAM</div>
             
-            <div id="entryAnomalyBanner" class="anomaly-banner warning no-print" style="display:none; margin-bottom:15px; width: 100%; max-width: 450px;">
-                <h3 style="color:var(--yellow-color);">⚠️ PRE-DRAW WARNINGS</h3>
-                <ul id="entryAnomalyList"></ul>
-            </div>
+            <div id="entryAnomalyBanner" class="anomaly-banner warning no-print" style="display:none; position: absolute; bottom: 100%; right: 20px; z-index: 50; margin-bottom: 15px; width: 100%; max-width: 450px;">
+    <h3 style="color:var(--yellow-color);">⚠️ PRE-DRAW WARNINGS</h3>
+    <ul id="entryAnomalyList"></ul>
+</div>
 
-            <div style="display:flex; gap:12px; align-items:flex-start;">
-                <button class="btn-action-outline" id="mergeBtn" style="display:none; border-color:var(--text-dark); color:var(--text-dark); background: white; padding: 16px 32px; height: fit-content;" onclick="mergeSelected()">LINK TEAM (4)</button>
-                
-                <div id="viewDrawContainer" style="display:none; flex-direction:column; align-items:center; max-width: 280px;">
-                    <button class="btn-action" id="viewDrawBtn" onclick="displayDraw()" style="background:var(--green-color); width: 100%;">✅ SAVE EDITS & RETURN</button>
-                </div>
-
+<div style="display:flex; gap:12px; align-items:flex-start;">
+    <button class="btn-action-outline" id="mergeBtn" style="display:none; border-color:var(--text-dark); color:var(--text-dark); background: white; padding: 16px 32px; height: fit-content;" onclick="mergeSelected()">LINK TEAM (4)</button>
+    
+    <div id="viewDrawContainer" style="display:none; flex-direction:column; align-items:center; max-width: 280px;">
+        <button class="btn-action" id="viewDrawBtn" onclick="displayDraw()" style="background:var(--green-color); width: 100%;">✅ SAVE EDITS & RETURN</button>
+    </div>
                 <div id="processDrawContainer" style="display:flex; flex-direction:column; align-items:center;">
                     <button class="btn-action" id="mainActionBtn" onclick="initiateShuffle()" style="width: 100%;">PROCESS DRAW</button>
                 </div>
