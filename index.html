@@ -354,6 +354,40 @@
             color: #ffffff !important;
             text-shadow: 0 1px 3px rgba(0,0,0,0.5);
         }
+        /* --- BUTTON CONTRAST, ALIGNMENT, AND MANUAL ENTRY FIXES --- */
+        #accPanelWrapper button.active,
+        #accPanelWrapper .btn-primary.active,
+        #accPanelWrapper [class*="active"] {
+            color: #ffffff !important;
+        }
+
+        #accPanelWrapper > div > div[style*="flex"] {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 15px !important;
+        }
+
+        #accPanelWrapper select {
+            width: 100% !important;
+            box-sizing: border-box !important;
+        }
+
+        #rosterEntryZone div[style*="background: #ffffff"],
+        #rosterEntryZone div[style*="background:#ffffff"],
+        #rosterEntryZone .bg-white {
+            color: #0f172a !important;
+        }
+
+        #rosterEntryZone h4, 
+        #rosterEntryZone .entry-group-label {
+            color: #0f172a !important;
+            text-shadow: none !important;
+        }
+
+        #rosterEntryZone label,
+        #rosterEntryZone p {
+            color: #334155 !important;
+        }
     </style>
 </head>
 <body class="stage-draw">
