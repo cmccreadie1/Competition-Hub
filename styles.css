@@ -114,7 +114,7 @@
         #tabBtn-draw.active, #tabBtn-pairs.active { background: #0f172a !important; color: #ffffff !important; }
         #tabBtn-score.active { background: #0f172a !important; color: #ffffff !important; border-color: #0f172a !important; }
 
-       .tab-content { padding: 140px 20px 40px; }
+       .tab-content { padding: 175px 20px 40px; }
         #entrySection, #resultsSection, #dispatchSection, #rosterSection, #registrationPrintSection { max-width: 1400px; margin: 0 auto; }
         #registrationPrintSection, #dispatchSection, #rosterSection { display: none; }
 
@@ -195,7 +195,7 @@
 
 .score-list-header {
     position: sticky !important;
-    top: 115px !important;            
+    top: 160px !important;            
     z-index: 4000 !important;          
     background: #1e3a8a !important;    
     padding: 10px 15px 8px !important; 
