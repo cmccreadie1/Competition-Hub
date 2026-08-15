@@ -1,4 +1,4 @@
-const APP_VERSION = "v7.5.0"; // Version update for Embedded Manual
+const APP_VERSION = "v7.4.0"; // Version update for Embedded Manual
     document.getElementById('vTag').innerText = APP_VERSION;
 
     const zones = ['RED', 'YELLOW', 'GREEN', 'BLUE'];
