@@ -575,3 +575,126 @@ body.light-theme .col-length-reset { color: #0f172a !important; font-weight: nor
 .score-card input[placeholder*="Points" i], .score-card input[placeholder*="Pts" i], .score-row input[placeholder*="Points" i], .score-row input[placeholder*="Pts" i], input[id*="points" i], input[class*="points" i] { border: 3px solid var(--accent) !important; background-color: var(--accent-light) !important; color: var(--accent) !important; font-weight: 800 !important; }
 .score-card input:not([placeholder*="Points" i]):not([placeholder*="Pts" i]), .score-row input:not([placeholder*="Points" i]):not([placeholder*="Pts" i]) { background-color: #ffffff !important; color: #0f172a !important; border: 1px solid #bfdbfe !important; font-weight: normal !important; }
 .score-card label[for*="points" i], .score-row label[for*="points" i], label[class*="points" i] { color: var(--accent) !important; font-weight: 800 !important; }
+
+/* ==========================================================================
+   HIGH-END UI & SAAS VISUAL POLISH ENHANCEMENTS
+   ========================================================================== */
+
+/* 1. Glassmorphic Navigation Header */
+.header, 
+nav, 
+.tab-navigation {
+    background: rgba(15, 23, 42, 0.85) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* 2. Elevated Metric Summary Cards */
+.prize-card, 
+.entry-fee, 
+.summary-card {
+    background: linear-gradient(145deg, #ffffff, #f8fafc) !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 16px !important;
+    box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.02) !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.prize-card:hover, 
+.summary-card:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 10px 25px -3px rgba(15, 23, 42, 0.08) !important;
+}
+
+/* Bold Numerical Typography inside Cards */
+.prize-card span, 
+.prize-card div, 
+#prize-fund-display, 
+#prize-1st, 
+#prize-2nd, 
+#prize-3rd {
+    font-weight: 800 !important;
+    letter-spacing: -0.02em !important;
+}
+
+/* 3. Metallic Podium Badges */
+/* 1st Place - Gold Accent */
+.podium-card.first-place, 
+.podium-card:nth-child(1) {
+    border: 2px solid #f59e0b !important;
+    background: linear-gradient(180deg, #fffbeb 0%, #ffffff 100%) !important;
+    box-shadow: 0 8px 25px -5px rgba(245, 158, 11, 0.15) !important;
+}
+
+/* 2nd Place - Silver Accent */
+.podium-card:nth-child(2) {
+    border: 2px solid #94a3b8 !important;
+    background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%) !important;
+    box-shadow: 0 8px 25px -5px rgba(148, 163, 184, 0.15) !important;
+}
+
+/* 3rd Place - Bronze Accent */
+.podium-card:nth-child(3) {
+    border: 2px solid #b45309 !important;
+    background: linear-gradient(180deg, #fff7ed 0%, #ffffff 100%) !important;
+    box-shadow: 0 8px 25px -5px rgba(180, 83, 9, 0.12) !important;
+}
+
+/* Shared Tie Badge Accent */
+.podium-card.shared-tie {
+    border-style: dashed !important;
+}
+
+/* 4. Smooth Micro-Interactions for Buttons & Toggles */
+button, 
+.btn, 
+input[type="checkbox"], 
+.tab-button {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+button:hover, 
+.btn:hover {
+    transform: translateY(-1px) !important;
+    filter: brightness(1.05) !important;
+}
+
+button:active, 
+.btn:active {
+    transform: translateY(0) !important;
+}
+
+/* Focus States for Inputs */
+input[type="number"], 
+input[type="text"] {
+    border-radius: 8px !important;
+    border: 1px solid #cbd5e1 !important;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+input[type="number"]:focus, 
+input[type="text"]:focus {
+    outline: none !important;
+    border-color: #2563eb !important;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15) !important;
+}
+
+/* 5. Custom Slender Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #0f172a;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #475569;
+}
