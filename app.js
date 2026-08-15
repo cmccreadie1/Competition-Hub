@@ -393,20 +393,44 @@ const APP_VERSION = "v7.4.0"; // Version update for Embedded Manual
                 }
             });
         });
-        const totalFund = fee * optedInCount;
-        const first = Math.round(totalFund * 0.50);
-        const second = Math.round(totalFund * 0.30);
-        const third = Math.round(totalFund * 0.20);
-        
-        const fundDisp = document.getElementById('prize-fund-display');
-        const p1 = document.getElementById('prize-1st');
-        const p2 = document.getElementById('prize-2nd');
-        const p3 = document.getElementById('prize-3rd');
-        
-        if (fundDisp) fundDisp.innerText = totalFund;
-        if (p1) p1.innerText = first;
-        if (p2) p2.innerText = second;
-        if (p3) p3.innerText = third;
+      const totalFund = fee * optedInCount;
+const raw1st = totalFund * 0.50;
+const raw2nd = totalFund * 0.30;
+const raw3rd = totalFund * 0.20;
+
+let first = Math.round(raw1st / 5) * 5;
+let second = Math.round(raw2nd / 5) * 5;
+let third = Math.round(raw3rd / 5) * 5;
+
+let sumRounded = first + second + third;
+let remainder = totalFund - sumRounded;
+if (remainder !== 0) {
+    second += remainder;
+}
+
+const fundDisp = document.getElementById('prize-fund-display');
+const p1 = document.getElementById('prize-1st');
+const p2 = document.getElementById('prize-2nd');
+const p3 = document.getElementById('prize-3rd');
+
+if (fundDisp) fundDisp.innerText = totalFund;
+if (p1) p1.innerText = first;
+if (p2) p2.innerText = second;
+if (p3) p3.innerText = third;
+
+const breakdownBox = document.getElementById('prizeMathBreakdown');
+if (breakdownBox) {
+    breakdownBox.innerHTML = `
+        <div style="background: #ffffff; border: 2px solid #bfdbfe; border-radius: 12px; padding: 16px; margin-top: 15px; text-align: left; font-size: 13px; color: #0f172a;">
+            <strong style="color: #ea580c; font-size: 14px; display: block; margin-bottom: 8px;">📊 PRIZE BREAKDOWN FORMULA (50 / 30 / 20 SPLIT)</strong>
+            <p style="margin: 4px 0;"><strong>TOTAL POT:</strong> ${optedInCount} Anglers × £${fee} = <strong>£${totalFund}</strong></p>
+            <hr style="border: 0; border-top: 1px solid #eff6ff; margin: 8px 0;">
+            <p style="margin: 4px 0;"><strong>1ST PLACE (50%):</strong> Exact £${raw1st.toFixed(2)} → <strong>£${first}</strong> (Nearest £5)</p>
+            <p style="margin: 4px 0;"><strong>2ND PLACE (30%):</strong> Exact £${raw2nd.toFixed(2)} → <strong>£${second}</strong> (Adjusted to £5 boundary)</p>
+            <p style="margin: 4px 0;"><strong>3RD PLACE (20%):</strong> Exact £${raw3rd.toFixed(2)} → <strong>£${third}</strong> (Nearest £5)</p>
+        </div>
+    `;
+}
 
         const titleSpan = document.getElementById('accordion-title');
         if (titleSpan) titleSpan.innerText = `${optedInCount} ANGLERS OPTED IN - CLICK TO MANAGE`;
