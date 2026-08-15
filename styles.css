@@ -27,7 +27,7 @@
             --warning: #ffab00;
         }
 
-        html { scroll-behavior: smooth; scroll-padding-top: 100px; }
+        html { scroll-behavior: smooth; scroll-padding-top: 210px; }
 
         body { 
             font-family: 'Inter', system-ui, -apple-system, sans-serif; 
@@ -114,7 +114,7 @@
         #tabBtn-draw.active, #tabBtn-pairs.active { background: #0f172a !important; color: #ffffff !important; }
         #tabBtn-score.active { background: #0f172a !important; color: #ffffff !important; border-color: #0f172a !important; }
 
-       .tab-content { padding: 175px 20px 40px; }
+       .tab-content { padding: 210px 20px 40px; }
         #entrySection, #resultsSection, #dispatchSection, #rosterSection, #registrationPrintSection { max-width: 1400px; margin: 0 auto; }
         #registrationPrintSection, #dispatchSection, #rosterSection { display: none; }
 
@@ -195,7 +195,7 @@
 
 .score-list-header {
     position: sticky !important;
-    top: 160px !important;            
+    top: 200px !important;            
     z-index: 4000 !important;          
     background: #1e3a8a !important;    
     padding: 10px 15px 8px !important; 
