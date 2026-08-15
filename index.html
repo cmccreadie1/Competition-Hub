@@ -1,10 +1,10 @@
-<<!DOCTYPE html> 
+<!DOCTYPE html> 
 <html lang="en">
     
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ShoreMatch - v1.6.0</title>
+    <title>ShoreMatch - v7.4.0</title>
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -798,6 +798,9 @@
             <button class="modal-tab-btn" onclick="switchModalTab(event, 'tab-security')">
                 <span>🔒 Security & Math</span>
             </button>
+            <button class="modal-tab-btn" onclick="switchModalTab(event, 'tab-changelog')">
+                <span>📋 Change Log (v7.4.0)</span>
+            </button>
         </div>
 
         <div style="flex-grow: 1; overflow-y: auto; background: #f8fafc; padding: 35px 30px; font-size: 18px; line-height: 1.8; color: var(--text-dark); text-transform: none !important;">
@@ -1024,6 +1027,20 @@
                         <li><strong>100% Local Storage:</strong> All tournament data lives exclusively inside your device's web browser memory (<code>localStorage</code>). It never leaves the physical laptop or tablet running the event.</li>
                         <li><strong>No Third-Party Tracking:</strong> We do not run any cookies, advertising trackers, or background analytics scripts. Your activity is completely private.</li>
                         <li><strong>Complete Offline Independence:</strong> Because the app is completely self-contained, it can run entirely offline without an internet connection. Your data remains on your screen, in your control, at all times.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- TAB 3: Change Log (v7.4.0) -->
+            <div id="tab-changelog" class="modal-tab-pane" style="display: none;">
+                <div class="security-section">
+                    <h3>v7.4.0 System Update & Change Log</h3>
+                    <p><strong>Release Version:</strong> v7.4.0 Rewrite</p>
+                    <p>This update incorporates critical architectural enhancements to version management, branding consistency, and system stability across deployed instances.</p>
+                    <ul>
+                        <li><strong>Single Source of Truth Versioning Strategy:</strong> Implemented a unified version tracking protocol to ensure the application version hosted and rendered on the Netlify platform mirrors the front-facing app version displayed within the application header, document title, and metadata in all future updates.</li>
+                        <li><strong>Document Title Standardization:</strong> Updated main entry title metadata to align with full semantic versioning rules (`ShoreMatch - v7.4.0`).</li>
+                        <li><strong>Interface Scaffolding Integrity:</strong> Optimized accessibility-first modal tabs, dynamic high-contrast data rows, and real-time score input validation guards.</li>
                     </ul>
                 </div>
             </div>
