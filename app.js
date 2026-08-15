@@ -383,7 +383,7 @@ const APP_VERSION = "v7.4.0"; // Version update for Embedded Manual
 
     function updatePrizeFund() {
         const feeEl = document.getElementById('entry-fee');
-        const fee = feeEl ? (parseInt(feeEl.value) || 0) : 0;
+        const fee = feeEl ? (parseFloat(feeEl.value) || 0) : 0;
         let optedInCount = 0;
         appState.forEach(e => {
             e.anglers.forEach((a, aIdx) => {
@@ -398,22 +398,39 @@ const raw1st = totalFund * 0.50;
 const raw2nd = totalFund * 0.30;
 const raw3rd = totalFund * 0.20;
 
+// Base nearest-£5 rounding
 let first = Math.round(raw1st / 5) * 5;
 let second = Math.round(raw2nd / 5) * 5;
 let third = Math.round(raw3rd / 5) * 5;
 
-let sumRounded = first + second + third;
-let remainder = totalFund - sumRounded;
+// Minimize relative percentage displacement for remainder
+let remainder = totalFund - (first + second + third);
+
 if (remainder !== 0) {
-    second += remainder;
+    const diff1 = raw1st > 0 ? Math.abs((first + remainder - raw1st) / raw1st) : Infinity;
+    const diff2 = raw2nd > 0 ? Math.abs((second + remainder - raw2nd) / raw2nd) : Infinity;
+    const diff3 = raw3rd > 0 ? Math.abs((third + remainder - raw3rd) / raw3rd) : Infinity;
+
+    if (diff1 <= diff2 && diff1 <= diff3) {
+        first += remainder;
+    } else if (diff2 <= diff1 && diff2 <= diff3) {
+        second += remainder;
+    } else {
+        third += remainder;
+    }
 }
+
+// Calculate effective percentages for full transparency
+const pct1st = totalFund > 0 ? ((first / totalFund) * 100).toFixed(1) : "50.0";
+const pct2nd = totalFund > 0 ? ((second / totalFund) * 100).toFixed(1) : "30.0";
+const pct3rd = totalFund > 0 ? ((third / totalFund) * 100).toFixed(1) : "20.0";
 
 const fundDisp = document.getElementById('prize-fund-display');
 const p1 = document.getElementById('prize-1st');
 const p2 = document.getElementById('prize-2nd');
 const p3 = document.getElementById('prize-3rd');
 
-if (fundDisp) fundDisp.innerText = totalFund;
+if (fundDisp) fundDisp.innerText = totalFund.toFixed(2);
 if (p1) p1.innerText = first;
 if (p2) p2.innerText = second;
 if (p3) p3.innerText = third;
@@ -422,12 +439,12 @@ const breakdownBox = document.getElementById('prizeMathBreakdown');
 if (breakdownBox) {
     breakdownBox.innerHTML = `
         <div style="background: #ffffff; border: 2px solid #bfdbfe; border-radius: 12px; padding: 16px; margin-top: 15px; text-align: left; font-size: 13px; color: #0f172a;">
-            <strong style="color: #ea580c; font-size: 14px; display: block; margin-bottom: 8px;">📊 PRIZE BREAKDOWN FORMULA (50 / 30 / 20 SPLIT)</strong>
-            <p style="margin: 4px 0;"><strong>TOTAL POT:</strong> ${optedInCount} Anglers × £${fee} = <strong>£${totalFund}</strong></p>
+            <strong style="color: #ea580c; font-size: 14px; display: block; margin-bottom: 8px;">📊 PRIZE BREAKDOWN & EFFECTIVE SPLIT</strong>
+            <p style="margin: 4px 0;"><strong>TOTAL POT:</strong> ${optedInCount} Anglers × £${fee.toFixed(2)} = <strong>£${totalFund.toFixed(2)}</strong></p>
             <hr style="border: 0; border-top: 1px solid #eff6ff; margin: 8px 0;">
-            <p style="margin: 4px 0;"><strong>1ST PLACE (50%):</strong> Exact £${raw1st.toFixed(2)} → <strong>£${first}</strong> (Nearest £5)</p>
-            <p style="margin: 4px 0;"><strong>2ND PLACE (30%):</strong> Exact £${raw2nd.toFixed(2)} → <strong>£${second}</strong> (Adjusted to £5 boundary)</p>
-            <p style="margin: 4px 0;"><strong>3RD PLACE (20%):</strong> Exact £${raw3rd.toFixed(2)} → <strong>£${third}</strong> (Nearest £5)</p>
+            <p style="margin: 4px 0;"><strong>1ST PLACE:</strong> <strong>£${first}</strong> (${pct1st}% of pot — Target 50%)</p>
+            <p style="margin: 4px 0;"><strong>2ND PLACE:</strong> <strong>£${second}</strong> (${pct2nd}% of pot — Target 30%)</p>
+            <p style="margin: 4px 0;"><strong>3RD PLACE:</strong> <strong>£${third}</strong> (${pct3rd}% of pot — Target 20%)</p>
         </div>
     `;
 }
