@@ -664,7 +664,7 @@ body.stage-draw { background: #334155 !important; }
 /* Active Day Tab Definition State */
 .day-tab-btn.active {
     background: #334155 !important;                /* Lighter container slate */
-    border-color: #f8fafc !important;             /* High contrast border outline */
+    border-color: #f8fafc !important;              /* High contrast border outline */
     color: #ffffff !important;                    /* Bright crisp white text */
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
 }
@@ -673,5 +673,307 @@ body.stage-draw { background: #334155 !important; }
 .score-row.incomplete, 
 [data-status="incomplete"] {
     background-color: #991b1b !important; /* Deep crimson red instead of light pink */
-    color: #ffffff !important;             /* High-contrast white text */
+    color: #ffffff !important;              /* High-contrast white text */
+}
+
+/* ==========================================================================
+   v7.4.0 REWRITE EXTENDED STYLES (APPENDED WITHOUT SLIMMING)
+   ========================================================================== */
+
+/* --- SHOREMATCH BRANDING & HIGHLIGHTING --- */
+.pts-val {
+    color: var(--accent) !important;
+    font-weight: 900;
+}
+
+.cm-val, .ct-val, .big-val, .spc-val {
+    color: #ffffff !important;
+}
+
+.total-pts {
+    color: var(--accent) !important;
+    background: rgba(59, 130, 246, 0.1);
+}
+
+/* --- ACCESSIBILITY OPTIMIZED MODAL TAB BAR --- */
+.modal-tabs {
+    display: flex;
+    gap: 12px;
+    background: #ffffff;
+    padding: 16px 30px;
+    border-bottom: 1px solid #cbd5e1;
+}
+
+.modal-tab-btn {
+    background: transparent;
+    border: 2px solid #cbd5e1;
+    color: #64748b;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-weight: 800;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.modal-tab-btn:hover {
+    background: #f1f5f9;
+    color: #334155;
+}
+
+.modal-tab-btn.active {
+    background-color: #334155 !important;
+    color: #ffffff !important;
+    border-color: #334155 !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+body.stage-score-d2 .modal-tab-btn.active {
+    background-color: #0f766e !important;
+    border-color: #0f766e !important;
+}
+
+.modal-tab-pane {
+    animation: modalFadeIn 0.2s ease-in-out;
+}
+
+@keyframes modalFadeIn {
+    from { opacity: 0; transform: translateY(3px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- SECURITY & MANUAL SECTIONS FORMATTING --- */
+.security-section {
+    margin-bottom: 30px;
+    background: white;
+    padding: 30px;
+    border-radius: 14px;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+}
+
+.security-section h3 {
+    color: #0f172a;
+    font-size: 22px;
+    font-weight: 900;
+    margin-top: 0;
+    margin-bottom: 16px;
+    border-bottom: 2px solid #f1f5f9;
+    padding-bottom: 12px;
+}
+
+.security-section p {
+    color: #1e293b;
+    font-size: 18px;
+    line-height: 1.8;
+    margin-bottom: 16px;
+}
+
+.security-section ul {
+    padding-left: 25px;
+    margin-bottom: 16px;
+}
+
+.security-section li {
+    margin-bottom: 10px;
+    color: #1e293b;
+    font-size: 18px;
+    line-height: 1.8;
+}
+
+.security-section li strong {
+    color: #0f172a;
+}
+
+/* --- HIGH-VISIBILITY INCOMPLETE SCORECARD ROW ALERTS --- */
+.score-card.incomplete, 
+.scorecard.incomplete, 
+.score-row.incomplete, 
+.row-incomplete,
+[class*="incomplete"] {
+    background-color: #ef4444 !important;
+    border-left: 10px solid #7f1d1d !important;
+    border-top: 2px solid #b91c1c !important;
+    border-right: 2px solid #b91c1c !important;
+    border-bottom: 2px solid #b91c1c !important;
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3) !important;
+    transition: all 0.2s ease;
+}
+
+.score-card.incomplete *, 
+.scorecard.incomplete *, 
+.score-row.incomplete * {
+    color: #ffffff !important;
+    font-weight: 800 !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.score-card.incomplete input, 
+.scorecard.incomplete input, 
+.score-row.incomplete input {
+    border: 2px solid #7f1d1d !important;
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+}
+
+.score-card.incomplete input::placeholder, 
+.scorecard.incomplete input::placeholder, 
+.score-row.incomplete input::placeholder {
+    color: #991b1b !important;
+}
+
+.reality-warning {
+    color: #b45309 !important;
+    background-color: #fef3c7 !important;
+    border: 1px solid #f59e0b !important;
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 14px !important;
+    font-weight: 800 !important;
+    margin-top: 8px;
+    display: inline-block;
+    text-align: center;
+    width: calc(100% - 20px);
+    box-sizing: border-box;
+}
+
+/* --- HIGH-VISIBILITY ACCESSIBLE PEGS TOGGLE --- */
+#accToggleBtn {
+    background-color: #ffffff !important;
+    border: 3px solid #cbd5e1 !important;
+    border-radius: 14px !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25) !important;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out !important;
+}
+
+#accToggleBtn:hover {
+    background-color: #f1f5f9 !important;
+    border-color: #94a3b8 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3) !important;
+}
+
+#accToggleBtn:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+}
+
+#accToggleTitle {
+    color: #0f172a !important;
+    font-weight: 900 !important;
+}
+
+#accToggleSub {
+    color: #475569 !important;
+    font-weight: 800 !important;
+}
+
+/* --- HIGH-VISIBILITY DURATION TOGGLE (1 DAY / 2 DAYS) --- */
+.duration-toggle {
+    background-color: #f1f5f9 !important;
+    border: 3px solid #cbd5e1 !important;
+    border-radius: 50px !important;
+    padding: 6px !important;
+    display: inline-flex !important;
+    align-items: center;
+    gap: 6px !important;
+}
+
+.dt-opt {
+    background-color: transparent !important;
+    color: #475569 !important;
+    font-weight: 800 !important;
+    font-size: 14px !important;
+    padding: 12px 28px !important;
+    border-radius: 50px !important;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out !important;
+}
+
+.dt-opt.active {
+    background-color: #0f172a !important;
+    color: #ffffff !important;
+    font-weight: 900 !important;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.35) !important;
+}
+
+.dt-opt:not(.active):hover {
+    background-color: #e2e8f0 !important;
+    color: #0f172a !important;
+}
+
+/* --- MUTED LEADERBOARD ZONE POINTS COLUMN BACKGROUND --- */
+.col-points-shaded {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-left: 1px solid rgba(255, 255, 255, 0.12) !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.12) !important;
+    font-weight: 900 !important;
+    text-align: center;
+    color: var(--accent) !important;
+}
+
+.col-cumulative-points-shaded {
+    background: rgba(255, 255, 255, 0.15) !important;
+    border-left: 2px solid rgba(255, 255, 255, 0.2) !important;
+    border-right: 2px solid rgba(255, 255, 255, 0.2) !important;
+    font-weight: 900 !important;
+    text-align: center;
+    color: var(--accent) !important;
+}
+
+.col-length-reset {
+    color: #ffffff !important;
+    font-weight: normal !important;
+}
+
+body.light-theme .col-points-shaded {
+    background: rgba(15, 23, 42, 0.06) !important;
+    border-left: 1px solid rgba(15, 23, 42, 0.1) !important;
+    border-right: 1px solid rgba(15, 23, 42, 0.1) !important;
+    color: #0284c7 !important;
+}
+
+body.light-theme .col-cumulative-points-shaded {
+    background: rgba(15, 23, 42, 0.12) !important;
+    border-left: 2px solid rgba(15, 23, 42, 0.18) !important;
+    border-right: 2px solid rgba(15, 23, 42, 0.18) !important;
+    color: #0284c7 !important;
+}
+
+body.light-theme .col-length-reset {
+    color: #0f172a !important;
+    font-weight: normal !important;
+}
+
+/* --- INDIVIDUAL SCORECARD BLUE/WHITE HIGH-CONTRAST THEME --- */
+.score-card input[placeholder*="Points" i],
+.score-card input[placeholder*="Pts" i],
+.score-row input[placeholder*="Points" i],
+.score-row input[placeholder*="Pts" i],
+input[id*="points" i],
+input[class*="points" i] {
+    border: 3px solid var(--accent) !important;
+    background-color: var(--accent-light) !important;
+    color: var(--accent) !important;
+    font-weight: 800 !important;
+}
+
+.score-card input:not([placeholder*="Points" i]):not([placeholder*="Pts" i]),
+.score-row input:not([placeholder*="Points" i]):not([placeholder*="Pts" i]) {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    border: 1px solid #cbd5e1 !important;
+    font-weight: normal !important;
+}
+
+.score-card label[for*="points" i],
+.score-row label[for*="points" i],
+label[class*="points" i] {
+    color: var(--accent) !important;
+    font-weight: 800 !important;
 }
