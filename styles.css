@@ -975,5 +975,5 @@ input[class*="points" i] {
 .score-row label[for*="points" i],
 label[class*="points" i] {
     color: var(--accent) !important;
-    font-weight: 800 !important;
+    font-weight: 800 !important; 
 }
