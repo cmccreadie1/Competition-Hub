@@ -27,7 +27,7 @@
             --warning: #ffab00;
         }
 
-        html { scroll-behavior: smooth; scroll-padding-top: 210px; }
+        html { scroll-behavior: smooth; scroll-padding-top: 230px !important; }
 
         body { 
             font-family: 'Inter', system-ui, -apple-system, sans-serif; 
@@ -114,7 +114,7 @@
         #tabBtn-draw.active, #tabBtn-pairs.active { background: #0f172a !important; color: #ffffff !important; }
         #tabBtn-score.active { background: #0f172a !important; color: #ffffff !important; border-color: #0f172a !important; }
 
-       .tab-content { padding: 210px 20px 40px; }
+        .tab-content { padding: 230px 20px 40px !important; }
         #entrySection, #resultsSection, #dispatchSection, #rosterSection, #registrationPrintSection { max-width: 1400px; margin: 0 auto; }
         #registrationPrintSection, #dispatchSection, #rosterSection { display: none; }
 
@@ -195,7 +195,7 @@
 
 .score-list-header {
     position: sticky !important;
-    top: 200px !important;            
+    top: 215px !important;            
     z-index: 4000 !important;          
     background: #1e3a8a !important;    
     padding: 10px 15px 8px !important; 
@@ -289,7 +289,7 @@ body.stage-score-d2 .score-list-header {
         .live-dot { display: inline-block; animation: livePulse 1.5s infinite; vertical-align: baseline; margin-right: 6px; font-size: 14px; color: var(--red-color); }
         .group-label { grid-column: 1 / -1; font-size: 18px; font-weight: 900; color: #ea580c; border-bottom: 2px solid #bfdbfe; padding-bottom: 8px; margin: 20px 0 15px; }
         .entry-group-label { font-size: 14px; font-weight: 900; color: var(--text-light); margin: 10px 0 15px; text-align: left; padding-left: 5px; }
-        #resTitle { color: var(--text-dark); }
+        #resTitle { color: var(--text-dark); margin-top: 0 !important; padding-top: 10px !important; }
 
         /* Modals */
         .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(8px); z-index: 9999; display: none; align-items: center; justify-content: center; }
