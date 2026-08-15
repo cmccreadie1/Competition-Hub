@@ -629,11 +629,35 @@ const APP_VERSION = "v7.4.0"; // Version update for Embedded Manual
 
         // Output Top 3 to Podium
         if (podium) {
-            for (let i = 0; i < Math.min(3, standings.length); i++) {
-                const pair = standings[i];
-                const tieClass = pair.isTie ? "shared-tie" : "";
-                const noteText = pair.isTie ? ` (Split Pot Tie)` : "";
-                let prizeAmount = assignedPrizes[i] || 0;
+           // Fetch live calculated prize pool figures
+    const { first, second, third, totalFund } = updatePrizeFund();
+
+    // Calculate actual payouts accounting for dead-heat ties
+    let dynamicPrizes = [first, second, third];
+
+    // Check tie conditions across standings
+    const countTiedFor1st = standings.filter(s => s.isTie && s.rank === 1).length;
+    const countTiedFor2nd = standings.filter(s => s.isTie && s.rank === 2).length;
+
+    if (countTiedFor1st >= 3 || (standings[0]?.isTie && standings[1]?.isTie && standings[2]?.isTie)) {
+        // 3-way (or complete) tie for 1st: Split entire pot equally
+        const splitEach = Math.round((totalFund / Math.max(3, standings.length)) / 5) * 5;
+        dynamicPrizes = [splitEach, splitEach, splitEach];
+    } else if (countTiedFor1st === 2) {
+        // 2-way tie for 1st: Combine 1st + 2nd place pots
+        const split1st = Math.round(((first + second) / 2) / 5) * 5;
+        dynamicPrizes = [split1st, split1st, third];
+    } else if (countTiedFor2nd >= 2 || (standings[1]?.isTie && standings[2]?.isTie)) {
+        // 2-way tie for 2nd: Combine 2nd + 3rd place pots
+        const split2nd = Math.round(((second + third) / 2) / 5) * 5;
+        dynamicPrizes = [first, split2nd, split2nd];
+    }
+
+    for (let i = 0; i < Math.min(3, standings.length); i++) {
+        const pair = standings[i];
+        const tieClass = pair.isTie ? "shared-tie" : "";
+        const noteText = pair.isTie ? ` (Split Pot Tie)` : "";
+        let prizeAmount = dynamicPrizes[i] || 0;
                 let rankStr = i === 0 ? "1st Place" : i === 1 ? "2nd Place" : "3rd Place";
                 let rankLabel = rankStr + noteText;
                 let styleClass = (i === 0) ? "first-place" : "";
