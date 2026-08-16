@@ -720,19 +720,19 @@ input[type="text"]:focus {
 }
 
 /* ==========================================================================
-   RESULTS TAB - PTS CONTAINER BLUE OUTLINE (WRAPPER TARGET)
+   RESULTS TAB - PTS CONTAINER BLUE OUTLINE (CORRECTED SELECTOR)
    ========================================================================== */
 
-/* Target the inner span/div boxes inside points cells directly */
-.results-table td span[class*="pts"],
-.results-table td div[class*="pts"],
-.results-table td .pts-badge,
-.results-table td:nth-child(3) > *,
-.results-table td:nth-child(8) > *,
-.results-table td:nth-child(13) > * {
+/* Target the PTS container boxes across all results tables */
+.res-table td span,
+.res-table td div,
+.res-cell-pts,
+.res-pts,
+td.res-pts-cell,
+[class*="res-"] td:nth-child(3) > *,
+[class*="res-"] td:nth-child(8) > *,
+[class*="res-"] td:nth-child(13) > * {
     border: 1px solid #3b82f6 !important;
     border-radius: 6px !important;
     box-sizing: border-box !important;
-}
-    border-radius: 6px !important;
 }
