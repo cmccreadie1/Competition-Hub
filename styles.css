@@ -720,19 +720,19 @@ input[type="text"]:focus {
 }
 
 /* ==========================================================================
-   RESULTS TAB - PTS CONTAINER BLUE OUTLINE (CORRECTED SELECTOR)
+   RESULTS TAB - PTS CONTAINER BLUE OUTLINE (DIRECT TARGET)
    ========================================================================== */
 
-/* Target the PTS container boxes across all results tables */
-.res-table td span,
-.res-table td div,
-.res-cell-pts,
-.res-pts,
-td.res-pts-cell,
-[class*="res-"] td:nth-child(3) > *,
-[class*="res-"] td:nth-child(8) > *,
-[class*="res-"] td:nth-child(13) > * {
+/* Target blue-text metric badge containers directly */
+span.text-blue-400,
+span.text-blue-500,
+div.text-blue-400,
+div.text-blue-500,
+.text-blue-400,
+.text-blue-500 {
     border: 1px solid #3b82f6 !important;
     border-radius: 6px !important;
+    padding: 2px 8px !important;
+    display: inline-block !important;
     box-sizing: border-box !important;
 }
