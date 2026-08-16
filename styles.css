@@ -698,3 +698,23 @@ input[type="text"]:focus {
 ::-webkit-scrollbar-thumb:hover {
     background: #475569;
 }
+/* ==========================================================================
+   RESULTS TAB - ZONE POINTS HIGHLIGHT BADGE
+   ========================================================================== */
+
+/* Ring individual, team, and zone point totals in a prominent blue badge */
+.results-table .points-cell,
+.results-points,
+.zone-points-total,
+[data-metric="points"] {
+    display: inline-block !important;
+    border: 2px solid #2563eb !important;
+    background-color: #eff6ff !important;
+    color: #1d4ed8 !important;
+    font-weight: 800 !important;
+    font-size: 15px !important;
+    padding: 4px 10px !important;
+    border-radius: 6px !important;
+    box-shadow: 0 1px 3px rgba(37, 99, 235, 0.12) !important;
+    letter-spacing: -0.01em !important;
+}
