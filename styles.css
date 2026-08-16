@@ -720,19 +720,19 @@ input[type="text"]:focus {
 }
 
 /* ==========================================================================
-   RESULTS TAB - PTS CONTAINER BLUE OUTLINE (DIRECT TARGET)
+   RESULTS TAB - OPTION 1: NEON BLUE GLOW & TEXT OUTLINE
    ========================================================================== */
 
-/* Target blue-text metric badge containers directly */
-span.text-blue-400,
-span.text-blue-500,
-div.text-blue-400,
-div.text-blue-500,
+/* Apply an ultra-crisp blue glow outline to all PTS text elements */
 .text-blue-400,
-.text-blue-500 {
-    border: 1px solid #3b82f6 !important;
-    border-radius: 6px !important;
-    padding: 2px 8px !important;
-    display: inline-block !important;
-    box-sizing: border-box !important;
+.text-blue-500,
+[class*="text-blue"] {
+    color: #60a5fa !important;
+    font-weight: 900 !important;
+    text-shadow: 
+        0 0 2px #2563eb,
+        0 0 4px #2563eb,
+        0 0 8px #3b82f6,
+        0 0 12px rgba(59, 130, 246, 0.6) !important;
+    letter-spacing: 0.05em !important;
 }
