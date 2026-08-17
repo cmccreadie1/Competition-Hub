@@ -13,6 +13,7 @@ const APP_VERSION = "v7.4.0"; // Version update for Embedded Manual
     let isAppReady = false; 
     let appState = []; 
     let scoreState = {}; // SCORECARD DATA BUCKET
+let biggestFishSpecies = { d1: ["", "", ""], d2: ["", "", ""] };
     let matchDays = 2;
     let currentZoneSize = 0; 
     let isSwapMode = false;
@@ -2871,20 +2872,29 @@ function calculateAndRenderBiggestFishLeaderboard(containerId) {
             tableRows = `<tr><td colspan="4" style="padding: 30px; color: #64748b; font-weight: 700;">No fish recorded for this day yet.</td></tr>`;
         } else {
             topCatches.forEach((c, index) => {
-                tableRows += `
-                    <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.15); background: rgba(15, 23, 42, 0.1); height: 46px;">
-                        <td style="padding: 10px 12px; font-size: 16px; font-weight: 900; color: ${accentColor}; width: 40px;">${index + 1}</td>
-                        <td style="padding: 10px 6px; text-align: left; text-transform: uppercase;">
-                            <div style="font-weight: 800; color: #ffffff; font-size: 15px;">${c.name}</div>
-                            <div style="font-size: 11px; color: #94a3b8; font-weight: 600;">${c.team}</div>
-                        </td>
-                        <td style="padding: 10px 6px; color: #cbd5e1; font-weight: 700; font-size: 14px;">${c.location}</td>
-                        <td style="padding: 10px 12px; text-align: right; font-size: 17px; font-weight: 900; color: ${accentColor}; font-family: monospace;">
-                            ${c.size} cm
-                        </td>
-                    </tr>
-                `;
-            });
+            const dayKey = dayTitle.toLowerCase().includes('day 1') ? 'd1' : 'd2';
+            const speciesInputHTML = (index < 3) 
+                ? `<input type="text" 
+                          placeholder="Species (e.g. Cod)" 
+                          value="${biggestFishSpecies[dayKey][index] || ''}" 
+                          onchange="biggestFishSpecies['${dayKey}'][${index}] = this.value; persistState();" 
+                          style="margin-left: 8px; padding: 2px 6px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 4px; font-size: 12px; width: 120px; font-family: sans-serif;">`
+                : ``;
+
+            tableRows += `
+                <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.15); background: rgba(15, 23, 42, 0.1); height: 46px;">
+                    <td style="padding: 10px 12px; font-size: 16px; font-weight: 900; color: ${accentColor}; width: 40px;">${index + 1}</td>
+                    <td style="padding: 10px 6px; text-align: left; text-transform: uppercase;">
+                        <div style="font-weight: 800; color: #ffffff; font-size: 15px;">${c.name}</div>
+                        <div style="font-size: 11px; color: #94a3b8; font-weight: 600;">${c.team}</div>
+                    </td>
+                    <td style="padding: 10px 6px; color: #cbd5e1; font-weight: 700; font-size: 14px;">${c.location}</td>
+                    <td style="padding: 10px 12px; text-align: right; font-size: 17px; font-weight: 900; color: ${accentColor}; font-family: monospace;">
+                        ${c.size} cm ${speciesInputHTML}
+                    </td>
+                </tr>
+            `;
+        });
         }
 
         return `
@@ -3154,8 +3164,12 @@ function exportPublicResults() {
     const secretPairsDesc = "The computer calculated a hidden Target Length that falls strictly between the lowest and highest possible combined scores. The randomly chosen pair whose combined length finishes closest to the target wins.\n\nIf you have an uneven number of entries in the cash pool, the computer automatically generates a virtual partner named Joe Average. Joe is mathematically given the exact mean average score of the entire active field. Tie breaker if its a draw the tie breaker reverts to longest combined length.";
 
     const finalPayload = {
-        "anglers": cleanExport,
-        "secretPairs": {
+    "anglers": cleanExport,
+    "biggestFishSpecies": {
+        "day1": biggestFishSpecies.d1,
+        "day2": biggestFishSpecies.d2
+    },
+    "secretPairs": {
             "description": secretPairsDesc,
             "targetLength": officialTargetLength,
             "winners": secretPairsWinners,
