@@ -750,41 +750,41 @@ input[type="text"]:focus {
     transition: all 0.15s ease-in-out !important;       /* Smooth snappy transition */
 }
 /* ==========================================================================
-   SCORECARD ENTRY - DOUBLE HEIGHT EXPANSION & ANIMATION
+   SCORECARD ENTRY - REFINED EXPANSION & ACCENT GLOW
    ========================================================================== */
 
 /* Base transition setup on all score rows for smooth expanding and snapping back */
 .score-row {
-    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+    transition: all 0.2s ease-in-out !important;
     transform-origin: center center !important;
 }
 
-/* Active Focused Row: Expanded to 2x height with vibrant blue glow */
+/* Active Focused Row: Sleek 20% expansion, dark slate background, vibrant gold border */
 .score-row.focused-row {
-    min-height: 110px !important;                       /* Doubles standard row height */
-    padding: 18px 14px !important;                     /* Expands internal row spacing */
-    background: rgba(30, 58, 138, 0.95) !important;    /* High-contrast deep blue */
-    border: 2px solid #3b82f6 !important;               /* Vibrant outer border */
+    min-height: 68px !important;                        /* Subtle height expansion */
+    padding: 10px 14px !important;                     /* Balanced internal spacing */
+    background: #0f172a !important;                     /* Dark slate matching app theme */
+    border: 2px solid #f59e0b !important;               /* Crisp gold/amber border highlight */
     border-radius: 8px !important;
-    box-shadow: 0 12px 30px -5px rgba(59, 130, 246, 0.6), 
-                0 8px 15px -5px rgba(0, 0, 0, 0.6) !important;
-    z-index: 20 !important;                            /* Keeps row floating above adjacent rows */
-    animation: pulseGlow 1.5s infinite alternate !important; /* Subtle animated pulse while focused */
+    box-shadow: 0 8px 20px -4px rgba(245, 158, 11, 0.4), 
+                0 4px 10px -2px rgba(0, 0, 0, 0.5) !important;
+    z-index: 15 !important;                             /* Keeps row elevated above adjacent lines */
+    animation: goldPulse 2s infinite alternate !important; /* Gentle ambient glow pulse */
 }
 
-/* Enlarge input fields inside the active row for clear visibility */
+/* Slightly enlarged input boxes for easy visibility */
 .score-row.focused-row input {
-    font-size: 18px !important;
-    height: 42px !important;
-    border-color: #60a5fa !important;
+    font-size: 16px !important;
+    height: 38px !important;
+    border-color: #f59e0b !important;
 }
 
-/* Keyframe animation for subtle glowing pulse while focused */
-@keyframes pulseGlow {
+/* Keyframe animation for subtle gold pulse while focused */
+@keyframes goldPulse {
     0% {
-        box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.5);
+        box-shadow: 0 6px 16px -4px rgba(245, 158, 11, 0.3);
     }
     100% {
-        box-shadow: 0 15px 35px 2px rgba(59, 130, 246, 0.85);
+        box-shadow: 0 10px 24px -2px rgba(245, 158, 11, 0.6);
     }
 }
