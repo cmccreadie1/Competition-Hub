@@ -743,7 +743,7 @@ input[type="text"]:focus {
 .score-row.focused-row {
     background: rgba(16, 185, 129, 0.45) !important;  /* Rich vibrant green matching the border */
     border: 2px solid #10b981 !important;             /* Stronger 2px green outline */
-    transform: scaleY(1.35) translateY(-6px) !important; /* 35% height expansion + pronounced 6px 3D lift */
+    transform: scaleY(1.15) translateY(-6px) !important; /* 35% height expansion + pronounced 6px 3D lift */
     box-shadow: 0 16px 32px -6px rgba(16, 185, 129, 0.6), 
                 0 10px 20px -4px rgba(0, 0, 0, 0.7) !important; /* Deep 3D floating shadow */
     z-index: 30 !important;                             /* Ensures active row floats above everything */
