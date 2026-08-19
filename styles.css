@@ -741,11 +741,11 @@ input[type="text"]:focus {
    ========================================================================== */
 
 .score-row.focused-row {
-    background: rgba(59, 130, 246, 0.18) !important; /* Light translucent blue highlight */
-    border: 1.5px solid #3b82f6 !important;            /* Crisp bright blue outline */
-    transform: scaleY(1.200) translateY(-2px) !important; /* Pronounced physical lift & expansion */
-    box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.5), 
-                0 8px 10px -6px rgba(0, 0, 0, 0.5) !important; /* 3D drop-shadow glow */
+    background: rgba(16, 185, 129, 0.22) !important; /* High-contrast translucent teal/emerald */
+    border: 1.5px solid #10b981 !important;           /* Crisp vibrant teal/green outline */
+    transform: scaleY(1.35) translateY(-2px) !important; /* 35% height expansion ONLY (width locked) */
+    box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.45), 
+                0 8px 10px -6px rgba(0, 0, 0, 0.5) !important; /* Vibrant teal glow */
     z-index: 10 !important;                             /* Keeps row floating above neighboring rows */
     transition: all 0.15s ease-in-out !important;       /* Smooth snappy transition */
 }
