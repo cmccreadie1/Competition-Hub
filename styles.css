@@ -741,7 +741,7 @@ input[type="text"]:focus {
    ========================================================================== */
 
 .score-row.focused-row {
-    background: rgba(30, 58, 138, 0.85) !important; /* Deep vibrant blue background */
+    background: rgba(59, 130, 246, 0.18) !important; /* Light translucent blue highlight */
     border: 1.5px solid #3b82f6 !important;            /* Crisp bright blue outline */
     transform: scale(1.025) translateY(-2px) !important; /* Pronounced physical lift & expansion */
     box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.5), 
