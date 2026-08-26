@@ -392,14 +392,12 @@
 
             <div id="accPanelWrapper" style="display:none; flex-direction:column; align-items:center; gap:16px; width:100%; max-width:700px; padding: 24px; background: #f8fafc; border: 1px solid var(--border); border-radius: 20px; margin: 20px auto 0;">
                 <div style="display:flex; justify-content:center; gap:12px; width:100%;">
-                    <div id="mobModeA" class="dt-opt active" style="flex:1; flex-direction:column; border: 1px solid var(--border); padding: 12px;" onclick="setMobilityMode('A')">
-                        <span>DISTRIBUTED PEGS</span>
-                        <span style="font-size:10px; color:var(--text-light); margin-top:6px; text-transform:none; text-align: center;">A-Anglers rotate zones on Day 2.</span>
-                    </div>
-                    <div id="mobModeB" class="dt-opt" style="flex:1; flex-direction:column; border: 1px solid var(--border); padding: 12px;" onclick="setMobilityMode('B')">
-                        <span>STATIC ZONE ANCHOR</span>
-                        <span style="font-size:10px; color:var(--text-light); margin-top:6px; text-transform:none; text-align: center;">A-Anglers pinned to full specific zones.</span>
-                    </div>
+                    <button id="mobModeA" class="dt-opt active" style="flex:1; border: 1px solid var(--border); padding: 12px;" onclick="setMobilityMode('A')">
+                        Identify Individual Pegs
+                    </button>
+                    <button id="mobModeB" class="dt-opt" style="flex:1; border: 1px solid var(--border); padding: 12px;" onclick="setMobilityMode('B')">
+                        Dedicated Zone
+                    </button>
                 </div>
 
                 <div id="modeASetup" style="display:flex; flex-direction:column; gap:12px; width:100%; margin-top:8px;">
