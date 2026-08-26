@@ -1382,48 +1382,85 @@ let biggestFishSpecies = { d1: ["", "", ""], d2: ["", "", ""] };
             let p = []; for (let i = 1; i <= zSize; i++) p.push((idx * zSize) + i);
             p.sort(() => Math.random() - 0.5); return {z, p}; 
         });
-        let aEntries = [];
+       // Collect ALL individual [A] anglers with their team ownership
+        let aAnglersList = [];
         if (accEnabled) {
-            appState.forEach(e => { if (e.anglers.some(a => a.mobility)) aEntries.push(e); });
+            appState.forEach(e => {
+                e.anglers.forEach(a => {
+                    if (a.mobility) {
+                        aAnglersList.push({ anglerObj: a, teamId: e.id, isTeam: e.isTeam });
+                    }
+                });
+            });
         }
 
-        if (accEnabled && mobilityMode === 'A' && aEntries.length > 0) {
+        if (accEnabled && mobilityMode === 'A' && aAnglersList.length > 0) {
             let availableD1Safe = [];
             let availableD2Safe = [];
+
             zones.forEach(z => {
-                let zI = zones.indexOf(z); let safeCount = 0;
+                let zI = zones.indexOf(z);
+                let safeCount = 0;
                 p1[zI].p.forEach(pegNum => { if (s1A.includes(pegNum)) safeCount++; });
                 for (let i = 0; i < safeCount; i++) availableD1Safe.push(z);
             });
+
             zones.forEach(z => {
-                let zI = zones.indexOf(z); let safeCount = 0;
+                let zI = zones.indexOf(z);
+                let safeCount = 0;
                 p2[zI].p.forEach(pegNum => { if (s2A.includes(pegNum)) safeCount++; });
                 for (let i = 0; i < safeCount; i++) availableD2Safe.push(z);
             });
-            let bestPairing = []; let leastClashes = 999;
-            for (let attempt = 0; attempt < 100; attempt++) {
+
+            let bestPairing = [];
+            let leastClashes = 999;
+
+            for (let attempt = 0; attempt < 250; attempt++) {
                 let tempD1 = [...availableD1Safe].sort(() => Math.random() - 0.5);
                 let tempD2 = [...availableD2Safe].sort(() => Math.random() - 0.5);
-                let clashes = 0; let currentPairs = [];
-                for (let i = 0; i < aEntries.length; i++) {
-                    let z1 = null, z2 = null;
-                    if (i < tempD1.length) z1 = tempD1[i];
-                    if (i < tempD2.length) z2 = tempD2[i];
-                    if (z1 !== null && z2 !== null && z1 === z2) clashes++;
-                    currentPairs.push({z1: z1, z2: z2});
+                let clashes = 0;
+                let currentPairs = [];
+                let teamD1Zones = {}; // Track Day 1 zone per team to prevent same-team zone overlaps
+
+                for (let i = 0; i < aAnglersList.length; i++) {
+                    let item = aAnglersList[i];
+                    let z1 = i < tempD1.length ? tempD1[i] : null;
+                    let z2 = i < tempD2.length ? tempD2[i] : null;
+
+                    // Clash 1: Angler stuck in same zone both days
+                    if (z1 !== null && z2 !== null && z1 === z2) {
+                        clashes += 10;
+                    }
+
+                    // Clash 2: Two [A] anglers from SAME TEAM assigned to SAME ZONE on Day 1
+                    if (item.isTeam && z1 !== null) {
+                        if (!teamD1Zones[item.teamId]) {
+                            teamD1Zones[item.teamId] = [];
+                        }
+                        if (teamD1Zones[item.teamId].includes(z1)) {
+                            clashes += 50; // High penalty for putting teammates in same zone
+                        }
+                        teamD1Zones[item.teamId].push(z1);
+                    }
+
+                    currentPairs.push({ z1: z1, z2: z2 });
                 }
+
                 if (clashes < leastClashes) {
                     leastClashes = clashes;
                     bestPairing = currentPairs;
-                    if (leastClashes === 0) break; 
+                    if (leastClashes === 0) break;
                 }
             }
-            aEntries.forEach((e, idx) => {
-                let a = e.anglers.find(ang => ang.mobility);
-                if (a) {
-                    a.preZ1 = bestPairing[idx] ? bestPairing[idx].z1 : null; 
-                    a.preZ2 = bestPairing[idx] ? bestPairing[idx].z2 : null;
+
+            // Assign pre-determined safe zones to every individual [A] angler
+            aAnglersList.forEach((item, idx) => {
+                if (bestPairing[idx]) {
+                    item.anglerObj.preZ1 = bestPairing[idx].z1;
+                    item.anglerObj.preZ2 = bestPairing[idx].z2;
                 }
+            });
+        }
             });
         }
         
