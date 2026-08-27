@@ -1374,6 +1374,7 @@ let biggestFishSpecies = { d1: ["", "", ""], d2: ["", "", ""] };
             currentZoneSize = Math.max(Math.ceil(tot / 4), 1);
         }
         let zSize = currentZoneSize;
+        for (let attempt = 0; attempt < 200; attempt++) {
         let p1 = zones.map((z, idx) => { 
             let p = []; for (let i = 1; i <= zSize; i++) p.push((idx * zSize) + i);
             p.sort(() => Math.random() - 0.5); return {z, p}; 
@@ -1572,8 +1573,16 @@ let biggestFishSpecies = { d1: ["", "", ""], d2: ["", "", ""] };
                 a.p2 = pull(a.z2, 1, hasMobility);
             }
         });
-        displayDraw();
-    }
+
+        // Check if this attempt yielded 0 errors. If clean, stop retrying immediately!
+        let checkResult = runValidator();
+        if (checkResult.list.length === 0) {
+            break;
+        }
+    } // Closes the for (let attempt = 0; attempt < 200; attempt++) loop
+
+    displayDraw();
+}
 
     function toggleSwapMode() { 
         isSwapMode = !isSwapMode;
