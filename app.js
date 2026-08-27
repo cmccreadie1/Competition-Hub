@@ -1483,13 +1483,14 @@ let biggestFishSpecies = { d1: ["", "", ""], d2: ["", "", ""] };
     let d1Z = [null, null, null, null];
     let d2Z = [null, null, null, null];
 
+    // Alternating zone arrays so two [A] anglers on the same team MUST get separate zones
+    let teamAZonesD1 = ['GREEN', 'YELLOW'];
+    let teamAZonesD2 = ['YELLOW', 'GREEN'];
+
     mobIndices.forEach((mIdx, order) => {
         let ang = e.anglers[mIdx];
-        let z1 = ang.preZ1;
-        let z2 = ang.preZ2;
-
-        if (!z1) z1 = aSafeZones[order % aSafeZones.length];
-        if (!z2) z2 = (z1 === 'YELLOW') ? 'GREEN' : 'YELLOW';
+        let z1 = ang.preZ1 || teamAZonesD1[order % 2];
+        let z2 = ang.preZ2 || teamAZonesD2[order % 2];
 
         d1Z[mIdx] = z1;
         d2Z[mIdx] = z2;
