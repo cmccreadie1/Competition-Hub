@@ -1471,42 +1471,54 @@ let biggestFishSpecies = { d1: ["", "", ""], d2: ["", "", ""] };
                         a.z1 = d1Z[i]; a.p1 = pull(a.z1, 0, a.mobility); 
                         a.z2 = d2Z[i]; a.p2 = pull(a.z2, 1, a.mobility); 
                     });
-                } else if (accEnabled && mobilityMode === 'A' && hasA) {
-                    let mI = e.anglers.findIndex(a => a.mobility);
-                    let a = e.anglers[mI];
-                    let targetZ1 = a.preZ1; let targetZ2 = a.preZ2;
-                    if (!targetZ1) targetZ1 = [...zones].sort(() => Math.random() - 0.5)[0];
-                    if (!targetZ2) {
-                        let randZones = [];
-                        zones.forEach(z => { if (z !== targetZ1) randZones.push(z); });
-                        randZones.sort(() => Math.random() - 0.5);
-                        targetZ2 = randZones.length > 0 ? randZones[0] : targetZ1;
-                    }
-                    let d1Z = [null, null, null, null]; let d2Z = [null, null, null, null];
-                    d1Z[mI] = targetZ1; d2Z[mI] = targetZ2;
-                    
-                    let remainingD1 = [];
-                    zones.forEach(z => { if (z !== targetZ1) remainingD1.push(z); });
-                    let remainingD2 = [];
-                    zones.forEach(z => { if (z !== targetZ2) remainingD2.push(z); });
-                    remainingD1.sort(() => Math.random() - 0.5);
-                    
-                    let bestD2Perm = [...remainingD2];
-                    for (let attempt = 0; attempt < 20; attempt++) {
-                        remainingD2.sort(() => Math.random() - 0.5);
-                        let isValid = true;
-                        for (let i = 0; i < 3; i++) { if (remainingD1[i] === remainingD2[i]) isValid = false; }
-                        if (isValid) { bestD2Perm = [...remainingD2]; break; }
-                    }
-                    remainingD2 = bestD2Perm;
-                    let rIdx = 0;
-                    for (let i = 0; i < 4; i++) {
-                        if (i !== mI) { d1Z[i] = remainingD1[rIdx]; d2Z[i] = remainingD2[rIdx]; rIdx++; }
-                    }
-                    e.anglers.forEach((ang, i) => { 
-                        ang.z1 = d1Z[i]; ang.p1 = pull(ang.z1, 0, ang.mobility); 
-                        ang.z2 = d2Z[i]; ang.p2 = pull(ang.z2, 1, ang.mobility); 
-                    });
+              } else if (accEnabled && mobilityMode === 'A' && hasA) {
+    let mobIndices = [];
+    let normIndices = [];
+    e.anglers.forEach((ang, i) => {
+        if (ang.mobility) mobIndices.push(i);
+        else normIndices.push(i);
+    });
+
+    let aSafeZones = ['YELLOW', 'GREEN'];
+    let d1Z = [null, null, null, null];
+    let d2Z = [null, null, null, null];
+
+    mobIndices.forEach((mIdx, order) => {
+        let ang = e.anglers[mIdx];
+        let z1 = ang.preZ1;
+        let z2 = ang.preZ2;
+
+        if (!z1) z1 = aSafeZones[order % aSafeZones.length];
+        if (!z2) z2 = (z1 === 'YELLOW') ? 'GREEN' : 'YELLOW';
+
+        d1Z[mIdx] = z1;
+        d2Z[mIdx] = z2;
+    });
+
+    let usedD1 = d1Z.filter(z => z !== null);
+    let usedD2 = d2Z.filter(z => z !== null);
+
+    let remD1 = zones.filter(z => !usedD1.includes(z)).sort(() => Math.random() - 0.5);
+    let remD2 = zones.filter(z => !usedD2.includes(z)).sort(() => Math.random() - 0.5);
+
+    for (let attempt = 0; attempt < 20; attempt++) {
+        let valid = true;
+        for (let k = 0; k < normIndices.length; k++) {
+            if (remD1[k] === remD2[k]) { valid = false; break; }
+        }
+        if (valid) break;
+        remD2.sort(() => Math.random() - 0.5);
+    }
+
+    normIndices.forEach((nIdx, k) => {
+        d1Z[nIdx] = remD1[k];
+        d2Z[nIdx] = remD2[k];
+    });
+
+    e.anglers.forEach((ang, i) => {
+        ang.z1 = d1Z[i]; ang.p1 = pull(ang.z1, 0, ang.mobility);
+        ang.z2 = d2Z[i]; ang.p2 = pull(ang.z2, 1, ang.mobility);
+    });
                 } else {
                     let d1Z = [...zones].sort(() => Math.random() - 0.5);
                     let d2Z = [d1Z[1], d1Z[2], d1Z[3], d1Z[0]];
