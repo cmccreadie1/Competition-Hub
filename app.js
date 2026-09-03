@@ -1001,7 +1001,7 @@ let biggestFishSpecies = { d1: ["", "", ""], d2: ["", "", ""] };
         const t = parseInt(tVal) || 0;
         const i = parseInt(iVal) || 0;
         for(let x = 0; x < t; x++) appState.push({ id: genId(), isTeam: true, tName: '', anglers: [{},{},{},{}] });
-        for(let y = 0; y < i; y++) appState.push({ id: genId(), isTeam: false, tName: '', anglers: [{}] });
+        for(let y = 0; y < i; y++) appState.push({ id: genId(), isTeam: false, tName: '', anglers: [{ mobility: 0 }] });
         
         const rosterZone = document.getElementById('rosterEntryZone');
         const commandBar = document.getElementById('commandBar');
@@ -1024,7 +1024,7 @@ let biggestFishSpecies = { d1: ["", "", ""], d2: ["", "", ""] };
 
     function addNewStateItem(isTeam) {
         if (isTeam) appState.push({ id: genId(), isTeam: true, tName: '', anglers: [{},{},{},{}] });
-        else appState.push({ id: genId(), isTeam: false, tName: '', anglers: [{}] });
+        else appState.push({ id: genId(), isTeam: false, tName: '', anglers: [{ mobility: 0 }] });
         renderStateToScreen();
     }
 
