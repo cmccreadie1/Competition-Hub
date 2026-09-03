@@ -1368,15 +1368,26 @@ let biggestFishSpecies = { d1: ["", "", ""], d2: ["", "", ""] };
         const ancZ1 = ancZ1_el ? ancZ1_el.value : 'RED';
         const ancZ2 = ancZ2_el ? ancZ2_el.value : 'YELLOW';
 
-        if (currentZoneSize === 0) {
-            let tot = 0;
-            appState.forEach(e => { if (e.isTeam) tot += 4; else tot += 1; });
-            currentZoneSize = Math.max(Math.ceil(tot / 4), 1);
-        }
-        let zSize = currentZoneSize;
+      let totAnglers = 0;
+        appState.forEach(e => { if (e.isTeam) totAnglers += 4; else totAnglers += 1; });
+        let baseSize = Math.floor(totAnglers / 4);
+        let rem = totAnglers % 4;
+        currentZoneSize = Math.max(baseSize + (rem > 0 ? 1 : 0), 1);
+
         for (let attempt = 0; attempt < 200; attempt++) {
+        let startPeg1 = 1;
         let p1 = zones.map((z, idx) => { 
-            let p = []; for (let i = 1; i <= zSize; i++) p.push((idx * zSize) + i);
+            let count = baseSize + (idx < rem ? 1 : 0);
+            let p = []; for (let i = 0; i < count; i++) p.push(startPeg1 + i);
+            startPeg1 += count;
+            p.sort(() => Math.random() - 0.5); return {z, p}; 
+        });
+
+        let startPeg2 = 1;
+        let p2 = zones.map((z, idx) => { 
+            let count = baseSize + (idx < rem ? 1 : 0);
+            let p = []; for (let i = 0; i < count; i++) p.push(startPeg2 + i);
+            startPeg2 += count;
             p.sort(() => Math.random() - 0.5); return {z, p}; 
         });
         let p2 = zones.map((z, idx) => { 
@@ -1701,12 +1712,20 @@ let biggestFishSpecies = { d1: ["", "", ""], d2: ["", "", ""] };
         });
         let avail1 = { 'RED':[], 'YELLOW':[], 'GREEN':[], 'BLUE':[] };
         let avail2 = { 'RED':[], 'YELLOW':[], 'GREEN':[], 'BLUE':[] };
+        let totL = 0;
+        appState.forEach(e => { if (e.isTeam) totL += 4; else totL += 1; });
+        let baseL = Math.floor(totL / 4);
+        let remL = totL % 4;
+        let rPeg = 1;
+
         zones.forEach((z, idx) => {
-            for(let i=1; i<=currentZoneSize; i++) {
-                let pN = String((idx * currentZoneSize) + i);
+            let zCount = baseL + (idx < remL ? 1 : 0);
+            for(let i=0; i<zCount; i++) {
+                let pN = String(rPeg + i);
                 if(!used1[z].includes(pN)) avail1[z].push(pN);
                 if(matchDays === 2 && !used2[z].includes(pN)) avail2[z].push(pN);
             }
+            rPeg += zCount;
         });
 
         let newEntry = { id: genId(), isTeam: isTeam, tName: '', anglers: [] };
@@ -1780,12 +1799,21 @@ let biggestFishSpecies = { d1: ["", "", ""], d2: ["", "", ""] };
     }
 
     function buildBeachMap(day, s) {
+        let tot = 0;
+        appState.forEach(e => { if (e.isTeam) tot += 4; else tot += 1; });
+        let baseSize = Math.floor(tot / 4);
+        let rem = tot % 4;
+
         let html = `<div style="display:flex; width:100%; gap:8px; margin-bottom: 6px;">`;
+        let runningPeg = 1;
+
         zones.forEach((z, idx) => {
-            let baseMax = (idx + 1) * s;
-            let baseMin = (idx * s) + 1;
+            let zCount = baseSize + (idx < rem ? 1 : 0);
+            let baseMin = zCount > 0 ? runningPeg : 0;
+            let baseMax = zCount > 0 ? runningPeg + zCount - 1 : 0;
+            runningPeg += zCount;
+
             let highestAlpha = '';
-            
             let assignedPegs = [];
             let aPegs = [];
             
@@ -1804,9 +1832,11 @@ let biggestFishSpecies = { d1: ["", "", ""], d2: ["", "", ""] };
             }));
             
             let emptyPegs = [];
-            for (let i = baseMin; i <= baseMax; i++) {
-                if (!assignedPegs.includes(String(i))) {
-                    emptyPegs.push(i);
+            if (zCount > 0) {
+                for (let i = baseMin; i <= baseMax; i++) {
+                    if (!assignedPegs.includes(String(i))) {
+                        emptyPegs.push(i);
+                    }
                 }
             }
             
