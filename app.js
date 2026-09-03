@@ -1390,10 +1390,7 @@ let biggestFishSpecies = { d1: ["", "", ""], d2: ["", "", ""] };
             startPeg2 += count;
             p.sort(() => Math.random() - 0.5); return {z, p}; 
         });
-        let p2 = zones.map((z, idx) => { 
-            let p = []; for (let i = 1; i <= zSize; i++) p.push((idx * zSize) + i);
-            p.sort(() => Math.random() - 0.5); return {z, p}; 
-        });
+       
         let aEntries = [];
         if (accEnabled) {
             appState.forEach(e => { if (e.anglers.some(a => a.mobility)) aEntries.push(e); });
