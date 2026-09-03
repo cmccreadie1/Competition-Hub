@@ -1552,14 +1552,14 @@ let biggestFishSpecies = { d1: ["", "", ""], d2: ["", "", ""] };
                         a.z2 = av2.length > 0 ? av2[0] : a.z1;
                     }
                 } else { 
-                    let av = [];
+                   let av1 = [];
                     zones.forEach(z => { 
-                        if (p1[zones.indexOf(z)].p.length > 0) av.push({z: z, left: p1[zones.indexOf(z)].p.length}); 
+                        if (p1[zones.indexOf(z)].p.length > 0) av1.push({z: z, left: p1[zones.indexOf(z)].p.length}); 
                     });
-                    if (av.length > 0) {
-                        av.sort((val1, val2) => val2.left - val1.left);
-                        let maxLeft = av[0].left;
-                        let candidates = av.filter(item => item.left === maxLeft).map(item => item.z);
+                    if (av1.length > 0) {
+                        av1.sort((val1, val2) => val2.left - val1.left);
+                        let maxLeft = av1[0].left;
+                        let candidates = av1.filter(item => item.left === maxLeft).map(item => item.z);
                         a.z1 = candidates[Math.floor(Math.random() * candidates.length)];
                     } 
                     
@@ -1567,9 +1567,11 @@ let biggestFishSpecies = { d1: ["", "", ""], d2: ["", "", ""] };
                     zones.forEach(z => { 
                         if (z !== a.z1 && p2[zones.indexOf(z)].p.length > 0) av2.push({z: z, left: p2[zones.indexOf(z)].p.length}); 
                     });
+                    
                     if (av2.length === 0) {
                         zones.forEach(z => { if (p2[zones.indexOf(z)].p.length > 0) av2.push({z: z, left: p2[zones.indexOf(z)].p.length}); });
                     }
+
                     if (av2.length > 0) {
                         av2.sort((val1, val2) => val2.left - val1.left);
                         let maxLeft2 = av2[0].left;
