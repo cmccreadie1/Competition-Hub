@@ -716,6 +716,8 @@ let biggestFishSpecies = { d1: ["", "", ""], d2: ["", "", ""] };
             accEnabled: accEnabled,
             safePegs1_a: document.getElementById('accPegs1_a') ? document.getElementById('accPegs1_a').value : '',
             safePegs2_a: document.getElementById('accPegs2_a') ? document.getElementById('accPegs2_a').value : '',
+            accessPeg1_a: document.getElementById('accAccess1_a') ? document.getElementById('accAccess1_a').value : '',
+accessPeg2_a: document.getElementById('accAccess2_a') ? document.getElementById('accAccess2_a').value : '',
             anchorZone: document.getElementById('anchorZoneSelect') ? document.getElementById('anchorZoneSelect').value : 'RED',
             anchorZone2: document.getElementById('anchorZoneSelect2') ? document.getElementById('anchorZoneSelect2').value : 'YELLOW',
             sweepstakeOptIns: sweepstakeOptIns 
@@ -948,6 +950,10 @@ let biggestFishSpecies = { d1: ["", "", ""], d2: ["", "", ""] };
         if (indivs) indivs.value = 0;
         if (safe1) safe1.value = '';
         if (safe2) safe2.value = '';
+        const acc1 = document.getElementById('accAccess1_a');
+const acc2 = document.getElementById('accAccess2_a');
+if (acc1) acc1.value = '';
+if (acc2) acc2.value = '';
         
         appState = []; 
         scoreState = {};
@@ -1399,24 +1405,29 @@ let biggestFishSpecies = { d1: ["", "", ""], d2: ["", "", ""] };
             p2.push({ z, p: p2Arr });
         });
 
-       const pull = (z, d2, mob) => {
+      const pull = (z, d2, mob) => {
             const pools = d2 ? p2 : p1;
             const zI = zones.indexOf(z);
             if (!pools[zI]) return 9999;
             
             const sL = d2 ? s2A : s1A;
+            const accessEl = d2 ? document.getElementById('accAccess2_a') : document.getElementById('accAccess1_a');
+            const accessPeg = accessEl && accessEl.value !== '' ? parseInt(accessEl.value, 10) : 1;
+
             if (accEnabled && mobilityMode === 'A') {
                 if (mob) { 
-                    // Genuine [A] angler drawing a safe peg
-                    let sI = pools[zI].p.findIndex(p => sL.includes(p));
-                    if (sI > -1) return pools[zI].p.splice(sI, 1)[0]; 
+                    let availableSafe = pools[zI].p.filter(p => sL.includes(p));
+                    if (availableSafe.length > 0) {
+                        availableSafe.sort((a, b) => Math.abs(a - accessPeg) - Math.abs(b - accessPeg));
+                        let chosenPeg = availableSafe[0];
+                        let removeIndex = pools[zI].p.indexOf(chosenPeg);
+                        return pools[zI].p.splice(removeIndex, 1)[0];
+                    }
                 } else if (sL && sL.length > 0) { 
-                    // Standard angler: prefer non-safe pegs first
                     let nI = pools[zI].p.findIndex(p => !sL.includes(p));
                     if (nI > -1) return pools[zI].p.splice(nI, 1)[0]; 
                 }
             }
-            // If only spare safe pegs remain, standard anglers draw them silently without an [A] tag
             let popVal = pools[zI].p.pop();
             return popVal !== undefined ? popVal : 9999;
         };
