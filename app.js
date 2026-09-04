@@ -1428,14 +1428,17 @@ let biggestFishSpecies = { d1: ["", "", ""], d2: ["", "", ""] };
             });
         }
         
-        const pull = (z, d2, mob) => {
-            const pools = d2 ? p2 : p1; const zI = zones.indexOf(z);
+       const pull = (z, d2, mob) => {
+            const pools = d2 ? p2 : p1;
+            const zI = zones.indexOf(z);
+            if (!pools[zI]) return 9999;
+            
+            const sL = d2 ? s2A : s1A;
             if (accEnabled && mobilityMode === 'A') {
-                const sL = d2 ? s2A : s1A;
                 if (mob) { 
                     let sI = pools[zI].p.findIndex(p => sL.includes(p));
                     if (sI > -1) return pools[zI].p.splice(sI, 1)[0]; 
-                } else if (sL.length > 0) { 
+                } else if (sL && sL.length > 0) { 
                     let nI = pools[zI].p.findIndex(p => !sL.includes(p));
                     if (nI > -1) return pools[zI].p.splice(nI, 1)[0]; 
                 }
@@ -1569,11 +1572,34 @@ let biggestFishSpecies = { d1: ["", "", ""], d2: ["", "", ""] };
                         a.z2 = candidates2[Math.floor(Math.random() * candidates2.length)];
                     }
                 }
-                a.p1 = pull(a.z1, 0, hasMobility);
-                a.p2 = pull(a.z2, 1, hasMobility);
-            }
-        });
+                // --- [A] TEAMMATE SAFE-ZONE OPTIMIZATION ---
+        // --- [A] TEAMMATE SAFE-ZONE OPTIMIZATION ---
+        // --- [A] TEAMMATE SAFE-ZONE OPTIMIZATION ---
+                if (accEnabled && matchDays === 2) {
+                    let day2SafeZones = zones.filter(z => {
+                        let zI = zones.indexOf(z);
+                        return p2[zI].p.some(pegNum => s2A.includes(pegNum));
+                    });
+                    e.anglers.forEach((a1) => {
+                        if (a1.mobility && !day2SafeZones.includes(a1.z2)) {
+                            e.anglers.forEach((a2) => {
+                                if (!a2.mobility && day2SafeZones.includes(a2.z2)) {
+                                    let tempZ = a1.z2;
+                                    a1.z2 = a2.z2;
+                                    a2.z2 = tempZ;
+                                }
+                            });
+                        }
+                    });
+        }
 
+        e.anglers.forEach(a => {
+            let hasMobility = accEnabled && a.mobility;
+            a.p1 = pull(a.z1, 0, hasMobility);
+            a.p2 = pull(a.z2, 1, hasMobility);
+        });
+    }
+});
         // Check if this attempt yielded 0 errors. If clean, stop retrying immediately!
         let checkResult = runValidator();
         if (checkResult.list.length === 0) {
