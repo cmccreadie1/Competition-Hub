@@ -1345,90 +1345,61 @@ let biggestFishSpecies = { d1: ["", "", ""], d2: ["", "", ""] };
         return maxBase + 'Z';
     }
 
-    function runDraw() {
-        appState.sort((a, b) => {
-            let getPriority = (entry) => { 
-                let hasA = accEnabled && entry.anglers.some(ang => ang.mobility); 
-                if (entry.isTeam && hasA) return 4;
-                if (!entry.isTeam && hasA) return 3;
-                if (entry.isTeam) return 2;
-                return 1; 
-            };
-            return getPriority(b) - getPriority(a);
-        });
-        let s1A_el = document.getElementById('accPegs1_a');
-        let s2A_el = document.getElementById('accPegs2_a');
-        let s1A_str = s1A_el ? s1A_el.value || '' : '';
-        let s2A_str = s2A_el ? s2A_el.value || '' : '';
-        let s1A = s1A_str.match(/\d+/g) ? s1A_str.match(/\d+/g).map(Number) : [];
-        let s2A = s2A_str.match(/\d+/g) ? s2A_str.match(/\d+/g).map(Number) : [];
-        
-        const ancZ1_el = document.getElementById('anchorZoneSelect');
-        const ancZ2_el = document.getElementById('anchorZoneSelect2');
-        const ancZ1 = ancZ1_el ? ancZ1_el.value : 'RED';
-        const ancZ2 = ancZ2_el ? ancZ2_el.value : 'YELLOW';
+   function runDraw() {
+    appState.sort((a, b) => {
+        let getPriority = (entry) => { 
+            let hasA = accEnabled && entry.anglers.some(ang => ang.mobility); 
+            if (entry.isTeam && hasA) return 4;
+            if (!entry.isTeam && hasA) return 3;
+            if (entry.isTeam) return 2;
+            return 1; 
+        };
+        return getPriority(b) - getPriority(a);
+    });
 
-        if (currentZoneSize === 0) {
-            let tot = 0;
-            appState.forEach(e => { if (e.isTeam) tot += 4; else tot += 1; });
-            currentZoneSize = Math.max(Math.ceil(tot / 4), 1);
-        }
-        let zSize = currentZoneSize;
-        for (let attempt = 0; attempt < 200; attempt++) {
-        let p1 = zones.map((z, idx) => { 
-            let p = []; for (let i = 1; i <= zSize; i++) p.push((idx * zSize) + i);
-            p.sort(() => Math.random() - 0.5); return {z, p}; 
-        });
-        let p2 = zones.map((z, idx) => { 
-            let p = []; for (let i = 1; i <= zSize; i++) p.push((idx * zSize) + i);
-            p.sort(() => Math.random() - 0.5); return {z, p}; 
-        });
-        let aEntries = [];
-        if (accEnabled) {
-            appState.forEach(e => { if (e.anglers.some(a => a.mobility)) aEntries.push(e); });
-        }
+    let s1A_el = document.getElementById('accPegs1_a');
+    let s2A_el = document.getElementById('accPegs2_a');
+    let s1A_str = s1A_el ? s1A_el.value || '' : '';
+    let s2A_str = s2A_el ? s2A_el.value || '' : '';
+    let s1A = s1A_str.match(/\d+/g) ? s1A_str.match(/\d+/g).map(Number) : [];
+    let s2A = s2A_str.match(/\d+/g) ? s2A_str.match(/\d+/g).map(Number) : [];
 
-        if (accEnabled && mobilityMode === 'A' && aEntries.length > 0) {
-            let availableD1Safe = [];
-            let availableD2Safe = [];
-            zones.forEach(z => {
-                let zI = zones.indexOf(z); let safeCount = 0;
-                p1[zI].p.forEach(pegNum => { if (s1A.includes(pegNum)) safeCount++; });
-                for (let i = 0; i < safeCount; i++) availableD1Safe.push(z);
-            });
-            zones.forEach(z => {
-                let zI = zones.indexOf(z); let safeCount = 0;
-                p2[zI].p.forEach(pegNum => { if (s2A.includes(pegNum)) safeCount++; });
-                for (let i = 0; i < safeCount; i++) availableD2Safe.push(z);
-            });
-            let bestPairing = []; let leastClashes = 999;
-            for (let attempt = 0; attempt < 100; attempt++) {
-                let tempD1 = [...availableD1Safe].sort(() => Math.random() - 0.5);
-                let tempD2 = [...availableD2Safe].sort(() => Math.random() - 0.5);
-                let clashes = 0; let currentPairs = [];
-                for (let i = 0; i < aEntries.length; i++) {
-                    let z1 = null, z2 = null;
-                    if (i < tempD1.length) z1 = tempD1[i];
-                    if (i < tempD2.length) z2 = tempD2[i];
-                    if (z1 !== null && z2 !== null && z1 === z2) clashes++;
-                    currentPairs.push({z1: z1, z2: z2});
-                }
-                if (clashes < leastClashes) {
-                    leastClashes = clashes;
-                    bestPairing = currentPairs;
-                    if (leastClashes === 0) break; 
-                }
+    const ancZ1_el = document.getElementById('anchorZoneSelect');
+    const ancZ2_el = document.getElementById('anchorZoneSelect2');
+    const ancZ1 = ancZ1_el ? ancZ1_el.value : 'RED';
+    const ancZ2 = ancZ2_el ? ancZ2_el.value : 'YELLOW';
+
+    let totalAnglers = 0;
+    appState.forEach(e => { totalAnglers += e.anglers.length; });
+
+    for (let attempt = 0; attempt < 200; attempt++) {
+        let basePerZone = Math.floor(totalAnglers / 4);
+        let remainder = totalAnglers % 4;
+
+        let zoneCounts = zones.map((z, idx) => basePerZone + (idx < remainder ? 1 : 0));
+
+        let currentPeg = 1;
+        let p1 = [];
+        let p2 = [];
+
+        zones.forEach((z, idx) => {
+            let count = zoneCounts[idx];
+            let p1Arr = [];
+            let p2Arr = [];
+            for (let i = 0; i < count; i++) {
+                p1Arr.push(currentPeg + i);
+                p2Arr.push(currentPeg + i);
             }
-            aEntries.forEach((e, idx) => {
-                let a = e.anglers.find(ang => ang.mobility);
-                if (a) {
-                    a.preZ1 = bestPairing[idx] ? bestPairing[idx].z1 : null; 
-                    a.preZ2 = bestPairing[idx] ? bestPairing[idx].z2 : null;
-                }
-            });
-        }
-        
-       const pull = (z, d2, mob) => {
+            currentPeg += count;
+
+            p1Arr.sort(() => Math.random() - 0.5);
+            p2Arr.sort(() => Math.random() - 0.5);
+
+            p1.push({ z, p: p1Arr });
+            p2.push({ z, p: p2Arr });
+        });
+
+        const pull = (z, d2, mob) => {
             const pools = d2 ? p2 : p1;
             const zI = zones.indexOf(z);
             if (!pools[zI]) return 9999;
@@ -1446,24 +1417,23 @@ let biggestFishSpecies = { d1: ["", "", ""], d2: ["", "", ""] };
             let popVal = pools[zI].p.pop();
             return popVal !== undefined ? popVal : 9999;
         };
-        
+
         appState.forEach(e => {
             if (e.isTeam) {
                 let hasA = false;
                 if (accEnabled) { e.anglers.forEach(a => { if (a.mobility) hasA = true; }); }
-                
+
                 if (accEnabled && mobilityMode === 'B' && hasA) {
                     let d1Z = [null, null, null, null]; let d2Z = [null, null, null, null]; 
                     e.anglers.forEach((a, i) => { if (a.mobility) { d1Z[i] = ancZ1; d2Z[i] = ancZ2; } });
                     
-                    let av1 = []; zones.forEach(z => { if (z !== ancZ1) av1.push(z); });
-                    av1.sort(() => Math.random() - 0.5);
+                    let av1 = zones.filter(z => z !== ancZ1).sort(() => Math.random() - 0.5);
                     let sI = []; e.anglers.forEach((a, i) => { if (!a.mobility) sI.push(i); });
                     d1Z[sI[0]] = av1[0]; d1Z[sI[1]] = av1[1]; d1Z[sI[2]] = av1[2];
                     
-                    let av2 = []; zones.forEach(z => { if (z !== ancZ2) av2.push(z); });
+                    let av2 = zones.filter(z => z !== ancZ2);
                     let bestD2Perm = [...av2];
-                    for (let attempt = 0; attempt < 20; attempt++) {
+                    for (let att = 0; att < 20; att++) {
                         av2.sort(() => Math.random() - 0.5);
                         let isValid = true;
                         for (let k = 0; k < 3; k++) { if (d1Z[sI[k]] === av2[k]) isValid = false; }
@@ -1472,109 +1442,61 @@ let biggestFishSpecies = { d1: ["", "", ""], d2: ["", "", ""] };
                     d2Z[sI[0]] = bestD2Perm[0]; d2Z[sI[1]] = bestD2Perm[1]; d2Z[sI[2]] = bestD2Perm[2];
                     
                     e.anglers.forEach((a, i) => { 
-                        a.z1 = d1Z[i]; a.p1 = pull(a.z1, 0, a.mobility); 
-                        a.z2 = d2Z[i]; a.p2 = pull(a.z2, 1, a.mobility); 
+                        a.z1 = d1Z[i];
+                        a.z2 = d2Z[i];
                     });
-              } else if (accEnabled && mobilityMode === 'A' && hasA) {
-    let mobIndices = [];
-    let normIndices = [];
-    e.anglers.forEach((ang, i) => {
-        if (ang.mobility) mobIndices.push(i);
-        else normIndices.push(i);
-    });
+                } else if (accEnabled && mobilityMode === 'A' && hasA) {
+                    let mobIndices = [];
+                    let normIndices = [];
+                    e.anglers.forEach((ang, i) => {
+                        if (ang.mobility) mobIndices.push(i);
+                        else normIndices.push(i);
+                    });
 
-    let aSafeZones = ['YELLOW', 'GREEN'];
-    let d1Z = [null, null, null, null];
-    let d2Z = [null, null, null, null];
+                    let d1Z = [null, null, null, null];
+                    let d2Z = [null, null, null, null];
 
-    // Alternating zone arrays so two [A] anglers on the same team MUST get separate zones
-    let teamAZonesD1 = ['GREEN', 'YELLOW'];
-    let teamAZonesD2 = ['YELLOW', 'GREEN'];
+                    let teamAZonesD1 = ['GREEN', 'YELLOW', 'RED', 'BLUE'];
+                    let teamAZonesD2 = ['YELLOW', 'GREEN', 'BLUE', 'RED'];
 
-    mobIndices.forEach((mIdx, order) => {
-        let ang = e.anglers[mIdx];
-        let z1 = ang.preZ1 || teamAZonesD1[order % 2];
-        let z2 = ang.preZ2 || teamAZonesD2[order % 2];
+                    mobIndices.forEach((mIdx, order) => {
+                        d1Z[mIdx] = teamAZonesD1[order % 4];
+                        d2Z[mIdx] = teamAZonesD2[order % 4];
+                    });
 
-        d1Z[mIdx] = z1;
-        d2Z[mIdx] = z2;
-    });
+                    let usedD1 = d1Z.filter(z => z !== null);
+                    let usedD2 = d2Z.filter(z => z !== null);
 
-    let usedD1 = d1Z.filter(z => z !== null);
-    let usedD2 = d2Z.filter(z => z !== null);
+                    let remD1 = zones.filter(z => !usedD1.includes(z)).sort(() => Math.random() - 0.5);
+                    let remD2 = zones.filter(z => !usedD2.includes(z)).sort(() => Math.random() - 0.5);
 
-    let remD1 = zones.filter(z => !usedD1.includes(z)).sort(() => Math.random() - 0.5);
-    let remD2 = zones.filter(z => !usedD2.includes(z)).sort(() => Math.random() - 0.5);
+                    for (let att = 0; att < 20; att++) {
+                        let valid = true;
+                        for (let k = 0; k < normIndices.length; k++) {
+                            if (remD1[k] === remD2[k]) { valid = false; break; }
+                        }
+                        if (valid) break;
+                        remD2.sort(() => Math.random() - 0.5);
+                    }
 
-    for (let attempt = 0; attempt < 20; attempt++) {
-        let valid = true;
-        for (let k = 0; k < normIndices.length; k++) {
-            if (remD1[k] === remD2[k]) { valid = false; break; }
-        }
-        if (valid) break;
-        remD2.sort(() => Math.random() - 0.5);
-    }
+                    normIndices.forEach((nIdx, k) => {
+                        d1Z[nIdx] = remD1[k];
+                        d2Z[nIdx] = remD2[k];
+                    });
 
-    normIndices.forEach((nIdx, k) => {
-        d1Z[nIdx] = remD1[k];
-        d2Z[nIdx] = remD2[k];
-    });
-
-    e.anglers.forEach((ang, i) => {
-        ang.z1 = d1Z[i]; ang.p1 = pull(ang.z1, 0, ang.mobility);
-        ang.z2 = d2Z[i]; ang.p2 = pull(ang.z2, 1, ang.mobility);
-    });
+                    e.anglers.forEach((ang, i) => {
+                        ang.z1 = d1Z[i];
+                        ang.z2 = d2Z[i];
+                    });
                 } else {
                     let d1Z = [...zones].sort(() => Math.random() - 0.5);
                     let d2Z = [d1Z[1], d1Z[2], d1Z[3], d1Z[0]];
                     e.anglers.forEach((a, i) => { 
-                        a.z1 = d1Z[i]; a.p1 = pull(a.z1, 0, 0); 
-                        a.z2 = d2Z[i]; a.p2 = pull(a.z2, 1, 0); 
+                        a.z1 = d1Z[i];
+                        a.z2 = d2Z[i];
                     });
                 }
-            } else {
-                let a = e.anglers[0];
-                let hasMobility = accEnabled && a.mobility;
-                if (accEnabled && mobilityMode === 'B' && hasMobility) { 
-                    a.z1 = ancZ1; a.z2 = ancZ2; 
-                } else if (accEnabled && mobilityMode === 'A' && hasMobility) {
-                    if (a.preZ1) a.z1 = a.preZ1;
-                    else a.z1 = zones[Math.floor(Math.random() * zones.length)];
-                    if (a.preZ2) a.z2 = a.preZ2;
-                    else {
-                        let av2 = [];
-                        zones.forEach(z => { if (z !== a.z1) av2.push(z); });
-                        a.z2 = av2.length > 0 ? av2[0] : a.z1;
-                    }
-                } else { 
-                    let av = [];
-                    zones.forEach(z => { 
-                        if (p1[zones.indexOf(z)].p.length > 0) av.push({z: z, left: p1[zones.indexOf(z)].p.length}); 
-                    });
-                    if (av.length > 0) {
-                        av.sort((val1, val2) => val2.left - val1.left);
-                        let maxLeft = av[0].left;
-                        let candidates = av.filter(item => item.left === maxLeft).map(item => item.z);
-                        a.z1 = candidates[Math.floor(Math.random() * candidates.length)];
-                    } 
-                    
-                    let av2 = [];
-                    zones.forEach(z => { 
-                        if (z !== a.z1 && p2[zones.indexOf(z)].p.length > 0) av2.push({z: z, left: p2[zones.indexOf(z)].p.length}); 
-                    });
-                    if (av2.length === 0) {
-                        zones.forEach(z => { if (p2[zones.indexOf(z)].p.length > 0) av2.push({z: z, left: p2[zones.indexOf(z)].p.length}); });
-                    }
-                    if (av2.length > 0) {
-                        av2.sort((val1, val2) => val2.left - val1.left);
-                        let maxLeft2 = av2[0].left;
-                        let candidates2 = av2.filter(item => item.left === maxLeft2).map(item => item.z);
-                        a.z2 = candidates2[Math.floor(Math.random() * candidates2.length)];
-                    }
-                }
-                // --- [A] TEAMMATE SAFE-ZONE OPTIMIZATION ---
-        // --- [A] TEAMMATE SAFE-ZONE OPTIMIZATION ---
-        // --- [A] TEAMMATE SAFE-ZONE OPTIMIZATION ---
+
                 if (accEnabled && matchDays === 2) {
                     let day2SafeZones = zones.filter(z => {
                         let zI = zones.indexOf(z);
@@ -1591,21 +1513,40 @@ let biggestFishSpecies = { d1: ["", "", ""], d2: ["", "", ""] };
                             });
                         }
                     });
-        }
+                }
 
-        e.anglers.forEach(a => {
-            let hasMobility = accEnabled && a.mobility;
-            a.p1 = pull(a.z1, 0, hasMobility);
-            a.p2 = pull(a.z2, 1, hasMobility);
+                e.anglers.forEach(a => {
+                    let hasMobility = accEnabled && a.mobility;
+                    a.p1 = pull(a.z1, 0, hasMobility);
+                    a.p2 = pull(a.z2, 1, hasMobility);
+                });
+            } else {
+                let a = e.anglers[0];
+                let hasMobility = accEnabled && a.mobility;
+                if (accEnabled && mobilityMode === 'B' && hasMobility) { 
+                    a.z1 = ancZ1; a.z2 = ancZ2; 
+                } else if (accEnabled && mobilityMode === 'A' && hasMobility) {
+                    a.z1 = zones[Math.floor(Math.random() * zones.length)];
+                    let av2 = zones.filter(z => z !== a.z1);
+                    a.z2 = av2.length > 0 ? av2[Math.floor(Math.random() * av2.length)] : a.z1;
+                } else { 
+                    let av = zones.filter(z => p1[zones.indexOf(z)].p.length > 0);
+                    if (av.length > 0) a.z1 = av[Math.floor(Math.random() * av.length)];
+                    
+                    let av2 = zones.filter(z => z !== a.z1 && p2[zones.indexOf(z)].p.length > 0);
+                    if (av2.length === 0) av2 = zones.filter(z => p2[zones.indexOf(z)].p.length > 0);
+                    if (av2.length > 0) a.z2 = av2[Math.floor(Math.random() * av2.length)];
+                }
+                a.p1 = pull(a.z1, 0, hasMobility);
+                a.p2 = pull(a.z2, 1, hasMobility);
+            }
         });
-    }
-});
-        // Check if this attempt yielded 0 errors. If clean, stop retrying immediately!
+
         let checkResult = runValidator();
         if (checkResult.list.length === 0) {
             break;
         }
-    } // Closes the for (let attempt = 0; attempt < 200; attempt++) loop
+    }
 
     displayDraw();
 }
