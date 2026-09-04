@@ -12,7 +12,7 @@ const APP_VERSION = "v7.4.0"; // Version update for Embedded Manual
     
     let isAppReady = false; 
     let appState = []; 
-    let scoreState = {}; // SCORECARD DATA BUCKET
+    let scoreState = {}; // SCORECARD DATA BUCKETS
 let biggestFishSpecies = { d1: ["", "", ""], d2: ["", "", ""] };
     let matchDays = 2;
     let currentZoneSize = 0; 
