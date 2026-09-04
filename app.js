@@ -1759,40 +1759,50 @@ let biggestFishSpecies = { d1: ["", "", ""], d2: ["", "", ""] };
             let assignedPegs = [];
             let aPegs = [];
             
-           function buildBeachMap(day, s) {
-    let html = `<div style="display:flex; width:100%; gap:8px; margin-bottom: 6px;">`;
-    zones.forEach((z, idx) => {
-        let assignedPegs = [];
-        let aPegs = [];
-        
-        appState.forEach(e => e.anglers.forEach(a => {
-            let zp = day === 1 ? {z: a.z1, p: a.p1} : {z: a.z2, p: a.p2};
-            if (zp.z === z && zp.p !== undefined && zp.p !== 9999) {
-                let pStr = String(zp.p);
-                assignedPegs.push(pStr);
-                if (a.mobility) aPegs.push(pStr);
+            appState.forEach(e => e.anglers.forEach(a => {
+                let zp = day === 1 ? {z: a.z1, p: a.p1} : {z: a.z2, p: a.p2};
+                if (zp.z === z && zp.p !== undefined && zp.p !== 9999) {
+                    let pStr = String(zp.p);
+                    assignedPegs.push(pStr);
+                    if (a.mobility) aPegs.push(pStr);
+                    
+                    if (pStr.startsWith(String(baseMax))) {
+                        let alpha = pStr.replace(/[0-9]/g, '');
+                        if (alpha > highestAlpha) highestAlpha = alpha;
+                    }
+                }
+            }));
+            
+            let emptyPegs = [];
+            for (let i = baseMin; i <= baseMax; i++) {
+                if (!assignedPegs.includes(String(i))) {
+                    emptyPegs.push(i);
+                }
             }
-        }));
-        
-        let totalInZone = assignedPegs.length;
-        let bg = zColors[z];
-        let label = `${z} (${totalInZone} Anglers)`;
-        
-        let extraInfo = '';
-        let hasA = accEnabled && aPegs.length > 0;
+            
+            let bg = zColors[z];
+            let label = highestAlpha ? `${baseMin}-${baseMax} + ${baseMax}${highestAlpha}` : `${baseMin}-${baseMax}`;
+            
+            let extraInfo = '';
+            let hasEmpty = emptyPegs.length > 0;
+            let hasA = accEnabled && aPegs.length > 0;
 
-        if (hasA) {
-            extraInfo += `<span style="font-size:10px; font-weight:900; background:white; color:var(--text-dark); padding:4px 8px; border-radius:50px; white-space:nowrap; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">[A]: ${aPegs.join(', ')}</span>`;
-        }
+            if (hasEmpty) {
+                extraInfo += `<span style="font-size:10px; font-weight:900; background:white; color:var(--text-dark); padding:4px 8px; border-radius:50px; white-space:nowrap; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">E: ${emptyPegs.join(', ')}</span>`;
+            }
+            if (hasA) {
+                extraInfo += `<span style="font-size:10px; font-weight:900; background:white; color:var(--text-dark); padding:4px 8px; border-radius:50px; white-space:nowrap; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">[A]: ${aPegs.join(', ')}</span>`;
+            }
 
-        html += `<div style="flex:1; background:${bg}; border-radius:12px; padding:6px 12px; color:white; font-weight:900; display:flex; flex-direction:row; flex-wrap:wrap; justify-content:center; align-items:center; gap:8px; min-height:26px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-                    <span style="font-size:14px; letter-spacing:0.5px;">${label}</span>
-                    ${extraInfo}
-                </div>`;
-    });
-    html += `</div>`;
-    return html;
-}
+            html += `<div style="flex:1; background:${bg}; border-radius:12px; padding:6px 12px; color:white; font-weight:900; display:flex; flex-direction:row; flex-wrap:wrap; justify-content:center; align-items:center; gap:8px; min-height:26px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                        <span style="font-size:14px; letter-spacing:0.5px;">${label}</span>
+                        ${extraInfo}
+                    </div>`;
+        });
+        html += `</div>`;
+        return html;
+    }
+
     function displayDraw() {
         document.querySelectorAll('.tab-content').forEach(s => s.style.display = 'none');
         const drawTab = document.getElementById('drawTab');
