@@ -1399,7 +1399,7 @@ let biggestFishSpecies = { d1: ["", "", ""], d2: ["", "", ""] };
             p2.push({ z, p: p2Arr });
         });
 
-        const pull = (z, d2, mob) => {
+       const pull = (z, d2, mob) => {
             const pools = d2 ? p2 : p1;
             const zI = zones.indexOf(z);
             if (!pools[zI]) return 9999;
@@ -1407,13 +1407,16 @@ let biggestFishSpecies = { d1: ["", "", ""], d2: ["", "", ""] };
             const sL = d2 ? s2A : s1A;
             if (accEnabled && mobilityMode === 'A') {
                 if (mob) { 
+                    // Genuine [A] angler drawing a safe peg
                     let sI = pools[zI].p.findIndex(p => sL.includes(p));
                     if (sI > -1) return pools[zI].p.splice(sI, 1)[0]; 
                 } else if (sL && sL.length > 0) { 
+                    // Standard angler: prefer non-safe pegs first
                     let nI = pools[zI].p.findIndex(p => !sL.includes(p));
                     if (nI > -1) return pools[zI].p.splice(nI, 1)[0]; 
                 }
             }
+            // If only spare safe pegs remain, standard anglers draw them silently without an [A] tag
             let popVal = pools[zI].p.pop();
             return popVal !== undefined ? popVal : 9999;
         };
