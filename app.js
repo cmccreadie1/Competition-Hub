@@ -1,4 +1,4 @@
-const APP_VERSION = "v7.4.0"; // Single Source of Truth versioning for Netlify page & front-end
+const APP_VERSION = "v7.4.0"; // Version update for Embedded Manual
     document.getElementById('vTag').innerText = APP_VERSION;
 
     const zones = ['RED', 'YELLOW', 'GREEN', 'BLUE'];
@@ -718,6 +718,9 @@ let biggestFishSpecies = { d1: ["", "", ""], d2: ["", "", ""] };
             safePegs2_a: document.getElementById('accPegs2_a') ? document.getElementById('accPegs2_a').value : '',
             accessPeg1_a: document.getElementById('accAccess1_a') ? document.getElementById('accAccess1_a').value : '',
 accessPeg2_a: document.getElementById('accAccess2_a') ? document.getElementById('accAccess2_a').value : '',
+            splitRotationActive: document.getElementById('splitRotationToggle') ? document.getElementById('splitRotationToggle').checked : false,
+block1Zones: Array.from(document.querySelectorAll('.block1-zone:checked')).map(cb => cb.value),
+block2Zones: Array.from(document.querySelectorAll('.block2-zone:checked')).map(cb => cb.value),
             anchorZone: document.getElementById('anchorZoneSelect') ? document.getElementById('anchorZoneSelect').value : 'RED',
             anchorZone2: document.getElementById('anchorZoneSelect2') ? document.getElementById('anchorZoneSelect2').value : 'YELLOW',
             sweepstakeOptIns: sweepstakeOptIns 
@@ -725,6 +728,31 @@ accessPeg2_a: document.getElementById('accAccess2_a') ? document.getElementById(
         localStorage.setItem('zonedraw_current_state_v1', JSON.stringify(stateObj));
     }
 
+function toggleBlockRotationUI() {
+    const toggle = document.getElementById('splitRotationToggle');
+    const container = document.getElementById('blockRotationSetup');
+    if (toggle && container) {
+        container.style.display = toggle.checked ? 'flex' : 'none';
+    }
+}
+
+function syncBlockSelection(sourceBlock, zone) {
+    const targetClass = sourceBlock === 1 ? '.block2-zone' : '.block1-zone';
+    const sourceClass = sourceBlock === 1 ? '.block1-zone' : '.block2-zone';
+    
+    const sourceEl = document.querySelector(`${sourceClass}[value="${zone}"]`);
+    const targetEl = document.querySelector(`${targetClass}[value="${zone}"]`);
+    
+    if (sourceEl && sourceEl.checked && targetEl) {
+        targetEl.checked = false;
+    }
+}
+
+function getSelectedBlocks() {
+    const b1 = Array.from(document.querySelectorAll('.block1-zone:checked')).map(cb => cb.value);
+    const b2 = Array.from(document.querySelectorAll('.block2-zone:checked')).map(cb => cb.value);
+    return { b1, b2 };
+}
     function formatPegs(el) {
         let val = el.value;
         let nums = val.match(/\d+/g);
@@ -954,6 +982,11 @@ accessPeg2_a: document.getElementById('accAccess2_a') ? document.getElementById(
 const acc2 = document.getElementById('accAccess2_a');
 if (acc1) acc1.value = '';
 if (acc2) acc2.value = '';
+        const splitToggle = document.getElementById('splitRotationToggle');
+if (splitToggle) {
+    splitToggle.checked = false;
+    toggleBlockRotationUI();
+}
         
         appState = []; 
         scoreState = {};
@@ -1374,6 +1407,9 @@ if (acc2) acc2.value = '';
     const ancZ2_el = document.getElementById('anchorZoneSelect2');
     const ancZ1 = ancZ1_el ? ancZ1_el.value : 'RED';
     const ancZ2 = ancZ2_el ? ancZ2_el.value : 'YELLOW';
+       const blockToggle = document.getElementById('splitRotationToggle');
+    const isBlockRotationActive = blockToggle && blockToggle.checked;
+    const { b1, b2 } = getSelectedBlocks();
 
     let totalAnglers = 0;
     appState.forEach(e => { totalAnglers += e.anglers.length; });
@@ -1470,8 +1506,23 @@ if (acc2) acc2.value = '';
                     let d1Z = [null, null, null, null];
                     let d2Z = [null, null, null, null];
 
-                    let teamAZonesD1 = ['GREEN', 'YELLOW', 'RED', 'BLUE'];
-                    let teamAZonesD2 = ['YELLOW', 'GREEN', 'BLUE', 'RED'];
+                    let teamAZonesD1 = [...zones].sort(() => Math.random() - 0.5);
+let teamAZonesD2 = [null, null, null, null];
+
+if (isBlockRotationActive && b1.length > 0 && b2.length > 0) {
+    let poolB1 = [...b1].sort(() => Math.random() - 0.5);
+    let poolB2 = [...b2].sort(() => Math.random() - 0.5);
+
+    teamAZonesD1.forEach((z1, i) => {
+        if (b1.includes(z1)) {
+            teamAZonesD2[i] = poolB2.pop() || b2[0];
+        } else {
+            teamAZonesD2[i] = poolB1.pop() || b1[0];
+        }
+    });
+} else {
+    teamAZonesD2 = ['YELLOW', 'GREEN', 'BLUE', 'RED'];
+}
 
                     mobIndices.forEach((mIdx, order) => {
                         d1Z[mIdx] = teamAZonesD1[order % 4];
@@ -1502,14 +1553,30 @@ if (acc2) acc2.value = '';
                         ang.z1 = d1Z[i];
                         ang.z2 = d2Z[i];
                     });
-                } else {
-                    let d1Z = [...zones].sort(() => Math.random() - 0.5);
-                    let d2Z = [d1Z[1], d1Z[2], d1Z[3], d1Z[0]];
-                    e.anglers.forEach((a, i) => { 
-                        a.z1 = d1Z[i];
-                        a.z2 = d2Z[i];
-                    });
-                }
+               } else {
+    let d1Z = [...zones].sort(() => Math.random() - 0.5);
+    let d2Z = [null, null, null, null];
+
+    if (isBlockRotationActive && b1.length > 0 && b2.length > 0) {
+        let poolB1 = [...b1].sort(() => Math.random() - 0.5);
+        let poolB2 = [...b2].sort(() => Math.random() - 0.5);
+
+        d1Z.forEach((z1, i) => {
+            if (b1.includes(z1)) {
+                d2Z[i] = poolB2.pop() || b2[0];
+            } else {
+                d2Z[i] = poolB1.pop() || b1[0];
+            }
+        });
+    } else {
+        d2Z = [d1Z[1], d1Z[2], d1Z[3], d1Z[0]];
+    }
+
+    e.anglers.forEach((a, i) => { 
+        a.z1 = d1Z[i];
+        a.z2 = d2Z[i];
+    });
+}
 
                 if (accEnabled && matchDays === 2) {
                     let day2SafeZones = zones.filter(z => {
@@ -1545,11 +1612,18 @@ if (acc2) acc2.value = '';
                     a.z2 = av2.length > 0 ? av2[Math.floor(Math.random() * av2.length)] : a.z1;
                 } else { 
                     let av = zones.filter(z => p1[zones.indexOf(z)].p.length > 0);
-                    if (av.length > 0) a.z1 = av[Math.floor(Math.random() * av.length)];
-                    
-                    let av2 = zones.filter(z => z !== a.z1 && p2[zones.indexOf(z)].p.length > 0);
-                    if (av2.length === 0) av2 = zones.filter(z => p2[zones.indexOf(z)].p.length > 0);
-                    if (av2.length > 0) a.z2 = av2[Math.floor(Math.random() * av2.length)];
+if (av.length > 0) a.z1 = av[Math.floor(Math.random() * av.length)];
+
+let av2 = zones.filter(z => z !== a.z1 && p2[zones.indexOf(z)].p.length > 0);
+if (isBlockRotationActive && b1.length > 0 && b2.length > 0) {
+    if (b1.includes(a.z1)) {
+        av2 = av2.filter(z => b2.includes(z));
+    } else if (b2.includes(a.z1)) {
+        av2 = av2.filter(z => b1.includes(z));
+    }
+}
+if (av2.length === 0) av2 = zones.filter(z => p2[zones.indexOf(z)].p.length > 0);
+if (av2.length > 0) a.z2 = av2[Math.floor(Math.random() * av2.length)];
                 }
                 a.p1 = pull(a.z1, 0, hasMobility);
                 a.p2 = pull(a.z2, 1, hasMobility);
