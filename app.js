@@ -1585,14 +1585,24 @@ if (isBlockRotationActive && b1.length > 0 && b2.length > 0) {
                     });
                     e.anglers.forEach((a1) => {
                         if (a1.mobility && !day2SafeZones.includes(a1.z2)) {
-                            e.anglers.forEach((a2) => {
-                                if (!a2.mobility && day2SafeZones.includes(a2.z2)) {
-                                    let tempZ = a1.z2;
-                                    a1.z2 = a2.z2;
-                                    a2.z2 = tempZ;
-                                }
-                            });
-                        }
+    e.anglers.forEach((a2) => {
+        if (!a2.mobility && day2SafeZones.includes(a2.z2)) {
+            let a1TargetBlock = null;
+            if (isBlockRotationActive && b1.length > 0 && b2.length > 0) {
+                if (b1.includes(a1.z1)) a1TargetBlock = b2;
+                else if (b2.includes(a1.z1)) a1TargetBlock = b1;
+            }
+
+            let isValidBlockSwap = !a1TargetBlock || a1TargetBlock.includes(a2.z2);
+
+            if (isValidBlockSwap) {
+                let tempZ = a1.z2;
+                a1.z2 = a2.z2;
+                a2.z2 = tempZ;
+            }
+        }
+    });
+}
                     });
                 }
 
