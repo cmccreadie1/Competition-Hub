@@ -439,6 +439,36 @@
                     </div>
                 </div>
             </div>
+            <!-- 2-Zone Block Rotation Setup -->
+<div class="input-group" style="margin-top: 12px; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
+    <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 900; color: var(--text-dark); cursor: pointer; text-align: left;">
+        <input type="checkbox" id="splitRotationToggle" onchange="toggleBlockRotationUI()">
+        Enable 2-Zone Block Rotation (Split Match Grounds)
+    </label>
+    
+    <div id="blockRotationSetup" style="display: none; margin-top: 10px; flex-direction: column; gap: 10px;">
+        <div style="display: flex; gap: 10px;">
+            <div style="flex: 1; background: #ffffff; padding: 8px; border-radius: 6px; border: 1px solid #ccc;">
+                <span style="font-size: 11px; font-weight: 900; color: var(--text-dark); display: block; margin-bottom: 4px;">BLOCK 1 (Group A)</span>
+                <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                    <label style="font-size: 10px; font-weight: 700;"><input type="checkbox" class="block1-zone" value="RED" checked onchange="syncBlockSelection(1, 'RED')"> RED</label>
+                    <label style="font-size: 10px; font-weight: 700;"><input type="checkbox" class="block1-zone" value="YELLOW" checked onchange="syncBlockSelection(1, 'YELLOW')"> YELLOW</label>
+                    <label style="font-size: 10px; font-weight: 700;"><input type="checkbox" class="block1-zone" value="GREEN" onchange="syncBlockSelection(1, 'GREEN')"> GREEN</label>
+                    <label style="font-size: 10px; font-weight: 700;"><input type="checkbox" class="block1-zone" value="BLUE" onchange="syncBlockSelection(1, 'BLUE')"> BLUE</label>
+                </div>
+            </div>
+            <div style="flex: 1; background: #ffffff; padding: 8px; border-radius: 6px; border: 1px solid #ccc;">
+                <span style="font-size: 11px; font-weight: 900; color: var(--text-dark); display: block; margin-bottom: 4px;">BLOCK 2 (Group B)</span>
+                <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                    <label style="font-size: 10px; font-weight: 700;"><input type="checkbox" class="block2-zone" value="RED" onchange="syncBlockSelection(2, 'RED')"> RED</label>
+                    <label style="font-size: 10px; font-weight: 700;"><input type="checkbox" class="block2-zone" value="YELLOW" onchange="syncBlockSelection(2, 'YELLOW')"> YELLOW</label>
+                    <label style="font-size: 10px; font-weight: 700;"><input type="checkbox" class="block2-zone" value="GREEN" checked onchange="syncBlockSelection(2, 'GREEN')"> GREEN</label>
+                    <label style="font-size: 10px; font-weight: 700;"><input type="checkbox" class="block2-zone" value="BLUE" checked onchange="syncBlockSelection(2, 'BLUE')"> BLUE</label>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
             <div id="rosterEntryZone">
                 <div style="margin: 25px 0; border-bottom: 2px dashed var(--border);"></div>
