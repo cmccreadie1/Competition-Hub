@@ -1538,14 +1538,30 @@ if (splitToggle) {
                         ang.z1 = d1Z[i];
                         ang.z2 = d2Z[i];
                     });
-                } else {
-                    let d1Z = [...zones].sort(() => Math.random() - 0.5);
-                    let d2Z = [d1Z[1], d1Z[2], d1Z[3], d1Z[0]];
-                    e.anglers.forEach((a, i) => { 
-                        a.z1 = d1Z[i];
-                        a.z2 = d2Z[i];
-                    });
-                }
+               } else {
+    let d1Z = [...zones].sort(() => Math.random() - 0.5);
+    let d2Z = [null, null, null, null];
+
+    if (isBlockRotationActive && b1.length > 0 && b2.length > 0) {
+        let poolB1 = [...b1].sort(() => Math.random() - 0.5);
+        let poolB2 = [...b2].sort(() => Math.random() - 0.5);
+
+        d1Z.forEach((z1, i) => {
+            if (b1.includes(z1)) {
+                d2Z[i] = poolB2.pop() || b2[0];
+            } else {
+                d2Z[i] = poolB1.pop() || b1[0];
+            }
+        });
+    } else {
+        d2Z = [d1Z[1], d1Z[2], d1Z[3], d1Z[0]];
+    }
+
+    e.anglers.forEach((a, i) => { 
+        a.z1 = d1Z[i];
+        a.z2 = d2Z[i];
+    });
+}
 
                 if (accEnabled && matchDays === 2) {
                     let day2SafeZones = zones.filter(z => {
