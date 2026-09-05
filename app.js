@@ -1389,8 +1389,7 @@ if (splitToggle) {
     appState.forEach(e => {
         if (e.anglers && Array.isArray(e.anglers)) {
             e.anglers.forEach(a => {
-                a.z1 = undefined; a.p1 = undefined;
-                a.z2 = undefined; a.p2 = undefined;
+                
                 a.mobility = a.mobility ? 1 : 0;
             });
         }
