@@ -1506,8 +1506,23 @@ if (splitToggle) {
                     let d1Z = [null, null, null, null];
                     let d2Z = [null, null, null, null];
 
-                    let teamAZonesD1 = ['GREEN', 'YELLOW', 'RED', 'BLUE'];
-                    let teamAZonesD2 = ['YELLOW', 'GREEN', 'BLUE', 'RED'];
+                    let teamAZonesD1 = [...zones].sort(() => Math.random() - 0.5);
+let teamAZonesD2 = [null, null, null, null];
+
+if (isBlockRotationActive && b1.length > 0 && b2.length > 0) {
+    let poolB1 = [...b1].sort(() => Math.random() - 0.5);
+    let poolB2 = [...b2].sort(() => Math.random() - 0.5);
+
+    teamAZonesD1.forEach((z1, i) => {
+        if (b1.includes(z1)) {
+            teamAZonesD2[i] = poolB2.pop() || b2[0];
+        } else {
+            teamAZonesD2[i] = poolB1.pop() || b1[0];
+        }
+    });
+} else {
+    teamAZonesD2 = ['YELLOW', 'GREEN', 'BLUE', 'RED'];
+}
 
                     mobIndices.forEach((mIdx, order) => {
                         d1Z[mIdx] = teamAZonesD1[order % 4];
