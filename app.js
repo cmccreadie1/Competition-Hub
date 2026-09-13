@@ -3332,12 +3332,12 @@ function exportPublicResults() {
     showToast("🚀 PUBLIC PORTAL SCORES.JSON GENERATED!");
 }
 function copyWhatsAppDraw() {
-    let output = "🎣 *SHOREMATCH COMPETITION DRAW* 🎣\n\n";
+    let output = "";
 
     appState.forEach(entry => {
-        // Correct team/entry title
-        let teamTitle = entry.name ? entry.name.trim() : (entry.isTeam ? 'TEAM' : 'SOLO ANGLERS');
-        output += `🏆 *${teamTitle.toUpperCase()}*\n`;
+        // Resolve actual team name or fall back cleanly
+        let teamTitle = entry.name || entry.teamName || (entry.isTeam ? 'TEAM' : 'SOLO ANGLERS');
+        output += `*${teamTitle.toUpperCase()}*\n`;
 
         entry.anglers.forEach(angler => {
             // Remove [A] designation for privacy
@@ -3347,8 +3347,8 @@ function copyWhatsAppDraw() {
             let d1Peg = (angler.p1 !== undefined && angler.p1 !== null) ? angler.p1 : 'N/A';
             let d2Peg = (angler.p2 !== undefined && angler.p2 !== null) ? angler.p2 : 'N/A';
 
-            output += `• *${cleanName}*\n`;
-            output += `   Day 1: Peg ${d1Peg}  |  Day 2: Peg ${d2Peg}\n`;
+            output += `*${cleanName}*\n`;
+            output += `  D1: Peg ${d1Peg}  |  D2: Peg ${d2Peg}\n`;
         });
 
         output += "\n";
@@ -3357,7 +3357,7 @@ function copyWhatsAppDraw() {
     // Copy formatted text directly to clipboard
     if (navigator.clipboard && window.isSecureContext) {
         navigator.clipboard.writeText(output.trim()).then(() => {
-            alert("✅ WhatsApp roster copied to clipboard!");
+            alert("WhatsApp roster copied to clipboard!");
         }).catch(err => {
             console.error("Clipboard write failed: ", err);
             alert("Failed to copy automatically. Please try again.");
@@ -3369,7 +3369,7 @@ function copyWhatsAppDraw() {
         textArea.select();
         try {
             document.execCommand('copy');
-            alert("✅ WhatsApp roster copied to clipboard!");
+            alert("WhatsApp roster copied to clipboard!");
         } catch (err) {
             alert("Failed to copy roster.");
         }
