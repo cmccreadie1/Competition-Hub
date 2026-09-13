@@ -3331,3 +3331,47 @@ function exportPublicResults() {
     
     showToast("🚀 PUBLIC PORTAL SCORES.JSON GENERATED!");
 }
+function copyWhatsAppDraw() {
+    let output = "🎣 *SHOREMATCH COMPETITION DRAW* 🎣\n\n";
+
+    appState.forEach(team => {
+        output += `🏆 *${(team.name || 'SOLO ANGLERS').toUpperCase()}*\n`;
+
+        team.anglers.forEach(angler => {
+            // Remove [A] designation for privacy
+            let cleanName = angler.name.replace(/\[A\]/gi, '').trim();
+
+            // Extract peg numbers cleanly from day assignments
+            let d1Peg = angler.day1 ? angler.day1.replace(/\D/g, '') : 'N/A';
+            let d2Peg = angler.day2 ? angler.day2.replace(/\D/g, '') : 'N/A';
+
+            output += `• *${cleanName}*\n`;
+            output += `   Day 1: Peg ${d1Peg}  |  Day 2: Peg ${d2Peg}\n`;
+        });
+
+        output += "\n";
+    });
+
+    // Copy formatted text directly to clipboard
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(output.trim()).then(() => {
+            alert("✅ WhatsApp roster copied to clipboard!");
+        }).catch(err => {
+            console.error("Clipboard write failed: ", err);
+            alert("Failed to copy automatically. Please try again.");
+        });
+    } else {
+        // Fallback for non-HTTPS or legacy clipboard behavior
+        let textArea = document.createElement("textarea");
+        textArea.value = output.trim();
+        document.body.appendChild(textArea);
+        textArea.select();
+        try {
+            document.execCommand('copy');
+            alert("✅ WhatsApp roster copied to clipboard!");
+        } catch (err) {
+            alert("Failed to copy roster.");
+        }
+        document.body.removeChild(textArea);
+    }
+}
