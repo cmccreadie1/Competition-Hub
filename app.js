@@ -3334,16 +3334,24 @@ function exportPublicResults() {
 function copyWhatsAppDraw() {
     let output = "🎣 *SHOREMATCH COMPETITION DRAW* 🎣\n\n";
 
-    appState.forEach(team => {
-        output += `🏆 *${(team.name || 'SOLO ANGLERS').toUpperCase()}*\n`;
+    appState.forEach(entry => {
+        // Fallback checks for team/entry name
+        let teamTitle = entry.name || entry.teamName || entry.title || (entry.isTeam ? 'TEAM' : 'SOLO ANGLERS');
+        output += `🏆 *${teamTitle.toUpperCase()}*\n`;
 
-        team.anglers.forEach(angler => {
+        let anglerList = entry.anglers || [entry];
+
+        anglerList.forEach(angler => {
             // Remove [A] designation for privacy
-            let cleanName = angler.name.replace(/\[A\]/gi, '').trim();
+            let cleanName = (angler.name || angler.anglerName || 'Angler').replace(/\[A\]/gi, '').trim();
 
-            // Extract peg numbers cleanly from day assignments
-            let d1Peg = angler.day1 ? angler.day1.replace(/\D/g, '') : 'N/A';
-            let d2Peg = angler.day2 ? angler.day2.replace(/\D/g, '') : 'N/A';
+            // Extract Day 1 peg (checking multiple possible object keys)
+            let d1Val = angler.day1 || angler.d1 || angler.peg1 || (angler.pegs ? angler.pegs.day1 : null) || 'N/A';
+            let d1Peg = String(d1Val).replace(/\D/g, '') || d1Val;
+
+            // Extract Day 2 peg (checking multiple possible object keys)
+            let d2Val = angler.day2 || angler.d2 || angler.peg2 || (angler.pegs ? angler.pegs.day2 : null) || 'N/A';
+            let d2Peg = String(d2Val).replace(/\D/g, '') || d2Val;
 
             output += `• *${cleanName}*\n`;
             output += `   Day 1: Peg ${d1Peg}  |  Day 2: Peg ${d2Peg}\n`;
@@ -3361,7 +3369,6 @@ function copyWhatsAppDraw() {
             alert("Failed to copy automatically. Please try again.");
         });
     } else {
-        // Fallback for non-HTTPS or legacy clipboard behavior
         let textArea = document.createElement("textarea");
         textArea.value = output.trim();
         document.body.appendChild(textArea);
