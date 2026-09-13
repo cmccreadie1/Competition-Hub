@@ -1382,13 +1382,13 @@ if (splitToggle) {
 
 function runDraw() {
         // --- 1. SORT BY ACCESSIBILITY PRIORITY QUEUE ---
-        // Multi-[A] teams get absolute first pick of the beach while safe pegs are 100% open
+        // Teams with multiple [A] anglers are drawn first when all safe pegs are 100% open
         appState.sort((a, b) => {
             let getPriority = (entry) => { 
                 let aCount = accEnabled ? entry.anglers.filter(ang => ang.mobility).length : 0;
                 if (entry.isTeam) {
                     if (aCount >= 2) return 4; // Highest constraint: Multi-[A] team
-                    if (aCount === 1) return 2; // Single-[A] team
+                    if (aCount === 1) return 2; // Moderate constraint: Single-[A] team
                     return 1;                   // Standard team
                 } else {
                     if (aCount >= 1) return 3; // Solo [A] angler
@@ -1398,7 +1398,7 @@ function runDraw() {
             return getPriority(b) - getPriority(a);
         });
 
-        // --- 2. PARSE SAFE PEG LISTS ONLY ---
+        // --- 2. PARSE SAFE PEG LISTS ---
         let s1A_el = document.getElementById('accPegs1_a');
         let s2A_el = document.getElementById('accPegs2_a');
         let s1A_str = s1A_el ? s1A_el.value || '' : '';
@@ -1414,7 +1414,7 @@ function runDraw() {
         let totalAnglers = 0;
         appState.forEach(e => { totalAnglers += e.anglers.length; });
 
-        // --- 3. MONTE CARLO DRAW ENGINE ---
+        // --- 3. MONTE CARLO DRAW ENGINE (UP TO 200 ATTEMPTS) ---
         for (let attempt = 0; attempt < 200; attempt++) {
             let basePerZone = Math.floor(totalAnglers / 4);
             let remainder = totalAnglers % 4;
@@ -1442,7 +1442,7 @@ function runDraw() {
                 p2.push({ z, p: p2Arr });
             });
 
-            // --- STRICT SAFE PEG PULL ENGINE ---
+            // --- STRICT SAFE PEG ISOLATION PULL ENGINE ---
             const pull = (z, d2, mob) => {
                 const pools = d2 ? p2 : p1;
                 const zI = zones.indexOf(z);
@@ -1451,7 +1451,7 @@ function runDraw() {
                 const sL = d2 ? s2A : s1A;
 
                 if (accEnabled && mob) {
-                    // Force grab a safe peg from the list if available in this zone
+                    // 1. Force [A] angler to take a safe peg from this zone if available
                     let availableSafe = pools[zI].p.filter(p => sL.includes(p));
                     if (availableSafe.length > 0) {
                         let chosenPeg = availableSafe[Math.floor(Math.random() * availableSafe.length)];
@@ -1459,16 +1459,16 @@ function runDraw() {
                         return pools[zI].p.splice(removeIndex, 1)[0];
                     }
                 } else if (accEnabled && sL && sL.length > 0) { 
-                    // Protect safe pegs from non-mobility anglers
-                    let nonSafeIndices = pools[zI].p.filter(p => !sL.includes(p));
-                    if (nonSafeIndices.length > 0) {
-                        let chosenPeg = nonSafeIndices[Math.floor(Math.random() * nonSafeIndices.length)];
+                    // 2. STRICT BLOCK: Standard anglers CANNOT touch safe pegs
+                    let nonSafePegs = pools[zI].p.filter(p => !sL.includes(p));
+                    if (nonSafePegs.length > 0) {
+                        let chosenPeg = nonSafePegs[Math.floor(Math.random() * nonSafePegs.length)];
                         let removeIndex = pools[zI].p.indexOf(chosenPeg);
                         return pools[zI].p.splice(removeIndex, 1)[0];
                     }
                 }
                 
-                // Fallback standard peg
+                // Fallback standard peg selection
                 let popVal = pools[zI].p.pop();
                 return popVal !== undefined ? popVal : 9999;
             };
