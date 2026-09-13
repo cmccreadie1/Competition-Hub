@@ -3332,7 +3332,13 @@ function exportPublicResults() {
     showToast("🚀 PUBLIC PORTAL SCORES.JSON GENERATED!");
 }
 function copyWhatsAppDraw() {
-    let output = "";
+    // 1. Grab match title from app or fall back to default
+    let titleInput = document.getElementById('matchTitle');
+    let competitionName = (titleInput && titleInput.value.trim()) ? titleInput.value.trim().toUpperCase() : 'SHOREMATCH COMPETITION';
+
+    // 2. Format Main Headings
+    let output = `*${competitionName}*\n`;
+    output += `*ZONE DRAW*\n\n`;
 
     appState.forEach(entry => {
         // Use tName property matching displayDraw()
