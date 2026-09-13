@@ -1506,5 +1506,21 @@
         <button onclick="closeExportModal()" class="btn-close-modal">CLOSE</button>
     </div>
 </div>
+    <!-- PRE-DRAW VALIDATION WARNING MODAL -->
+<div id="setupValidationModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center;">
+    <div style="background:#fff; border-radius:12px; padding:24px; max-width:480px; width:90%; box-shadow:0 10px 25px rgba(0,0,0,0.3); font-family:sans-serif;">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+            <span style="font-size:24px;">⚠️</span>
+            <h3 style="margin:0; color:#d9534f; font-size:18px; font-weight:800;">Draw Setup Configuration Error</h3>
+        </div>
+        <p style="margin:0 0 12px 0; font-size:13px; color:#555;">The draw cannot proceed because the safe peg input configuration conflicts with angler requirements:</p>
+        <div id="setupValidationList" style="background:#f8f9fa; border-left:4px solid #d9534f; padding:12px; border-radius:4px; font-size:13px; color:#333; margin-bottom:18px; line-height:1.5;">
+            <!-- Dynamic Errors Inserted Here -->
+        </div>
+        <div style="text-align:right;">
+            <button onclick="document.getElementById('setupValidationModal').style.display='none'" style="background:#2b3a4a; color:#fff; border:none; padding:10px 20px; border-radius:6px; font-weight:bold; cursor:pointer;">Edit Setup Inputs</button>
+        </div>
+    </div>
+</div>
 </body>
 </html>
