@@ -3335,23 +3335,17 @@ function copyWhatsAppDraw() {
     let output = "🎣 *SHOREMATCH COMPETITION DRAW* 🎣\n\n";
 
     appState.forEach(entry => {
-        // Fallback checks for team/entry name
-        let teamTitle = entry.name || entry.teamName || entry.title || (entry.isTeam ? 'TEAM' : 'SOLO ANGLERS');
+        // Correct team/entry title
+        let teamTitle = entry.name ? entry.name.trim() : (entry.isTeam ? 'TEAM' : 'SOLO ANGLERS');
         output += `🏆 *${teamTitle.toUpperCase()}*\n`;
 
-        let anglerList = entry.anglers || [entry];
-
-        anglerList.forEach(angler => {
+        entry.anglers.forEach(angler => {
             // Remove [A] designation for privacy
-            let cleanName = (angler.name || angler.anglerName || 'Angler').replace(/\[A\]/gi, '').trim();
+            let cleanName = (angler.name || 'Angler').replace(/\[A\]/gi, '').trim();
 
-            // Extract Day 1 peg (checking multiple possible object keys)
-            let d1Val = angler.day1 || angler.d1 || angler.peg1 || (angler.pegs ? angler.pegs.day1 : null) || 'N/A';
-            let d1Peg = String(d1Val).replace(/\D/g, '') || d1Val;
-
-            // Extract Day 2 peg (checking multiple possible object keys)
-            let d2Val = angler.day2 || angler.d2 || angler.peg2 || (angler.pegs ? angler.pegs.day2 : null) || 'N/A';
-            let d2Peg = String(d2Val).replace(/\D/g, '') || d2Val;
+            // Extract peg numbers directly from p1 and p2
+            let d1Peg = (angler.p1 !== undefined && angler.p1 !== null) ? angler.p1 : 'N/A';
+            let d2Peg = (angler.p2 !== undefined && angler.p2 !== null) ? angler.p2 : 'N/A';
 
             output += `• *${cleanName}*\n`;
             output += `   Day 1: Peg ${d1Peg}  |  Day 2: Peg ${d2Peg}\n`;
