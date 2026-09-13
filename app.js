@@ -1414,6 +1414,22 @@ function runDraw() {
         let totalAnglers = 0;
         appState.forEach(e => { totalAnglers += e.anglers.length; });
 
+        // Helper to check which zones contain safe pegs based on peg range
+        const getSafeZonesForList = (pegList, basePerZone, remainder) => {
+            let zMap = [];
+            let currentPeg = 1;
+            zones.forEach((z, idx) => {
+                let count = basePerZone + (idx < remainder ? 1 : 0);
+                let startPeg = currentPeg;
+                let endPeg = currentPeg + count - 1;
+                if (pegList.some(p => p >= startPeg && p <= endPeg)) {
+                    zMap.push(z);
+                }
+                currentPeg += count;
+            });
+            return zMap;
+        };
+
         // --- 3. MONTE CARLO DRAW ENGINE (UP TO 200 ATTEMPTS) ---
         for (let attempt = 0; attempt < 200; attempt++) {
             let basePerZone = Math.floor(totalAnglers / 4);
@@ -1442,6 +1458,10 @@ function runDraw() {
                 p2.push({ z, p: p2Arr });
             });
 
+            // Find zones that contain user's defined safe pegs
+            let d1SafeZones = getSafeZonesForList(s1A, basePerZone, remainder);
+            let d2SafeZones = getSafeZonesForList(s2A, basePerZone, remainder);
+
             // --- STRICT SAFE PEG ISOLATION PULL ENGINE ---
             const pull = (z, d2, mob) => {
                 const pools = d2 ? p2 : p1;
@@ -1451,7 +1471,7 @@ function runDraw() {
                 const sL = d2 ? s2A : s1A;
 
                 if (accEnabled && mob) {
-                    // 1. Force [A] angler to take a safe peg from this zone if available
+                    // Force [A] angler to take a safe peg from this zone if available
                     let availableSafe = pools[zI].p.filter(p => sL.includes(p));
                     if (availableSafe.length > 0) {
                         let chosenPeg = availableSafe[Math.floor(Math.random() * availableSafe.length)];
@@ -1459,7 +1479,7 @@ function runDraw() {
                         return pools[zI].p.splice(removeIndex, 1)[0];
                     }
                 } else if (accEnabled && sL && sL.length > 0) { 
-                    // 2. STRICT BLOCK: Standard anglers CANNOT touch safe pegs
+                    // STRICT BLOCK: Standard anglers CANNOT touch safe pegs
                     let nonSafePegs = pools[zI].p.filter(p => !sL.includes(p));
                     if (nonSafePegs.length > 0) {
                         let chosenPeg = nonSafePegs[Math.floor(Math.random() * nonSafePegs.length)];
@@ -1511,12 +1531,25 @@ function runDraw() {
                         let d1Z = [null, null, null, null];
                         let d2Z = [null, null, null, null];
 
-                        let teamAZonesD1 = ['GREEN', 'YELLOW', 'RED', 'BLUE'];
-                        let teamAZonesD2 = ['YELLOW', 'GREEN', 'BLUE', 'RED'];
+                        // Target safe zones dynamically on Day 1 and Day 2
+                        let availD1Safe = d1SafeZones.filter(z => p1[zones.indexOf(z)].p.some(p => s1A.includes(p))).sort(() => Math.random() - 0.5);
+                        let availD2Safe = d2SafeZones.filter(z => p2[zones.indexOf(z)].p.some(p => s2A.includes(p))).sort(() => Math.random() - 0.5);
 
-                        mobIndices.forEach((mIdx, order) => {
-                            d1Z[mIdx] = teamAZonesD1[order % 4];
-                            d2Z[mIdx] = teamAZonesD2[order % 4];
+                        mobIndices.forEach((mIdx) => {
+                            let targetD1 = availD1Safe.pop() || zones[Math.floor(Math.random() * zones.length)];
+                            
+                            // Ensure Day 2 zone respects Two-Block rotation (switch Block 1 <-> Block 2)
+                            let isBlock1 = (targetD1 === 'RED' || targetD1 === 'YELLOW');
+                            let oppositeBlockZones = isBlock1 ? ['GREEN', 'BLUE'] : ['RED', 'YELLOW'];
+                            let validD2Safe = availD2Safe.filter(z => oppositeBlockZones.includes(z));
+                            
+                            let targetD2 = validD2Safe.length > 0 ? validD2Safe.pop() : oppositeBlockZones[Math.floor(Math.random() * oppositeBlockZones.length)];
+                            
+                            // Remove chosen D2 zone from remaining pool
+                            availD2Safe = availD2Safe.filter(z => z !== targetD2);
+
+                            d1Z[mIdx] = targetD1;
+                            d2Z[mIdx] = targetD2;
                         });
 
                         let usedD1 = d1Z.filter(z => z !== null);
@@ -1552,24 +1585,6 @@ function runDraw() {
                         });
                     }
 
-                    if (accEnabled && matchDays === 2) {
-                        let day2SafeZones = zones.filter(z => {
-                            let zI = zones.indexOf(z);
-                            return p2[zI].p.some(pegNum => s2A.includes(pegNum));
-                        });
-                        e.anglers.forEach((a1) => {
-                            if (a1.mobility && !day2SafeZones.includes(a1.z2)) {
-                                e.anglers.forEach((a2) => {
-                                    if (!a2.mobility && day2SafeZones.includes(a2.z2)) {
-                                        let tempZ = a1.z2;
-                                        a1.z2 = a2.z2;
-                                        a2.z2 = tempZ;
-                                    }
-                                });
-                            }
-                        });
-                    }
-
                     e.anglers.forEach(a => {
                         let hasMobility = accEnabled && a.mobility;
                         a.p1 = pull(a.z1, 0, hasMobility);
@@ -1581,9 +1596,14 @@ function runDraw() {
                     if (accEnabled && mobilityMode === 'B' && hasMobility) { 
                         a.z1 = ancZ1; a.z2 = ancZ2; 
                     } else if (accEnabled && mobilityMode === 'A' && hasMobility) {
-                        a.z1 = zones[Math.floor(Math.random() * zones.length)];
-                        let av2 = zones.filter(z => z !== a.z1);
-                        a.z2 = av2.length > 0 ? av2[Math.floor(Math.random() * av2.length)] : a.z1;
+                        let targetD1 = d1SafeZones.length > 0 ? d1SafeZones[Math.floor(Math.random() * d1SafeZones.length)] : zones[Math.floor(Math.random() * zones.length)];
+                        let isBlock1 = (targetD1 === 'RED' || targetD1 === 'YELLOW');
+                        let oppositeBlockZones = isBlock1 ? ['GREEN', 'BLUE'] : ['RED', 'YELLOW'];
+                        let validD2Safe = d2SafeZones.filter(z => oppositeBlockZones.includes(z));
+                        let targetD2 = validD2Safe.length > 0 ? validD2Safe[Math.floor(Math.random() * validD2Safe.length)] : oppositeBlockZones[Math.floor(Math.random() * oppositeBlockZones.length)];
+                        
+                        a.z1 = targetD1;
+                        a.z2 = targetD2;
                     } else { 
                         let av = zones.filter(z => p1[zones.indexOf(z)].p.length > 0);
                         if (av.length > 0) a.z1 = av[Math.floor(Math.random() * av.length)];
