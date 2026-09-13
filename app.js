@@ -1379,8 +1379,86 @@ if (splitToggle) {
         }
         return maxBase + 'Z';
     }
+function validateSetupInputs() {
+    if (!accEnabled) return [];
 
+    let errors = [];
+
+    // 1. Gather all selected [A] anglers
+    let totalMobilityAnglers = 0;
+    let mobAnglersByTeam = [];
+
+    appState.forEach(e => {
+        let mobCount = e.anglers.filter(a => a.mobility).length;
+        totalMobilityAnglers += mobCount;
+        if (mobCount > 0) {
+            mobAnglersByTeam.push({ teamName: e.name || 'Solo/Unnamed', count: mobCount });
+        }
+    });
+
+    if (totalMobilityAnglers === 0) return [];
+
+    // 2. Parse Safe Peg Inputs
+    let s1A_el = document.getElementById('accPegs1_a');
+    let s2A_el = document.getElementById('accPegs2_a');
+    let s1A_str = s1A_el ? s1A_el.value || '' : '';
+    let s2A_str = s2A_el ? s2A_el.value || '' : '';
+    let s1A = s1A_str.match(/\d+/g) ? s1A_str.match(/\d+/g).map(Number) : [];
+    let s2A = s2A_str.match(/\d+/g) ? s2A_str.match(/\d+/g).map(Number) : [];
+
+    // 3. Check peg counts
+    if (s1A.length < totalMobilityAnglers) {
+        errors.push(`You have <b>${totalMobilityAnglers}</b> [A] anglers, but only <b>${s1A.length}</b> Day 1 safe peg(s) entered.`);
+    }
+    if (matchDays === 2 && s2A.length < totalMobilityAnglers) {
+        errors.push(`You have <b>${totalMobilityAnglers}</b> [A] anglers, but only <b>${s2A.length}</b> Day 2 safe peg(s) entered.`);
+    }
+
+    // 4. Check multi-[A] team zone conflicts
+    let totalAnglers = 0;
+    appState.forEach(e => { totalAnglers += e.anglers.length; });
+    let basePerZone = Math.floor(totalAnglers / 4);
+    let remainder = totalAnglers % 4;
+
+    const getZonesForPegs = (pegList) => {
+        let zMap = [];
+        let currentPeg = 1;
+        zones.forEach((z, idx) => {
+            let count = basePerZone + (idx < remainder ? 1 : 0);
+            let startPeg = currentPeg;
+            let endPeg = currentPeg + count - 1;
+            if (pegList.some(p => p >= startPeg && p <= endPeg)) {
+                zMap.push(z);
+            }
+            currentPeg += count;
+        });
+        return zMap;
+    };
+
+    let d1SafeZones = getZonesForPegs(s1A);
+
+    mobAnglersByTeam.forEach(t => {
+        if (t.count > 1 && d1SafeZones.length < t.count) {
+            errors.push(`Team <b>${t.teamName}</b> has <b>${t.count}</b> [A] anglers, but Day 1 safe pegs only span <b>${d1SafeZones.length}</b> distinct zone(s). Team separation requires at least ${t.count} separate safe zones.`);
+        }
+    });
+
+    return errors;
+}
 function runDraw() {
+    // --- PRE-DRAW VALIDATION POPUP CHECK ---
+        let validationErrors = validateSetupInputs();
+        if (validationErrors.length > 0) {
+            let listEl = document.getElementById('setupValidationList');
+            if (listEl) {
+                listEl.innerHTML = '<ul style="margin:0; padding-left:18px;">' + 
+                    validationErrors.map(err => `<li style="margin-bottom:6px;">${err}</li>`).join('') + 
+                    '</ul>';
+            }
+            let modalEl = document.getElementById('setupValidationModal');
+            if (modalEl) modalEl.style.display = 'flex';
+            return;
+        }
         // --- 1. SORT BY ACCESSIBILITY PRIORITY QUEUE ---
         // Teams with multiple [A] anglers are drawn first when all safe pegs are 100% open
         appState.sort((a, b) => {
