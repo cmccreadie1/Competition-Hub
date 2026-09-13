@@ -3335,15 +3335,15 @@ function copyWhatsAppDraw() {
     let output = "";
 
     appState.forEach(entry => {
-        // Resolve actual team name or fall back cleanly
-        let teamTitle = entry.team || entry.name || entry.teamName || entry.group || entry.team_name || (entry.isTeam ? `TEAM ${entry.id || ''}` : 'SOLO ANGLERS');
+        // Use tName property matching displayDraw()
+        let teamTitle = entry.tName || entry.name || (entry.isTeam ? 'TEAM' : 'SOLO ANGLERS');
         output += `*${teamTitle.toUpperCase()}*\n`;
 
         entry.anglers.forEach(angler => {
             // Remove [A] designation for privacy
             let cleanName = (angler.name || 'Angler').replace(/\[A\]/gi, '').trim();
 
-            // Extract peg numbers directly from p1 and p2
+            // Extract peg numbers cleanly from p1 and p2
             let d1Peg = (angler.p1 !== undefined && angler.p1 !== null) ? angler.p1 : 'N/A';
             let d2Peg = (angler.p2 !== undefined && angler.p2 !== null) ? angler.p2 : 'N/A';
 
