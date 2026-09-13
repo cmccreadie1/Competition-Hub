@@ -3336,7 +3336,7 @@ function copyWhatsAppDraw() {
 
     appState.forEach(entry => {
         // Resolve actual team name or fall back cleanly
-        let teamTitle = entry.name || entry.teamName || (entry.isTeam ? 'TEAM' : 'SOLO ANGLERS');
+        let teamTitle = entry.team || entry.name || entry.teamName || entry.group || entry.team_name || (entry.isTeam ? `TEAM ${entry.id || ''}` : 'SOLO ANGLERS');
         output += `*${teamTitle.toUpperCase()}*\n`;
 
         entry.anglers.forEach(angler => {
