@@ -716,8 +716,7 @@ let biggestFishSpecies = { d1: ["", "", ""], d2: ["", "", ""] };
             accEnabled: accEnabled,
             safePegs1_a: document.getElementById('accPegs1_a') ? document.getElementById('accPegs1_a').value : '',
             safePegs2_a: document.getElementById('accPegs2_a') ? document.getElementById('accPegs2_a').value : '',
-            accessPeg1_a: document.getElementById('accAccess1_a') ? document.getElementById('accAccess1_a').value : '',
-accessPeg2_a: document.getElementById('accAccess2_a') ? document.getElementById('accAccess2_a').value : '',
+          
             splitRotationActive: document.getElementById('splitRotationToggle') ? document.getElementById('splitRotationToggle').checked : false,
 block1Zones: Array.from(document.querySelectorAll('.block1-zone:checked')).map(cb => cb.value),
 block2Zones: Array.from(document.querySelectorAll('.block2-zone:checked')).map(cb => cb.value),
@@ -978,10 +977,7 @@ function getSelectedBlocks() {
         if (indivs) indivs.value = 0;
         if (safe1) safe1.value = '';
         if (safe2) safe2.value = '';
-        const acc1 = document.getElementById('accAccess1_a');
-const acc2 = document.getElementById('accAccess2_a');
-if (acc1) acc1.value = '';
-if (acc2) acc2.value = '';
+       
         const splitToggle = document.getElementById('splitRotationToggle');
 if (splitToggle) {
     splitToggle.checked = false;
