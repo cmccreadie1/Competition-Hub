@@ -1469,6 +1469,32 @@ function runDraw() {
     let s2A_str = s2A_el ? s2A_el.value || '' : '';
     let s1A = s1A_str.match(/\d+/g) ? s1A_str.match(/\d+/g).map(Number) : [];
     let s2A = s2A_str.match(/\d+/g) ? s2A_str.match(/\d+/g).map(Number) : [];
+    // --- PRE-DRAW MOBILITY PEG SUFFICIENCY CHECK ---
+    let totalMobilityCount = 0;
+    appState.forEach(entry => {
+        entry.anglers.forEach(a => {
+            if (accEnabled && a.mobility) totalMobilityCount++;
+        });
+    });
+
+    let totalSafeAvailable = s1A.length + s2A.length;
+
+    if (accEnabled && totalMobilityCount > 0 && totalSafeAvailable < (totalMobilityCount * matchDays)) {
+        alert(
+            `⚠️ DRAW BLOCKED: INSUFFICIENT SAFE PEGS\n\n` +
+            `PROBLEM:\n` +
+            `• You have ${totalMobilityCount} mobility [A] angler(s).\n` +
+            `• Across ${matchDays} day(s), you need at least ${totalMobilityCount * matchDays} safe peg slot(s) total.\n` +
+            `• You currently only have ${totalSafeAvailable} safe peg(s) defined (Day 1: ${s1A.length}, Day 2: ${s2A.length}).\n\n` +
+            `SOLUTION:\n` +
+            `1. Close this popup.\n` +
+            `2. Go to '1. DRAW SETUP' and open the 'Manage Draw Setup' menu.\n` +
+            `3. Add at least ${totalMobilityCount} safe peg(s) in the Day 1 Safe Pegs box.\n` +
+            `4. Add at least ${totalMobilityCount} safe peg(s) in the Day 2 Safe Pegs box.\n` +
+            `5. Click 'Run Draw' again.`
+        );
+        return; // Stop draw execution safely before running Monte Carlo loop
+    }
 
     const ancZ1_el = document.getElementById('anchorZoneSelect');
     const ancZ2_el = document.getElementById('anchorZoneSelect2');
