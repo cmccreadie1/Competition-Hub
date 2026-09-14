@@ -1825,6 +1825,15 @@ function runDraw() {
                     clashMap.push({eId: team.id, aI: aI, day: 1});
                     clashMap.push({eId: team.id, aI: aI, day: 2});
                 }
+                if (matchDays === 2 && a.z1 && a.z2) {
+                    let b1 = (a.z1 === 'RED' || a.z1 === 'YELLOW') ? 1 : 2;
+                    let b2 = (a.z2 === 'RED' || a.z2 === 'YELLOW') ? 1 : 2;
+                    if (b1 === b2) {
+                        errors.push(`Block Rotation Clash: '${aN}' stayed in Block ${b1} (${a.z1} -> ${a.z2}).`);
+                        clashMap.push({eId: team.id, aI: aI, day: 1});
+                        clashMap.push({eId: team.id, aI: aI, day: 2});
+                    }
+                }
                 
                 if (a.z1 && a.p1 !== undefined && a.p1 !== 9999) {
                     let dup = pM1[a.z1].find(p => String(p.val) === String(a.p1));
