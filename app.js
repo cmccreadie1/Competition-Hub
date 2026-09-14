@@ -1445,44 +1445,18 @@ function validateSetupInputs() {
 
     return errors;
 }
-// --- BLOCK-SWAP VALIDATION HELPER ---
-// --- BLOCK-SWAP VALIDATION HELPER ---
-function validateBlockRotation() {
-    if (matchDays < 2) return true;
-
-    const block1 = ['RED', 'YELLOW'];
-    const block2 = ['GREEN', 'BLUE'];
-
-    for (let team of appState) {
-        for (let angler of team.anglers) {
-            let hasMobility = accEnabled && angler.mobility;
-            if (hasMobility && mobilityMode === 'B') continue;
-
-            if (angler.z1 && angler.z2) {
-                let d1InB1 = block1.includes(angler.z1);
-                let d2InB1 = block1.includes(angler.z2);
-
-                if (d1InB1 === d2InB1) {
-                    return false;
-                }
-            }
-        }
-    }
-    return true;
-}
-
 function runDraw() {
     // --- 1. SORT BY ACCESSIBILITY PRIORITY QUEUE ---
     appState.sort((a, b) => {
         let getPriority = (entry) => { 
             let aCount = accEnabled ? entry.anglers.filter(ang => ang.mobility).length : 0;
             if (entry.isTeam) {
-                if (aCount >= 2) return 4;
-                if (aCount === 1) return 2;
-                return 1;
+                if (aCount >= 2) return 4; // Highest constraint: Multi-[A] team
+                if (aCount === 1) return 2; // Moderate constraint: Single-[A] team
+                return 1;                   // Standard team
             } else {
-                if (aCount >= 1) return 3;
-                return 0;
+                if (aCount >= 1) return 3; // Solo [A] angler
+                return 0;                   // Standard solo
             }
         };
         return getPriority(b) - getPriority(a);
@@ -1495,7 +1469,7 @@ function runDraw() {
     let s2A_str = s2A_el ? s2A_el.value || '' : '';
     let s1A = s1A_str.match(/\d+/g) ? s1A_str.match(/\d+/g).map(Number) : [];
     let s2A = s2A_str.match(/\d+/g) ? s2A_str.match(/\d+/g).map(Number) : [];
-    
+    // --- PRE-DRAW MOBILITY PEG SUFFICIENCY CHECK ---
     let totalMobilityCount = 0;
     appState.forEach(entry => {
         entry.anglers.forEach(a => {
@@ -1506,8 +1480,20 @@ function runDraw() {
     let totalSafeAvailable = s1A.length + s2A.length;
 
     if (accEnabled && totalMobilityCount > 0 && totalSafeAvailable < (totalMobilityCount * matchDays)) {
-        console.warn(`Insufficient Safe Pegs: Needed ${totalMobilityCount * matchDays}, Available ${totalSafeAvailable}`);
-        return;
+        alert(
+            `⚠️ DRAW BLOCKED: INSUFFICIENT SAFE PEGS\n\n` +
+            `PROBLEM:\n` +
+            `• You have ${totalMobilityCount} mobility [A] angler(s).\n` +
+            `• Across ${matchDays} day(s), you need at least ${totalMobilityCount * matchDays} safe peg slot(s) total.\n` +
+            `• You currently only have ${totalSafeAvailable} safe peg(s) defined (Day 1: ${s1A.length}, Day 2: ${s2A.length}).\n\n` +
+            `SOLUTION:\n` +
+            `1. Close this popup.\n` +
+            `2. Go to '1. DRAW SETUP' and open the 'Manage Draw Setup' menu.\n` +
+            `3. Add at least ${totalMobilityCount} safe peg(s) in the Day 1 Safe Pegs box.\n` +
+            `4. Add at least ${totalMobilityCount} safe peg(s) in the Day 2 Safe Pegs box.\n` +
+            `5. Click 'Run Draw' again.`
+        );
+        return; // Stop draw execution safely before running Monte Carlo loop
     }
 
     const ancZ1_el = document.getElementById('anchorZoneSelect');
@@ -1518,6 +1504,7 @@ function runDraw() {
     let totalAnglers = 0;
     appState.forEach(e => { totalAnglers += e.anglers.length; });
 
+    // Helper to check which zones contain safe pegs based on peg range
     const getSafeZonesForList = (pegList, basePerZone, remainder) => {
         let zMap = [];
         let currentPeg = 1;
@@ -1533,8 +1520,8 @@ function runDraw() {
         return zMap;
     };
 
-    // --- 3. MONTE CARLO DRAW ENGINE ---
-    for (let attempt = 0; attempt < 500; attempt++) {
+    // --- 3. MONTE CARLO DRAW ENGINE (UP TO 200 ATTEMPTS) ---
+    for (let attempt = 0; attempt < 200; attempt++) {
         let basePerZone = Math.floor(totalAnglers / 4);
         let remainder = totalAnglers % 4;
 
@@ -1561,10 +1548,12 @@ function runDraw() {
             p2.push({ z, p: p2Arr });
         });
 
+        // Find zones that contain user's defined safe pegs
         let d1SafeZones = getSafeZonesForList(s1A, basePerZone, remainder);
         let d2SafeZones = getSafeZonesForList(s2A, basePerZone, remainder);
 
-        const pull = (z, d2, mob, allowFallback = false) => {
+        // --- STRICT SAFE PEG ISOLATION PULL ENGINE ---
+        const pull = (z, d2, mob) => {
             const pools = d2 ? p2 : p1;
             const zI = zones.indexOf(z);
             if (!pools[zI] || pools[zI].p.length === 0) return 9999;
@@ -1572,13 +1561,15 @@ function runDraw() {
             const sL = d2 ? s2A : s1A;
 
             if (accEnabled && mob) {
+                // Force [A] angler to take a safe peg from this zone if available
                 let availableSafe = pools[zI].p.filter(p => sL.includes(p));
                 if (availableSafe.length > 0) {
                     let chosenPeg = availableSafe[Math.floor(Math.random() * availableSafe.length)];
                     let removeIndex = pools[zI].p.indexOf(chosenPeg);
                     return pools[zI].p.splice(removeIndex, 1)[0];
                 }
-            } else if (accEnabled && sL && sL.length > 0 && !allowFallback) { 
+            } else if (accEnabled && sL && sL.length > 0) { 
+                // STRICT BLOCK: Standard anglers CANNOT touch safe pegs
                 let nonSafePegs = pools[zI].p.filter(p => !sL.includes(p));
                 if (nonSafePegs.length > 0) {
                     let chosenPeg = nonSafePegs[Math.floor(Math.random() * nonSafePegs.length)];
@@ -1587,6 +1578,7 @@ function runDraw() {
                 }
             }
             
+            // Fallback standard peg selection
             let popVal = pools[zI].p.pop();
             return popVal !== undefined ? popVal : 9999;
         };
@@ -1629,18 +1621,21 @@ function runDraw() {
                     let d1Z = [null, null, null, null];
                     let d2Z = [null, null, null, null];
 
+                    // Target safe zones dynamically on Day 1 and Day 2
                     let availD1Safe = d1SafeZones.filter(z => p1[zones.indexOf(z)].p.some(p => s1A.includes(p))).sort(() => Math.random() - 0.5);
                     let availD2Safe = d2SafeZones.filter(z => p2[zones.indexOf(z)].p.some(p => s2A.includes(p))).sort(() => Math.random() - 0.5);
 
                     mobIndices.forEach((mIdx) => {
                         let targetD1 = availD1Safe.pop() || zones[Math.floor(Math.random() * zones.length)];
                         
+                        // Ensure Day 2 zone respects Two-Block rotation (switch Block 1 <-> Block 2)
                         let isBlock1 = (targetD1 === 'RED' || targetD1 === 'YELLOW');
                         let oppositeBlockZones = isBlock1 ? ['GREEN', 'BLUE'] : ['RED', 'YELLOW'];
                         let validD2Safe = availD2Safe.filter(z => oppositeBlockZones.includes(z));
                         
                         let targetD2 = validD2Safe.length > 0 ? validD2Safe.pop() : oppositeBlockZones[Math.floor(Math.random() * oppositeBlockZones.length)];
                         
+                        // Remove chosen D2 zone from remaining pool
                         availD2Safe = availD2Safe.filter(z => z !== targetD2);
 
                         d1Z[mIdx] = targetD1;
@@ -1672,8 +1667,12 @@ function runDraw() {
                         ang.z2 = d2Z[i];
                     });
                 } else {
+                    // --- STANDARD TEAM ROUTING (STRICT TWO-BLOCK ROTATION) ---
+                    // Randomize Day 1 across all 4 zones
                     let d1Z = [...zones].sort(() => Math.random() - 0.5);
                     
+                    // Map Day 2 strictly to opposite block paired zones
+                    // Block 1 (RED / YELLOW) MUST swap to Block 2 (GREEN / BLUE)
                     let b1Pairs = ['GREEN', 'BLUE'].sort(() => Math.random() - 0.5);
                     let b2Pairs = ['RED', 'YELLOW'].sort(() => Math.random() - 0.5);
                     let d2Z = [null, null, null, null];
@@ -1694,11 +1693,11 @@ function runDraw() {
 
                 e.anglers.forEach(a => {
                     let hasMobility = accEnabled && a.mobility;
-                    let allowFallback = attempt > 250;
-                    a.p1 = pull(a.z1, 0, hasMobility, allowFallback);
-                    a.p2 = pull(a.z2, 1, hasMobility, allowFallback);
+                    a.p1 = pull(a.z1, 0, hasMobility);
+                    a.p2 = pull(a.z2, 1, hasMobility);
                 });
             } else {
+                // --- SOLO ANGLER ROUTING (STRICT TWO-BLOCK ROTATION) ---
                 let a = e.anglers[0];
                 let hasMobility = accEnabled && a.mobility;
                 if (accEnabled && mobilityMode === 'B' && hasMobility) { 
@@ -1716,6 +1715,7 @@ function runDraw() {
                     let av = zones.filter(z => p1[zones.indexOf(z)].p.length > 0);
                     if (av.length > 0) a.z1 = av[Math.floor(Math.random() * av.length)];
                     
+                    // Enforce strict opposite block selection for Day 2
                     let isBlock1 = (a.z1 === 'RED' || a.z1 === 'YELLOW');
                     let oppositeBlock = isBlock1 ? ['GREEN', 'BLUE'] : ['RED', 'YELLOW'];
                     let av2 = oppositeBlock.filter(z => p2[zones.indexOf(z)].p.length > 0);
@@ -1723,148 +1723,125 @@ function runDraw() {
                     if (av2.length === 0) av2 = zones.filter(z => z !== a.z1 && p2[zones.indexOf(z)].p.length > 0);
                     if (av2.length > 0) a.z2 = av2[Math.floor(Math.random() * av2.length)];
                 }
-                let allowFallback = attempt > 250;
-                a.p1 = pull(a.z1, 0, hasMobility, allowFallback);
-                a.p2 = pull(a.z2, 1, hasMobility, allowFallback);
+                a.p1 = pull(a.z1, 0, hasMobility);
+                a.p2 = pull(a.z2, 1, hasMobility);
             }
         });
-
-        if (!validateBlockRotation()) {
-            continue;
-        }
 
         let checkResult = runValidator();
         if (checkResult.list.length === 0) {
-            displayDraw();
-            return;
+            break;
         }
     }
 
-    // Silent fallback to prevent UI alert loops
-    console.warn("Draw engine completed max attempts with unresolvable block/peg conflicts.");
-}
-
-function toggleSwapMode() { 
-    isSwapMode = !isSwapMode;
-    swapObj1 = null; 
-    const prompt = document.getElementById('swapPrompt');
-    if (prompt) prompt.style.display = isSwapMode ? 'block' : 'none';
     displayDraw();
 }
 
-function handleSwapClick(eId, aI, day) { 
-    if (!isSwapMode) return;
-    if (!swapObj1) { 
-        swapObj1 = { eId: eId, aI: aI, day: day };
-        displayDraw(); 
-    } else { 
-        if (swapObj1.day !== day) { 
-            alert("Please select another Day " + swapObj1.day + " peg to complete the swap.");
-            return; 
-        }
-        let e1 = null, e2 = null;
-        appState.forEach(e => {
-            if (e.id === swapObj1.eId) e1 = e;
-            if (e.id === eId) e2 = e;
-        });
-        const a1 = e1.anglers[swapObj1.aI]; const a2 = e2.anglers[aI]; 
-        if (day === 1) { 
-            let tempZ = a1.z1; a1.z1 = a2.z1; a2.z1 = tempZ;
-            let tempP = a1.p1; a1.p1 = a2.p1; a2.p1 = tempP;
+    function toggleSwapMode() { 
+        isSwapMode = !isSwapMode;
+        swapObj1 = null; 
+        const prompt = document.getElementById('swapPrompt');
+        if (prompt) prompt.style.display = isSwapMode ? 'block' : 'none';
+        displayDraw();
+    }
+
+    function handleSwapClick(eId, aI, day) { 
+        if (!isSwapMode) return;
+        if (!swapObj1) { 
+            swapObj1 = { eId: eId, aI: aI, day: day };
+            displayDraw(); 
         } else { 
-            let tempZ = a1.z2; a1.z2 = a2.z2; a2.z2 = tempZ;
-            let tempP = a1.p2; a1.p2 = a2.p2; a2.p2 = tempP;
-        }
-        toggleSwapMode();
-    } 
-}
+            if (swapObj1.day !== day) { 
+                alert("Please select another Day " + swapObj1.day + " peg to complete the swap.");
+                return; 
+            }
+            let e1 = null, e2 = null;
+            appState.forEach(e => {
+                if (e.id === swapObj1.eId) e1 = e;
+                if (e.id === eId) e2 = e;
+            });
+            const a1 = e1.anglers[swapObj1.aI]; const a2 = e2.anglers[aI]; 
+            if (day === 1) { 
+                let tempZ = a1.z1; a1.z1 = a2.z1; a2.z1 = tempZ;
+                let tempP = a1.p1; a1.p1 = a2.p1; a2.p1 = tempP;
+            } else { 
+                let tempZ = a1.z2; a1.z2 = a2.z2; a2.z2 = tempZ;
+                let tempP = a1.p2; a1.p2 = a2.p2; a2.p2 = tempP;
+            }
+            toggleSwapMode();
+        } 
+    }
 
-function runValidator() {
-    let errors = [];
-    let clashMap = [];
-    let pM1 = { RED:[], YELLOW:[], GREEN:[], BLUE:[] };
-    let pM2 = { RED:[], YELLOW:[], GREEN:[], BLUE:[] };
+    function runValidator() {
+        let errors = [];
+        let clashMap = [];
+        let pM1 = { RED:[], YELLOW:[], GREEN:[], BLUE:[] };
+        let pM2 = { RED:[], YELLOW:[], GREEN:[], BLUE:[] };
 
-    const block1 = ['RED', 'YELLOW'];
-    const block2 = ['GREEN', 'BLUE'];
-
-    appState.forEach(team => {
-        let tN = team.tName || 'SOLO';
-        if (team.isTeam) {
-            let d1Z = {}, d2Z = {};
+        appState.forEach(team => {
+            let tN = team.tName || 'SOLO';
+            if (team.isTeam) {
+                let d1Z = {}, d2Z = {};
+                team.anglers.forEach((a, aI) => {
+                    if (a.z1) { if (!d1Z[a.z1]) d1Z[a.z1] = []; d1Z[a.z1].push(aI); }
+                    if (matchDays === 2 && a.z2) { if (!d2Z[a.z2]) d2Z[a.z2] = []; d2Z[a.z2].push(aI); }
+                });
+                Object.keys(d1Z).forEach(z => {
+                    if (d1Z[z].length > 1) {
+                        errors.push(`Team Clash: '${tN}' has multiple anglers in ${z} Zone [DAY 1].`);
+                        d1Z[z].forEach(idx => clashMap.push({eId: team.id, aI: idx, day: 1}));
+                    }
+                });
+                Object.keys(d2Z).forEach(z => {
+                    if (d2Z[z].length > 1) {
+                        errors.push(`Team Clash: '${tN}' has multiple anglers in ${z} Zone [DAY 2].`);
+                        d2Z[z].forEach(idx => clashMap.push({eId: team.id, aI: idx, day: 2}));
+                    }
+                });
+            }
+            
             team.anglers.forEach((a, aI) => {
-                if (a.z1) { if (!d1Z[a.z1]) d1Z[a.z1] = []; d1Z[a.z1].push(aI); }
-                if (matchDays === 2 && a.z2) { if (!d2Z[a.z2]) d2Z[a.z2] = []; d2Z[a.z2].push(aI); }
-            });
-            Object.keys(d1Z).forEach(z => {
-                if (d1Z[z].length > 1) {
-                    errors.push(`Team Clash: '${tN}' has multiple anglers in ${z} Zone [DAY 1].`);
-                    d1Z[z].forEach(idx => clashMap.push({eId: team.id, aI: idx, day: 1}));
+                let aN = a.name || 'UNNAMED';
+                if (!a.z1 || a.p1 === undefined || a.p1 === 9999) {
+                    errors.push(`Missing Peg: '${aN}' invalid allocation [DAY 1].`);
+                    clashMap.push({eId: team.id, aI: aI, day: 1});
                 }
-            });
-            Object.keys(d2Z).forEach(z => {
-                if (d2Z[z].length > 1) {
-                    errors.push(`Team Clash: '${tN}' has multiple anglers in ${z} Zone [DAY 2].`);
-                    d2Z[z].forEach(idx => clashMap.push({eId: team.id, aI: idx, day: 2}));
+                if (matchDays === 2 && (!a.z2 || a.p2 === undefined || a.p2 === 9999)) {
+                    errors.push(`Missing Peg: '${aN}' invalid allocation [DAY 2].`);
+                    clashMap.push({eId: team.id, aI: aI, day: 2});
                 }
-            });
-        }
-        
-        team.anglers.forEach((a, aI) => {
-            let aN = a.name || 'UNNAMED';
-            if (!a.z1 || a.p1 === undefined || a.p1 === 9999) {
-                errors.push(`Missing Peg: '${aN}' invalid allocation [DAY 1].`);
-                clashMap.push({eId: team.id, aI: aI, day: 1});
-            }
-            if (matchDays === 2 && (!a.z2 || a.p2 === undefined || a.p2 === 9999)) {
-                errors.push(`Missing Peg: '${aN}' invalid allocation [DAY 2].`);
-                clashMap.push({eId: team.id, aI: aI, day: 2});
-            }
-            
-            let allowedDouble = (accEnabled && a.mobility) ? true : false;
-            if (matchDays === 2 && a.z1 && a.z2 && a.z1 === a.z2 && !allowedDouble) {
-                errors.push(`Static Zone Clash: '${aN}' stuck in same zone.`);
-                clashMap.push({eId: team.id, aI: aI, day: 1});
-                clashMap.push({eId: team.id, aI: aI, day: 2});
-            }
-
-            if (matchDays === 2 && a.z1 && a.z2 && !allowedDouble) {
-                let d1InB1 = block1.includes(a.z1);
-                let d2InB1 = block1.includes(a.z2);
-                if (d1InB1 === d2InB1) {
-                    errors.push(`Block Rotation Clash: '${aN}' stayed in the same block.`);
+                
+                let allowedDouble = (accEnabled && a.mobility) ? true : false;
+                if (matchDays === 2 && a.z1 && a.z2 && a.z1 === a.z2 && !allowedDouble) {
+                    errors.push(`Static Zone Clash: '${aN}' stuck in same zone.`);
                     clashMap.push({eId: team.id, aI: aI, day: 1});
                     clashMap.push({eId: team.id, aI: aI, day: 2});
                 }
-            }
-            
-            if (a.z1 && a.p1 !== undefined && a.p1 !== 9999) {
-                let dup = pM1[a.z1].find(p => String(p.val) === String(a.p1));
-                if (dup) {
-                    errors.push(`Peg Collision: '${a.z1} ${a.p1}' duplicated [DAY 1].`);
-                    clashMap.push({eId: team.id, aI: aI, day: 1});
-                    clashMap.push({eId: dup.eId, aI: dup.aI, day: 1});
-                } else { pM1[a.z1].push({val: a.p1, eId: team.id, aI: aI}); }
-            }
-            
-            if (matchDays === 2 && a.z2 && a.p2 !== undefined && a.p2 !== 9999) {
-                let dup = pM2[a.z2].find(p => String(p.val) === String(a.p2));
-                if (dup) {
-                    errors.push(`Peg Collision: '${a.z2} ${a.p2}' duplicated [DAY 2].`);
-                    clashMap.push({eId: team.id, aI: aI, day: 2});
-                    clashMap.push({eId: dup.eId, aI: dup.aI, day: 2});
-                } else { pM2[a.z2].push({val: a.p2, eId: team.id, aI: aI}); }
-            }
+                
+                if (a.z1 && a.p1 !== undefined && a.p1 !== 9999) {
+                    let dup = pM1[a.z1].find(p => String(p.val) === String(a.p1));
+                    if (dup) {
+                        errors.push(`Peg Collision: '${a.z1} ${a.p1}' duplicated [DAY 1].`);
+                        clashMap.push({eId: team.id, aI: aI, day: 1});
+                        clashMap.push({eId: dup.eId, aI: dup.aI, day: 1});
+                    } else { pM1[a.z1].push({val: a.p1, eId: team.id, aI: aI}); }
+                }
+                
+                if (matchDays === 2 && a.z2 && a.p2 !== undefined && a.p2 !== 9999) {
+                    let dup = pM2[a.z2].find(p => String(p.val) === String(a.p2));
+                    if (dup) {
+                        errors.push(`Peg Collision: '${a.z2} ${a.p2}' duplicated [DAY 2].`);
+                        clashMap.push({eId: team.id, aI: aI, day: 2});
+                        clashMap.push({eId: dup.eId, aI: dup.aI, day: 2});
+                    } else { pM2[a.z2].push({val: a.p2, eId: team.id, aI: aI}); }
+                }
+            });
         });
-    });
-    
-    let uniqueErrors = []; errors.forEach(e => { if (!uniqueErrors.includes(e)) uniqueErrors.push(e); });
-    return { list: uniqueErrors, markers: clashMap };
-}
-    
-    let uniqueErrors = []; errors.forEach(e => { if (!uniqueErrors.includes(e)) uniqueErrors.push(e); });
-    return { list: uniqueErrors, markers: clashMap };
-}
+        
+        let uniqueErrors = []; errors.forEach(e => { if (!uniqueErrors.includes(e)) uniqueErrors.push(e); });
+        return { list: uniqueErrors, markers: clashMap };
+    }
+
     function injectLatecomer(isTeam) {
         let used1 = { 'RED':[], 'YELLOW':[], 'GREEN':[], 'BLUE':[] };
         let used2 = { 'RED':[], 'YELLOW':[], 'GREEN':[], 'BLUE':[] };
