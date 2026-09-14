@@ -1645,21 +1645,25 @@ function runDraw() {
                     let usedD1 = d1Z.filter(z => z !== null);
                     let usedD2 = d2Z.filter(z => z !== null);
 
-                    let remD1 = zones.filter(z => !usedD1.includes(z)).sort(() => Math.random() - 0.5);
-                    let remD2 = zones.filter(z => !usedD2.includes(z)).sort(() => Math.random() - 0.5);
-
-                    for (let att = 0; att < 20; att++) {
-                        let valid = true;
-                        for (let k = 0; k < normIndices.length; k++) {
-                            if (remD1[k] === remD2[k]) { valid = false; break; }
-                        }
-                        if (valid) break;
-                        remD2.sort(() => Math.random() - 0.5);
-                    }
+                   let remD1 = zones.filter(z => !usedD1.includes(z)).sort(() => Math.random() - 0.5);
+                    let remD2Pool = zones.filter(z => !usedD2.includes(z));
 
                     normIndices.forEach((nIdx, k) => {
-                        d1Z[nIdx] = remD1[k];
-                        d2Z[nIdx] = remD2[k];
+                        let z1 = remD1[k];
+                        let isBlock1 = (z1 === 'RED' || z1 === 'YELLOW');
+                        let allowedOpposite = isBlock1 ? ['GREEN', 'BLUE'] : ['RED', 'YELLOW'];
+                        
+                        // Pick a Day 2 zone for standard angler from opposite block pool
+                        let validD2Choices = remD2Pool.filter(z => allowedOpposite.includes(z));
+                        let chosenD2 = validD2Choices.length > 0 
+                            ? validD2Choices[Math.floor(Math.random() * validD2Choices.length)] 
+                            : remD2Pool[0];
+
+                        // Remove chosen D2 zone from pool
+                        remD2Pool = remD2Pool.filter(z => z !== chosenD2);
+
+                        d1Z[nIdx] = z1;
+                        d2Z[nIdx] = chosenD2;
                     });
 
                     e.anglers.forEach((ang, i) => {
