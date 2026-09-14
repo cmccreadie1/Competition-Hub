@@ -1730,13 +1730,21 @@ function runDraw() {
 
         let checkResult = runValidator();
         if (checkResult.list.length === 0) {
-            break;
+            displayDraw(); // Render ONLY when 100% rule-compliant
+            return;
         }
     }
 
-    displayDraw();
+    // IF 200 ATTEMPTS FINISH WITH RULE CONFLICTS:
+    alert(
+        `⚠️ DRAW GENERATION INCOMPLETE\n\n` +
+        `The draw engine could not resolve all block or peg constraints in this run.\n\n` +
+        `SOLUTION:\n` +
+        `1. Click 'Run Draw' again to re-seed the engine.\n` +
+        `2. If this warning repeats, verify your safe peg counts and team setups.`
+    );
+    // displayDraw() is intentionally NOT called, preventing invalid draws from reaching the screen
 }
-
     function toggleSwapMode() { 
         isSwapMode = !isSwapMode;
         swapObj1 = null; 
