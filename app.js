@@ -2479,22 +2479,22 @@ function calculateAndRenderZoneLeaderboard(dayNum, containerId) {
                 nextIdx++;
             }
 
+          const higherRank = currentRank;
+            const groupSize = tieGroup.length;
+            const isBottomTie = (currentRank - 1 + groupSize === zoneAnglers.length);
+
             let pointsToAssign = 0;
-            if (tieGroup[0].length === 0) {
+            if (tieGroup[0].length === 0 || isBottomTie) {
                 pointsToAssign = zoneAnglers.length;
             } else {
-                let sumRanks = 0;
-                for (let r = currentRank; r <= nextIdx; r++) {
-                    sumRanks += r;
-                }
-                pointsToAssign = sumRanks / tieGroup.length;
+                pointsToAssign = higherRank;
             }
 
             tieGroup.forEach(angler => {
                 angler.zonePoints = pointsToAssign;
             });
 
-            currentRank = nextIdx + 1;
+            currentRank += groupSize;
         }
 
         // Re-sort cleanly by points to keep list layout immaculate
@@ -2614,17 +2614,19 @@ function calculateAndRenderIndividualLeaderboard(containerId) {
                     nextIdx++;
                 }
 
+                const higherRank = currentRank;
+                const groupSize = tieGroup.length;
+                const isBottomTie = (currentRank - 1 + groupSize === zoneAnglers.length);
+
                 let pointsToAssign = 0;
-                if (tieGroup[0].length === 0) {
+                if (tieGroup[0].length === 0 || isBottomTie) {
                     pointsToAssign = zoneAnglers.length;
                 } else {
-                    let sumRanks = 0;
-                    for (let r = currentRank; r <= nextIdx; r++) sumRanks += r;
-                    pointsToAssign = sumRanks / tieGroup.length;
+                    pointsToAssign = higherRank;
                 }
 
                 tieGroup.forEach(item => { zonePointsMap[item.key] = pointsToAssign; });
-                currentRank = nextIdx + 1;
+                currentRank += groupSize;
             }
         });
         return zonePointsMap;
