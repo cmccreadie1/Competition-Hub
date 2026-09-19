@@ -2483,11 +2483,13 @@ function calculateAndRenderZoneLeaderboard(dayNum, containerId) {
             const groupSize = tieGroup.length;
             const isBottomTie = (currentRank - 1 + groupSize === zoneAnglers.length);
 
-            let pointsToAssign = 0;
-            if (tieGroup[0].length === 0 || isBottomTie) {
-                pointsToAssign = zoneAnglers.length;
+          let pointsToAssign = 0;
+            if (tieGroup[0].length === 0) {
+                pointsToAssign = 7; // Blanks ALWAYS get max match penalty (7 points)
+            } else if (isBottomTie) {
+                pointsToAssign = zoneAnglers.length; // Active ties at the bottom get that zone's max rank
             } else {
-                pointsToAssign = higherRank;
+                pointsToAssign = higherRank; // Mid-zone ties get the joint higher rank
             }
 
             tieGroup.forEach(angler => {
@@ -2618,11 +2620,13 @@ function calculateAndRenderIndividualLeaderboard(containerId) {
                 const groupSize = tieGroup.length;
                 const isBottomTie = (currentRank - 1 + groupSize === zoneAnglers.length);
 
-                let pointsToAssign = 0;
-                if (tieGroup[0].length === 0 || isBottomTie) {
-                    pointsToAssign = zoneAnglers.length;
+               let pointsToAssign = 0;
+                if (tieGroup[0].length === 0) {
+                    pointsToAssign = 7; // Blanks ALWAYS get max match penalty (7 points)
+                } else if (isBottomTie) {
+                    pointsToAssign = zoneAnglers.length; // Active ties at the bottom get that zone's max rank
                 } else {
-                    pointsToAssign = higherRank;
+                    pointsToAssign = higherRank; // Mid-zone ties get the joint higher rank
                 }
 
                 tieGroup.forEach(item => { zonePointsMap[item.key] = pointsToAssign; });
