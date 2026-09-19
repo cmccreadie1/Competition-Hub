@@ -3175,7 +3175,7 @@ function exportPublicResults() {
                     nextIdx++;
                 }
 
-               const higherRank = currentRank;
+              const higherRank = currentRank;
                 const groupSize = tieGroup.length;
                 const isBottomTie = (currentRank - 1 + groupSize === zoneAnglers.length);
 
@@ -3190,6 +3190,7 @@ function exportPublicResults() {
 
                 tieGroup.forEach(item => { zonePointsMap[item.key] = pointsToAssign; });
                 currentRank += groupSize;
+            }
         });
         return zonePointsMap;
     }
