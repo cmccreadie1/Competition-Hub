@@ -2497,7 +2497,7 @@ function calculateAndRenderZoneLeaderboard(dayNum, containerId) {
                         <tr style="border-bottom: 2px solid rgba(255,255,255,0.15); color: #94a3b8; font-weight: 800; font-size: 11px;">
                             <th style="padding: 6px 2px; text-align: center; width: 45px;">PTS</th>
                             <th style="padding: 6px 6px;">ANGLER</th>
-                            <th style="padding: 6px 2px; text-align: right; width: 150px;">SCORES MATRIX (L/F/B/S)</th>
+                          <th style="padding: 6px 2px; text-align: right; width: 180px;">SCORES MATRIX (CM / FISH CT / BIGGEST)</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -2686,21 +2686,19 @@ function calculateAndRenderIndividualLeaderboard(containerId) {
                     </tr>
                     <tr style="border-bottom: 2px solid rgba(255,255,255,0.15); color: #cbd5e1; font-weight: 800; font-size: 14px; background: rgba(15, 23, 42, 0.3);">
                         <th style="padding: 12px 14px; text-align: left;">POS & ANGLER (TEAM)</th>
-                        <th style="padding: 12px 8px; background: rgba(59, 130, 246, 0.05); border-left: 1px solid rgba(255,255,255,0.05); border-right: 1px solid rgba(255,255,255,0.05); letter-spacing: 1px;">
-                            <span style="display:inline-block; width:55px; color:var(--accent); font-weight: 900;">PTS</span>|
-                            <span style="display:inline-block; width:65px;">CM</span>|
-                            <span style="display:inline-block; width:45px;">CT</span>|
-                            <span style="display:inline-block; width:55px;">BIG</span>|
-                            <span style="display:inline-block; width:45px;">SPC</span>
-                        </th>
-                        ${isTwoDayMatch ? `
-                        <th style="padding: 12px 8px; background: rgba(16, 185, 129, 0.05); border-right: 1px solid rgba(255,255,255,0.05); letter-spacing: 1px;">
-                            <span style="display:inline-block; width:55px; color:var(--accent); font-weight: 900;">PTS</span>|
-                            <span style="display:inline-block; width:65px;">CM</span>|
-                            <span style="display:inline-block; width:45px;">CT</span>|
-                            <span style="display:inline-block; width:55px;">BIG</span>|
-                            <span style="display:inline-block; width:45px;">SPC</span>
-                        </th>
+                       <th style="padding: 12px 8px; background: rgba(59, 130, 246, 0.05); border-left: 1px solid rgba(255,255,255,0.05); border-right: 1px solid rgba(255,255,255,0.05); letter-spacing: 1px;">
+    <span style="display:inline-block; width:55px; color:var(--accent); font-weight: 900;">PTS</span>|
+    <span style="display:inline-block; width:65px;">CM</span>|
+    <span style="display:inline-block; width:45px;">CT</span>|
+    <span style="display:inline-block; width:55px;">BIG</span>
+</th>
+${isTwoDayMatch ? `
+<th style="padding: 12px 8px; background: rgba(16, 185, 129, 0.05); border-right: 1px solid rgba(255,255,255,0.05); letter-spacing: 1px;">
+    <span style="display:inline-block; width:55px; color:var(--accent); font-weight: 900;">PTS</span>|
+    <span style="display:inline-block; width:65px;">CM</span>|
+    <span style="display:inline-block; width:45px;">CT</span>|
+    <span style="display:inline-block; width:55px;">BIG</span>
+</th>
                         <th style="padding: 12px 8px; background: rgba(234, 179, 8, 0.05); letter-spacing: 1px;">
                             <span style="display:inline-block; width:55px; color:var(--accent); font-weight:900;">PTS</span>|
                             <span style="display:inline-block; width:65px; font-weight:900;">CM</span>|
