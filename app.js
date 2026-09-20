@@ -3576,23 +3576,77 @@ function renderBonusDrawInputs(presetAmounts = null) {
   container.innerHTML = html;
 }
 
-// Mystery Pairs Generator (Ranks pairs strictly by combined Day 1 + Day 2 length in CM)
+// Mystery Pairs Generator (Reads live scorecards directly from zonedraw_current_state_v1 scores)
 function generateMysteryPairs() {
   const container = document.getElementById('mystery-pairs-results');
   if (!container) return;
 
-  // Sync latest angler data to ensure scores are fresh
-  if (typeof syncAnglersForOptIn === 'function') syncAnglersForOptIn();
+  // 1. Load active state and scores from localStorage
+  let stateData = null;
+  const rawState = localStorage.getItem('zonedraw_current_state_v1');
+  if (rawState) {
+    try {
+      stateData = JSON.parse(rawState);
+    } catch (e) {
+      console.error("Error parsing zonedraw_current_state_v1:", e);
+    }
+  }
 
-  const optedIn = (window.anglers || []).filter(a => a.optedIn !== false);
-
-  if (optedIn.length < 2) {
-    container.innerHTML = `<div style="padding: 10px; background: #fef3c7; color: #92400e; border-radius: 8px; font-size: 12px; font-weight: 800;">At least 2 opted-in anglers are required.</div>`;
+  if (!stateData || !stateData.data) {
+    container.innerHTML = `<div style="padding: 10px; background: #fef3c7; color: #92400e; border-radius: 8px; font-size: 12px; font-weight: 800;">No active competition score data found.</div>`;
     return;
   }
 
-  // Shuffle opted-in competitors for random pairing
-  let shuffled = [...optedIn].sort(() => 0.5 - Math.random());
+  // 2. Build list of opted-in anglers with aggregated Day 1 + Day 2 length (in CM)
+  const scoresObj = stateData.scores || {};
+  const optedInRoster = window.anglers || [];
+  let anglersWithScores = [];
+
+  stateData.data.forEach((group) => {
+    // Determine exact group ID string used in score keys
+    const groupId = group.id || '';
+    if (group.anglers && Array.isArray(group.anglers)) {
+      group.anglers.forEach((a, aIdx) => {
+        const anglerName = a.name ? a.name.trim() : '';
+        if (!anglerName) return;
+
+        // Check opt-in status from roster (defaults to true)
+        const matchInRoster = optedInRoster.find(r => r.name && r.name.trim().toUpperCase() === anglerName.toUpperCase());
+        const isOptedIn = matchInRoster ? (matchInRoster.optedIn !== false) : true;
+
+        if (!isOptedIn) return;
+
+        // Resolve Day 1 and Day 2 length using group ID or fallback index format
+        let d1Len = 0;
+        let d2Len = 0;
+
+        const d1Key = `${groupId}_${aIdx}_1`;
+        const d2Key = `${groupId}_${aIdx}_2`;
+
+        if (scoresObj[d1Key] && scoresObj[d1Key].len) {
+          d1Len = parseFloat(scoresObj[d1Key].len) || 0;
+        }
+        if (scoresObj[d2Key] && scoresObj[d2Key].len) {
+          d2Len = parseFloat(scoresObj[d2Key].len) || 0;
+        }
+
+        const totalCM = d1Len + d2Len;
+
+        anglersWithScores.push({
+          name: anglerName,
+          totalCM: totalCM
+        });
+      });
+    }
+  });
+
+  if (anglersWithScores.length < 2) {
+    container.innerHTML = `<div style="padding: 10px; background: #fef3c7; color: #92400e; border-radius: 8px; font-size: 12px; font-weight: 800;">At least 2 opted-in anglers with valid scorecards are required.</div>`;
+    return;
+  }
+
+  // 3. Shuffle opted-in anglers for random pairing
+  let shuffled = [...anglersWithScores].sort(() => 0.5 - Math.random());
   let pairs = [];
   let soloAngler = null;
 
@@ -3600,48 +3654,36 @@ function generateMysteryPairs() {
     soloAngler = shuffled.pop();
   }
 
-  // Helper to extract 2-day total length for an angler
-  const getAnglerTotalCM = (angler) => {
-    let d1Len = parseFloat(angler.day1Length || angler.d1Length || angler.lengthDay1 || 0) || 0;
-    let d2Len = parseFloat(angler.day2Length || angler.d2Length || angler.lengthDay2 || 0) || 0;
-    return parseFloat(angler.totalLength || angler.length || 0) || (d1Len + d2Len);
-  };
-
   // Form pairs
   for (let i = 0; i < shuffled.length; i += 2) {
-    const cm1 = getAnglerTotalCM(shuffled[i]);
-    const cm2 = getAnglerTotalCM(shuffled[i + 1]);
+    const a1 = shuffled[i];
+    const a2 = shuffled[i + 1];
 
     pairs.push({
-      angler1: shuffled[i],
-      angler2: shuffled[i + 1],
+      angler1: a1.name,
+      angler2: a2.name,
       isSoloPair: false,
-      totalLength: cm1 + cm2
+      combinedCM: a1.totalCM + a2.totalCM
     });
   }
 
-  // Handle odd angler (Solo Pair)
+  // Handle odd solo angler (pair with top individual scorer for benchmark)
   if (soloAngler) {
-    let soloCM = getAnglerTotalCM(soloAngler);
-    let individualRank = [...optedIn]
-      .map(a => ({ angler: a, cm: getAnglerTotalCM(a) }))
-      .sort((a, b) => b.cm - a.cm);
-
-    let partnerObj = individualRank.find(item => item.angler.id !== soloAngler.id) || individualRank[0];
-    let partnerCM = partnerObj ? partnerObj.cm : 0;
-    let partnerAngler = partnerObj ? partnerObj.angler : soloAngler;
+    let sortedIndividuals = [...anglersWithScores].sort((a, b) => b.totalCM - a.totalCM);
+    let partner = sortedIndividuals.find(item => item.name !== soloAngler.name) || sortedIndividuals[0];
 
     pairs.push({
-      angler1: soloAngler,
-      angler2: partnerAngler,
+      angler1: soloAngler.name,
+      angler2: partner ? partner.name : soloAngler.name,
       isSoloPair: true,
-      totalLength: soloCM + partnerCM
+      combinedCM: soloAngler.totalCM + (partner ? partner.totalCM : 0)
     });
   }
 
-  // Sort pairs strictly by HIGHEST total CM
-  pairs.sort((a, b) => b.totalLength - a.totalLength);
+  // 4. Sort pairs strictly by HIGHEST combined CM
+  pairs.sort((a, b) => b.combinedCM - a.combinedCM);
 
+  // 5. Render winners list
   const placesToAward = parseInt(document.getElementById('mystery-pairs-places').value) || 1;
   let html = `<div style="display: flex; flex-direction: column; gap: 8px;">`;
 
@@ -3651,17 +3693,16 @@ function generateMysteryPairs() {
       <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: #f8fafc; border: 1px solid var(--border); border-radius: 8px;">
         <div>
           <span style="font-size: 11px; font-weight: 900; background: var(--accent); color: white; padding: 2px 8px; border-radius: 50px; margin-right: 6px;">${i + 1}${getOrdinalSuffix(i + 1)} Place</span>
-          <strong style="font-size: 13px;">${p.angler1.name} & ${p.angler2.name}</strong>
+          <strong style="font-size: 13px;">${p.angler1} & ${p.angler2}</strong>
           ${p.isSoloPair ? '<small style="color: var(--text-light); margin-left: 4px;">(Solo Pair)</small>' : ''}
         </div>
-        <span style="font-size: 13px; font-weight: 900; color: #166534;">${p.totalLength} CM</span>
+        <span style="font-size: 13px; font-weight: 900; color: #166534;">${p.combinedCM} CM</span>
       </div>
     `;
   }
   html += `</div>`;
   container.innerHTML = html;
 }
-
 // Helper: Ordinal suffix generator
 function getOrdinalSuffix(i) {
   let j = i % 10, k = i % 100;
