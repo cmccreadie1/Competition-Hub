@@ -2596,11 +2596,10 @@ function calculateAndRenderIndividualLeaderboard(containerId) {
                 });
             });
 
-            zoneAnglers.sort((a, b) => {
+          zoneAnglers.sort((a, b) => {
                 if (b.length !== a.length) return b.length - a.length;
                 if (b.count !== a.count) return b.count - a.count;
-                if (b.max !== a.max) return b.max - a.max;
-                return b.species - a.species;
+                return b.max - a.max;
             });
 
             let currentRank = 1;
@@ -2610,8 +2609,7 @@ function calculateAndRenderIndividualLeaderboard(containerId) {
                 while (nextIdx < zoneAnglers.length && 
                        zoneAnglers[nextIdx].length === tieGroup[0].length &&
                        zoneAnglers[nextIdx].count === tieGroup[0].count &&
-                       zoneAnglers[nextIdx].max === tieGroup[0].max &&
-                       zoneAnglers[nextIdx].species === tieGroup[0].species) {
+                       zoneAnglers[nextIdx].max === tieGroup[0].max) {
                     tieGroup.push(zoneAnglers[nextIdx]);
                     nextIdx++;
                 }
