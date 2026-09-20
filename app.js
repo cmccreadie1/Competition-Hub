@@ -2427,24 +2427,12 @@ function calculateAndRenderZoneLeaderboard(dayNum, containerId) {
                     ? scoreState[scoreKey] 
                     : { len: '', count: '', big: '', spec: '' };
 
-                // Handle string entries and species conversions cleanly
-                let rawSpecies = String(rawScore.spec || '').trim();
-                let computedSpecies = 0;
-                if (rawSpecies !== '') {
-                    if (!isNaN(rawSpecies)) {
-                        computedSpecies = Number(rawSpecies);
-                    } else {
-                        computedSpecies = rawSpecies.split(',').filter(item => item.trim().length > 0).length;
-                    }
-                }
-
-                zoneAnglers.push({
+          zoneAnglers.push({
                     name: angler.name,
                     team: (teamEntry.isTeam && teamEntry.tName && teamEntry.tName.trim().toUpperCase() !== 'SOLO') ? teamEntry.tName.trim() : 'SOLO',
                     length: Number(rawScore.len) || 0,
                     count: Number(rawScore.count) || 0,
                     max: Number(rawScore.big) || 0,
-                    species: computedSpecies,
                     zonePoints: 0
                 });
             });
@@ -2454,8 +2442,7 @@ function calculateAndRenderZoneLeaderboard(dayNum, containerId) {
         zoneAnglers.sort((a, b) => {
             if (b.length !== a.length) return b.length - a.length; 
             if (b.count !== a.count) return b.count - a.count;     
-            if (b.max !== a.max) return b.max - a.max;             
-            return b.species - a.species;                          
+            return b.max - a.max;             
         });
 
         // Enforce Zone Points and handling for Blanks/No-Shows
@@ -2467,8 +2454,7 @@ function calculateAndRenderZoneLeaderboard(dayNum, containerId) {
             while (nextIdx < zoneAnglers.length && 
                    zoneAnglers[nextIdx].length === tieGroup[0].length &&
                    zoneAnglers[nextIdx].count === tieGroup[0].count &&
-                   zoneAnglers[nextIdx].max === tieGroup[0].max &&
-                   zoneAnglers[nextIdx].species === tieGroup[0].species) {
+                   zoneAnglers[nextIdx].max === tieGroup[0].max) {
                 tieGroup.push(zoneAnglers[nextIdx]);
                 nextIdx++;
             }
@@ -2521,7 +2507,7 @@ function calculateAndRenderZoneLeaderboard(dayNum, containerId) {
             htmlOutput += `<tr><td colspan="3" style="text-align:center; padding:20px; color:#64748b; font-weight:700;">No anglers assigned to this zone</td></tr>`;
         } else {
             zoneAnglers.forEach(angler => {
-                const dataString = `${angler.length} / ${angler.count} / ${angler.max} / ${angler.species}`;
+                const dataString = `${angler.length} / ${angler.count} / ${angler.max}`;
                 htmlOutput += `
                     <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.15); background: rgba(15, 23, 42, 0.1); font-weight: 600; height: 54px;">
                         <td style="padding: 6px 2px; text-align: center; color: var(--accent); font-weight: 900; font-size: 16px; font-family: monospace;">${angler.zonePoints}</td>
@@ -2810,21 +2796,20 @@ function calculateAndRenderTeamLeaderboard(containerId) {
                     let rawSpec = String(rawScore.spec || '').trim();
                     let compSpec = (rawSpec !== '') ? (!isNaN(rawSpec) ? Number(rawSpec) : rawSpec.split(',').filter(i => i.trim().length > 0).length) : 0;
 
-                    zoneAnglers.push({
-                        key: scoreKey,
-                        length: Number(rawScore.len) || 0,
-                        count: Number(rawScore.count) || 0,
-                        max: Number(rawScore.big) || 0,
-                        species: compSpec
-                    });
-                });
-            });
+              zoneAnglers.push({
+    key: scoreKey,
+    length: Number(rawScore.len) || 0,
+    count: Number(rawScore.count) || 0,
+    max: Number(rawScore.big) || 0
+});
+});
+});
 
-          zoneAnglers.sort((a, b) => {
-                if (b.length !== a.length) return b.length - a.length;
-                if (b.count !== a.count) return b.count - a.count;
-                return b.max - a.max;
-            });
+zoneAnglers.sort((a, b) => {
+    if (b.length !== a.length) return b.length - a.length;
+    if (b.count !== a.count) return b.count - a.count;
+    return b.max - a.max;
+});
 
             let currentRank = 1;
             while (currentRank <= zoneAnglers.length) {
