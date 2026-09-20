@@ -700,6 +700,21 @@
             <!-- Dynamic suggestion summary injected here by app.js -->
         </div>
     </div>
+    <!-- Angler Opt-In Roster Accordion -->
+    <div style="background: white; border: 1px solid var(--border); border-radius: 16px; padding: 15px; margin-bottom: 25px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+        <div style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;" onclick="toggleOptInRosterUI()">
+            <h4 style="margin: 0; font-size: 15px; font-weight: 900; color: var(--text-dark);">
+                📋 ANGLER OPT-IN ROSTER (<span id="opt-in-summary-text">All Anglers Opted-In</span>)
+            </h4>
+            <span id="opt-in-toggle-icon" style="font-size: 14px; font-weight: 800; color: var(--text-light);">▼ CLICK TO EXPAND</span>
+        </div>
+        
+        <div id="opt-in-roster-container" style="display: none; margin-top: 15px; border-top: 1px solid #f1f5f9; padding-top: 15px;">
+            <div id="opt-in-list-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px;">
+                <!-- Dynamic angler opt-in toggles rendered by app.js -->
+            </div>
+        </div>
+    </div>
 
     <!-- Controls Grid: Mystery Pairs & Bonus Cash Draw -->
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 20px; margin-bottom: 30px;">
