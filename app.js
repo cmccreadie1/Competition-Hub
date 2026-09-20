@@ -3695,3 +3695,57 @@ document.addEventListener('DOMContentLoaded', function() {
   renderBonusDrawInputs();
   updatePrizeFundCalculations();
 });
+
+// Toggle Roster Accordion Open/Close
+function toggleOptInRosterUI() {
+  const container = document.getElementById('opt-in-roster-container');
+  const icon = document.getElementById('opt-in-toggle-icon');
+  if (!container) return;
+
+  if (container.style.display === 'none') {
+    container.style.display = 'block';
+    if (icon) icon.innerText = '▲ CLICK TO COLLAPSE';
+    renderOptInRoster();
+  } else {
+    container.style.display = 'none';
+    if (icon) icon.innerText = '▼ CLICK TO EXPAND';
+  }
+}
+
+// Render Opt-In Angler Toggles Grid
+function renderOptInRoster() {
+  const grid = document.getElementById('opt-in-list-grid');
+  if (!grid) return;
+
+  const anglers = window.anglers || [];
+  if (anglers.length === 0) {
+    grid.innerHTML = `<div style="color: var(--text-light); font-size: 12px; grid-column: 1/-1;">No competitors added to match yet.</div>`;
+    return;
+  }
+
+  let html = '';
+  anglers.forEach((a, idx) => {
+    const isOptedIn = a.optedIn !== false;
+    
+    html += `
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: ${isOptedIn ? '#f0fdf4' : '#fef2f2'}; border: 1px solid ${isOptedIn ? '#bbf7d0' : '#fecaca'}; border-radius: 8px;">
+        <span style="font-size: 12px; font-weight: 800; color: var(--text-dark);">${a.name}</span>
+        <button onclick="toggleSingleAnglerOptIn(${idx})" style="padding: 4px 8px; font-size: 11px; font-weight: 900; border-radius: 6px; border: none; cursor: pointer; background: ${isOptedIn ? '#166534' : '#991b1b'}; color: white;">
+          ${isOptedIn ? 'YES' : 'NO'}
+        </button>
+      </div>
+    `;
+  });
+
+  grid.innerHTML = html;
+}
+
+// Toggle individual angler status
+function toggleSingleAnglerOptIn(index) {
+  if (!window.anglers || !window.anglers[index]) return;
+  
+  window.anglers[index].optedIn = window.anglers[index].optedIn === false ? true : false;
+  
+  renderOptInRoster();
+  updatePrizeFundCalculations();
+}
