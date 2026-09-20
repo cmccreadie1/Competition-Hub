@@ -2704,7 +2704,7 @@ ${isTwoDayMatch ? `
                             <span style="display:inline-block; width:65px; font-weight:900;">CM</span>|
                             <span style="display:inline-block; width:45px; font-weight:800;">CT</span>|
                             <span style="display:inline-block; width:55px; font-weight:800;">BIG</span>|
-                            <span style="display:inline-block; width:45px; font-weight:800;">SPC</span>
+                           
                         </th>` : ''}
                     </tr>
                 </thead>
