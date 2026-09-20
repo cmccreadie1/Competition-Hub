@@ -3692,22 +3692,39 @@ function getOrdinalSuffix(i) {
 
 // Sync Opt-In Status with Master Competitor Roster
 function syncAnglersForOptIn() {
-  // Pull anglers from window object or load directly from stored match data
-  if (!window.anglers || window.anglers.length === 0) {
-    const savedData = localStorage.getItem('shoreMatchData');
-    if (savedData) {
-      try {
-        const parsed = JSON.parse(savedData);
-        if (parsed.anglers && parsed.anglers.length > 0) {
-          window.anglers = parsed.anglers;
-        }
-      } catch (e) {
-        console.error("Error loading anglers for Prize Fund:", e);
+  // Check all common ShoreMatch state containers for anglers
+  let sourceList = [];
+
+  if (window.anglers && window.anglers.length > 0) {
+    sourceList = window.anglers;
+  } else if (window.state && window.state.anglers && window.state.anglers.length > 0) {
+    sourceList = window.state.anglers;
+  } else if (window.currentMatch && window.currentMatch.anglers) {
+    sourceList = window.currentMatch.anglers;
+  } else {
+    // Check local storage keys used by ShoreMatch
+    const possibleKeys = ['shoreMatchData', 'shoreMatch_state', 'shoreMatchState', 'sm_anglers'];
+    for (let key of possibleKeys) {
+      const saved = localStorage.getItem(key);
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            sourceList = parsed;
+            break;
+          } else if (parsed.anglers && parsed.anglers.length > 0) {
+            sourceList = parsed.anglers;
+            break;
+          }
+        } catch (e) {}
       }
     }
   }
 
-  // Ensure every angler has an optedIn state (defaults to true)
+  // Assign to global window.anglers so the rest of Tab 3 can use it
+  window.anglers = sourceList;
+
+  // Ensure every angler has an optedIn property (defaults to true)
   if (window.anglers && window.anglers.length > 0) {
     window.anglers.forEach(a => {
       if (a.optedIn === undefined) {
