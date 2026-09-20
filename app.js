@@ -3662,39 +3662,6 @@ function generateMysteryPairs() {
   container.innerHTML = html;
 }
 
-// Bonus Cash Draw Engine
-function runBonusCashDraw() {
-  const optedIn = (window.anglers || []).filter(a => a.optedIn !== false);
-  const container = document.getElementById('bonus-draw-results');
-  if (!container) return;
-
-  const amountInputs = document.querySelectorAll('.bonus-draw-amount-input');
-  if (amountInputs.length === 0 || optedIn.length === 0) {
-    container.innerHTML = `<div style="padding: 10px; background: #fef3c7; color: #92400e; border-radius: 8px; font-size: 12px; font-weight: 800;">No eligible anglers or draw slots found.</div>`;
-    return;
-  }
-
-  let shuffled = [...optedIn].sort(() => 0.5 - Math.random());
-  let html = `<div style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px;">`;
-
-  amountInputs.forEach((input, idx) => {
-    const prizeAmt = parseFloat(input.value) || 0;
-    const winner = shuffled[idx % shuffled.length];
-    html += `
-      <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px;">
-        <div>
-          <span style="font-size: 12px; margin-right: 6px;">🎟️</span>
-          <strong style="font-size: 13px;">${winner ? winner.name : 'Unknown'}</strong>
-        </div>
-        <span style="font-size: 14px; font-weight: 900; color: var(--green-color);">£${prizeAmt}</span>
-      </div>
-    `;
-  });
-
-  html += `</div>`;
-  container.innerHTML = html;
-}
-
 // Helper: Ordinal suffix generator
 function getOrdinalSuffix(i) {
   let j = i % 10, k = i % 100;
