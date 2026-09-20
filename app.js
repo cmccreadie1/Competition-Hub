@@ -3690,11 +3690,53 @@ function getOrdinalSuffix(i) {
   return "th";
 }
 
-// Initialize on page load
+// Sync Opt-In Status with Master Competitor Roster
+function syncAnglersForOptIn() {
+  // Pull anglers from window object or load directly from stored match data
+  if (!window.anglers || window.anglers.length === 0) {
+    const savedData = localStorage.getItem('shoreMatchData');
+    if (savedData) {
+      try {
+        const parsed = JSON.parse(savedData);
+        if (parsed.anglers && parsed.anglers.length > 0) {
+          window.anglers = parsed.anglers;
+        }
+      } catch (e) {
+        console.error("Error loading anglers for Prize Fund:", e);
+      }
+    }
+  }
+
+  // Ensure every angler has an optedIn state (defaults to true)
+  if (window.anglers && window.anglers.length > 0) {
+    window.anglers.forEach(a => {
+      if (a.optedIn === undefined) {
+        a.optedIn = true;
+      }
+    });
+  }
+
+  // Refresh calculations and UI grid
+  updatePrizeFundCalculations();
+  renderOptInRoster();
+}
+
+// Initialize on page load and tab switch
 document.addEventListener('DOMContentLoaded', function() {
   renderBonusDrawInputs();
-  updatePrizeFundCalculations();
+  syncAnglersForOptIn();
 });
+
+// Automatically refresh Prize Fund whenever Tab 3 is clicked
+const originalSwitchTab = window.switchTab;
+window.switchTab = function(tabName) {
+  if (typeof originalSwitchTab === 'function') {
+    originalSwitchTab(tabName);
+  }
+  if (tabName === 'pairs') {
+    syncAnglersForOptIn();
+  }
+};
 
 // Toggle Roster Accordion Open/Close
 function toggleOptInRosterUI() {
