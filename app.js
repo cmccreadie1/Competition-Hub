@@ -3424,73 +3424,81 @@ function updatePrizeFundCalculations() {
   renderSuggestedBreakdown(suggestion);
 }
 
-// Opinionated allocation formula enforcing caps (£75 Zone, £200 Pairs, £100 Draw)
+// Opinionated allocation formula enforcing caps, £5 rounding, and 100% pot distribution
 function calculateSuggestedAllocation(totalPot, anglerCount) {
   if (totalPot <= 0) {
     return { zone: { total: 0, perWinner: 0 }, pairs: [], draw: [] };
   }
 
+  // Helper function to round any amount to nearest £5
+  const round5 = (val) => Math.max(5, Math.round(val / 5) * 5);
+
   // 1. Zone Winners (~50% pool, 8 winners total, capped at £75 each)
-  let zonePool = totalPot * 0.50;
-  let zonePerWinner = zonePool / 8;
-  if (zonePerWinner > 75) {
-    zonePerWinner = 75;
-    zonePool = 600; // 8 * 75
-  } else {
-    zonePerWinner = Math.floor(zonePerWinner);
-    zonePool = zonePerWinner * 8;
-  }
+  let zonePoolRaw = totalPot * 0.50;
+  let zonePerWinner = Math.min(75, round5(zonePoolRaw / 8));
+  let zonePool = zonePerWinner * 8;
 
   let remainingPot = totalPot - zonePool;
 
   // 2. Mystery Pairs & Bonus Draw Pools
-  let pairsPool = 0;
-  let drawPool = 0;
+  let pairsPoolRaw = 0;
+  let drawPoolRaw = 0;
 
-  if (zonePool === 600) { // Capped zone scenario
-    pairsPool = remainingPot * 0.50;
-    drawPool = remainingPot * 0.50;
+  if (zonePerWinner === 75) {
+    pairsPoolRaw = remainingPot * 0.50;
+    drawPoolRaw = remainingPot * 0.50;
   } else {
-    pairsPool = totalPot * 0.25;
-    drawPool = totalPot * 0.25;
+    pairsPoolRaw = totalPot * 0.25;
+    drawPoolRaw = totalPot * 0.25;
   }
 
-  // Determine Pair Places & Amounts
+  // Determine Pair Places (£5 rounded)
   let pairPlaces = [];
   if (totalPot < 600) {
-    pairPlaces.push(Math.round(pairsPool));
+    pairPlaces.push(round5(pairsPoolRaw));
   } else if (totalPot <= 1200) {
-    let p1 = Math.min(200, Math.round(pairsPool * 0.65));
-    let p2 = Math.round(pairsPool - p1);
+    let p1 = Math.min(200, round5(pairsPoolRaw * 0.65));
+    let p2 = round5(pairsPoolRaw - p1);
     pairPlaces.push(p1, p2);
   } else {
-    let p1 = Math.min(200, Math.round(pairsPool * 0.50));
-    let p2 = Math.round(pairsPool * 0.30);
-    let p3 = Math.round(pairsPool - (p1 + p2));
+    let p1 = Math.min(200, round5(pairsPoolRaw * 0.50));
+    let p2 = round5(pairsPoolRaw * 0.30);
+    let p3 = round5(pairsPoolRaw - (p1 + p2));
     pairPlaces.push(p1, p2, p3);
   }
 
-  // Determine Draw Places & Amounts
+  let totalPairsAllocated = pairPlaces.reduce((a, b) => a + b, 0);
+
+  // 3. Determine Draw Places (£5 rounded)
+  let targetDrawPool = totalPot - zonePool - totalPairsAllocated;
   let drawPlaces = [];
+
   if (totalPot < 600) {
-    let d1 = Math.min(100, Math.round(drawPool * 0.48));
-    let d2 = Math.round(drawPool * 0.28);
-    let d3 = Math.round(drawPool - (d1 + d2));
+    let d1 = Math.min(100, round5(targetDrawPool * 0.50));
+    let d2 = round5(targetDrawPool * 0.30);
+    let d3 = round5(targetDrawPool - d1 - d2);
     drawPlaces.push(d1, d2, d3);
   } else if (totalPot <= 1200) {
-    let d1 = Math.min(100, Math.round(drawPool * 0.38));
-    let d2 = Math.round(drawPool * 0.28);
-    let d3 = Math.round(drawPool * 0.20);
-    let d4 = Math.round(drawPool - (d1 + d2 + d3));
+    let d1 = Math.min(100, round5(targetDrawPool * 0.40));
+    let d2 = round5(targetDrawPool * 0.28);
+    let d3 = round5(targetDrawPool * 0.20);
+    let d4 = round5(targetDrawPool - d1 - d2 - d3);
     drawPlaces.push(d1, d2, d3, d4);
   } else {
     let d1 = 100;
-    let rem = drawPool - 100;
-    let d2 = Math.round(rem * 0.35);
-    let d3 = Math.round(rem * 0.28);
-    let d4 = Math.round(rem * 0.22);
-    let d5 = Math.round(rem - (d2 + d3 + d4));
+    let rem = targetDrawPool - 100;
+    let d2 = round5(rem * 0.35);
+    let d3 = round5(rem * 0.28);
+    let d4 = round5(rem * 0.22);
+    let d5 = round5(rem - d2 - d3 - d4);
     drawPlaces.push(d1, d2, d3, d4, d5);
+  }
+
+  // Force exact 100% pot match by balancing remaining difference into 1st Draw Prize
+  let currentTotalAllocated = zonePool + totalPairsAllocated + drawPlaces.reduce((a, b) => a + b, 0);
+  let discrepancy = totalPot - currentTotalAllocated;
+  if (discrepancy !== 0 && drawPlaces.length > 0) {
+    drawPlaces[0] += discrepancy;
   }
 
   return {
