@@ -104,16 +104,16 @@ let biggestFishSpecies = { d1: ["", "", ""], d2: ["", "", ""] };
                     d1Expected++;
                     let key1 = `${e.id}_${aIdx}_1`;
                     let s1 = scoreState[key1] || {};
-                    let filled1 = (s1.len ? 1 : 0) + (s1.count ? 1 : 0) + (s1.big ? 1 : 0) + (s1.spec ? 1 : 0);
-                    if (filled1 === 4) d1Filled++;
+                    let filled1 = (s1.len ? 1 : 0) + (s1.count ? 1 : 0) + (s1.big ? 1 : 0);
+if (filled1 === 3) d1Filled++;
                 }
                 // Evaluate Day 2 Completeness
                 if (a.name && a.z2) {
                     d2Expected++;
                     let key2 = `${e.id}_${aIdx}_2`;
                     let s2 = scoreState[key2] || {};
-                    let filled2 = (s2.len ? 1 : 0) + (s2.count ? 1 : 0) + (s2.big ? 1 : 0) + (s2.spec ? 1 : 0);
-                    if (filled2 === 4) d2Filled++;
+                    let filled2 = (s2.len ? 1 : 0) + (s2.count ? 1 : 0) + (s2.big ? 1 : 0);
+if (filled2 === 3) d2Filled++;
                 }
             });
         });
@@ -205,7 +205,7 @@ let biggestFishSpecies = { d1: ["", "", ""], d2: ["", "", ""] };
         
         let hasDrawnData = false;
         
-        let headerRow = document.createElement('div');
+      let headerRow = document.createElement('div');
         headerRow.className = 'score-list-header';
         headerRow.innerHTML = `
             <div>ANGLER</div>
@@ -214,7 +214,6 @@ let biggestFishSpecies = { d1: ["", "", ""], d2: ["", "", ""] };
             <div style="text-align:center;">LENGTH</div>
             <div style="text-align:center;">FISH CT</div>
             <div style="text-align:center;">BIGGEST</div>
-            <div style="text-align:center;">SPECIES</div>
         `;
         container.appendChild(headerRow);
 
@@ -230,15 +229,15 @@ let biggestFishSpecies = { d1: ["", "", ""], d2: ["", "", ""] };
 
                 let tName = (e.isTeam && e.tName && e.tName.trim() !== "") ? e.tName.trim() : "";
                 let key = `${e.id}_${aIdx}_${currentScoreDay}`;
-                let s = scoreState[key] || {len:'', count:'', big:'', spec:'', witPeg:''};
+                let s = scoreState[key] || {len:'', count:'', big:'', witPeg:''};
                 let zColor = zColors[targetZ] || 'gray';
 
                 const row = document.createElement('div');
                 row.className = 'score-row';
                 row.id = 'row_' + key;
                 
-                let filledCount = (s.len ? 1 : 0) + (s.count ? 1 : 0) + (s.big ? 1 : 0) + (s.spec ? 1 : 0);
-                if (filledCount > 0 && filledCount < 4) {
+                let filledCount = (s.len ? 1 : 0) + (s.count ? 1 : 0) + (s.big ? 1 : 0);
+                if (filledCount > 0 && filledCount < 3) {
                     row.classList.add('incomplete-row');
                 }
 
@@ -261,11 +260,6 @@ let biggestFishSpecies = { d1: ["", "", ""], d2: ["", "", ""] };
                         onchange="saveScore('${key}', 'big', this.value)" 
                         onkeydown="handleScoreEnter(event)"
                         onfocus="highlightRow(this)" onblur="unhighlightRow(this)">
-                    <input type="text" placeholder="SPC" value="${s.spec}" 
-                        oninput="enforceLimits(this, 20)" 
-                        onchange="saveScore('${key}', 'spec', this.value)" 
-                        onkeydown="handleScoreEnter(event)"
-                        onfocus="highlightRow(this)" onblur="unhighlightRow(this)">
                 `;
                 container.appendChild(row);
             });
@@ -279,15 +273,15 @@ let biggestFishSpecies = { d1: ["", "", ""], d2: ["", "", ""] };
     }
 
     function saveScore(key, field, value) {
-        if (!scoreState[key]) scoreState[key] = { len:'', count:'', big:'', spec:'', witPeg:'' };
+        if (!scoreState[key]) scoreState[key] = { len:'', count:'', big:'', witPeg:'' };
         scoreState[key][field] = value;
         persistState();
         
         let s = scoreState[key];
-        let filledCount = (s.len ? 1 : 0) + (s.count ? 1 : 0) + (s.big ? 1 : 0) + (s.spec ? 1 : 0);
+        let filledCount = (s.len ? 1 : 0) + (s.count ? 1 : 0) + (s.big ? 1 : 0);
         let rowEl = document.getElementById('row_' + key);
         if (rowEl) {
-            if (filledCount > 0 && filledCount < 4) {
+            if (filledCount > 0 && filledCount < 3) {
                 rowEl.classList.add('incomplete-row');
             } else {
                 rowEl.classList.remove('incomplete-row');
@@ -2826,11 +2820,10 @@ function calculateAndRenderTeamLeaderboard(containerId) {
                 });
             });
 
-            zoneAnglers.sort((a, b) => {
+          zoneAnglers.sort((a, b) => {
                 if (b.length !== a.length) return b.length - a.length;
                 if (b.count !== a.count) return b.count - a.count;
-                if (b.max !== a.max) return b.max - a.max;
-                return b.species - a.species;
+                return b.max - a.max;
             });
 
             let currentRank = 1;
@@ -2840,8 +2833,7 @@ function calculateAndRenderTeamLeaderboard(containerId) {
                 while (nextIdx < zoneAnglers.length && 
                        zoneAnglers[nextIdx].length === tieGroup[0].length &&
                        zoneAnglers[nextIdx].count === tieGroup[0].count &&
-                       zoneAnglers[nextIdx].max === tieGroup[0].max &&
-                       zoneAnglers[nextIdx].species === tieGroup[0].species) {
+                       zoneAnglers[nextIdx].max === tieGroup[0].max) {
                     tieGroup.push(zoneAnglers[nextIdx]);
                     nextIdx++;
                 }
@@ -3164,11 +3156,10 @@ function exportPublicResults() {
             while (currentRank <= zoneAnglers.length) {
                 let tieGroup = [zoneAnglers[currentRank - 1]];
                 let nextIdx = currentRank;
-                while (nextIdx < zoneAnglers.length && 
+               while (nextIdx < zoneAnglers.length && 
                        zoneAnglers[nextIdx].length === tieGroup[0].length &&
                        zoneAnglers[nextIdx].count === tieGroup[0].count &&
-                       zoneAnglers[nextIdx].max === tieGroup[0].max &&
-                       zoneAnglers[nextIdx].species === tieGroup[0].species) {
+                       zoneAnglers[nextIdx].max === tieGroup[0].max) {
                     tieGroup.push(zoneAnglers[nextIdx]);
                     nextIdx++;
                 }
@@ -3275,11 +3266,10 @@ function exportPublicResults() {
     });
 
     compiledList.sort((a, b) => {
-        if (a._sort.pts !== b._sort.pts) return a._sort.pts - b._sort.pts;
-        if (b._sort.len !== a._sort.len) return b._sort.len - a._sort.len;
-        if (b._sort.cnt !== a._sort.cnt) return b._sort.cnt - a._sort.cnt;
-        if (b._sort.big !== a._sort.big) return b._sort.big - a._sort.big;
-        return b._sort.spc - a._sort.spc;
+        if (b._sort.pts !== a._sort.pts) return a._sort.pts - b._sort.pts;
+            if (b._sort.len !== a._sort.len) return b._sort.len - a._sort.len;
+            if (b._sort.cnt !== a._sort.cnt) return b._sort.cnt - a._sort.cnt;
+            return b._sort.big - a._sort.big;
     });
 
     let cleanExport = compiledList.map((item, index) => {
