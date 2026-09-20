@@ -937,7 +937,7 @@
                     <ul style="margin: 0; padding-left: 20px;">
                         <li style="margin-bottom: 6px;"><strong>SELECT THE ACTIVE DAY:</strong> Click the "Scorecards" tab and choose either the Day 1 or Day 2 sub-screen.</li>
                         <li style="margin-bottom: 6px;"><strong>STICKY SEARCH BAR:</strong> Do not waste time scrolling through a massive list. Type the first few letters of an angler's name into the search box at the top to bring their scorecard straight to the front.</li>
-                        <li style="margin-bottom: 6px;"><strong>KEYBOARD TAB OPTIMIZATION:</strong> Type the 4 metrics from the steward sheet: <strong>Total Length (cm)</strong>, <strong>Fish Count</strong>, <strong>Biggest Fish Size (cm)</strong>, and <strong>Species Count</strong>. Hit the <code>Tab</code> key on your keyboard to instantly jump to the next input box, letting you log an entire card in seconds without touching your mouse.</li>
+                       <li style="margin-bottom: 6px;"><strong>KEYBOARD TAB OPTIMIZATION:</strong> Type the 3 metrics from the steward sheet: <strong>Total Length (cm)</strong>, <strong>Fish Count</strong>, and <strong>Biggest Fish Size (cm)</strong>. Hit the <code>Tab</code> key on your keyboard to instantly jump to the next input box, letting you log an entire card in seconds without touching your mouse.</li>
                         <li style="margin-bottom: 6px;"><strong>INSTANT SAVING:</strong> <strong>There is no save button.</strong> The software saves your metrics the exact millisecond you type them. The leaderboards instantly recalculate in the background automatically.</li>
                     </ul>
                 </div>
@@ -972,7 +972,7 @@
                         <li style="margin-bottom: 6px;"><strong>2. TIE-BREAKER 1 &ndash; TOTAL LENGTH (cm):</strong> If total zone points match, the competitor with the higher cumulative fish length takes the lead.</li>
                         <li style="margin-bottom: 6px;"><strong>3. TIE-BREAKER 2 &ndash; TOTAL FISH COUNT:</strong> If lengths match, the angler who landed the highest number of fish wins.</li>
                         <li style="margin-bottom: 6px;"><strong>4. TIE-BREAKER 3 &ndash; SINGLE LARGEST FISH (cm):</strong> If points, length, and counts are identical, victory goes to the angler with the longest single catch.</li>
-                        <li style="margin-bottom: 6px;"><strong>5. TIE-BREAKER 4 &ndash; TOTAL SPECIES COUNT:</strong> The final tier separator rewards the angler who caught the widest variety of distinct fish species.</li>
+                        
                         <li style="margin-bottom: 6px;"><strong>CORE SCREENS PROVIDED:</strong> We provide full data grids for <strong>Zone Standings</strong>, <strong>Individual Champion Matrix</strong>, <strong>Team Championship</strong> (filters out solos automatically), and a side-by-side Top 10 <strong>Biggest Fish Board</strong> for Day 1 and Day 2.</li>
                     </ul>
                 </div>
@@ -1140,25 +1140,22 @@
         let isLength = placeholder.includes('length') || placeholder.includes('len');
         let isBiggest = placeholder.includes('biggest') || placeholder.includes('big') || placeholder.includes('size');
         let isCount = placeholder.includes('count') || placeholder.includes('fish') || placeholder.includes('qty');
-        let isSpecies = placeholder.includes('species') || placeholder.includes('spec');
-        
         // Fallback check based on standard element sequential index inside row
-        if (!isLength && !isBiggest && !isCount && !isSpecies) {
+        if (!isLength && !isBiggest && !isCount) {
             const rowInputs = Array.from(input.closest('.score-card, .score-row, tr, .scorecard-row').querySelectorAll('input'));
             const idx = rowInputs.indexOf(input);
             if (idx === 0) isLength = true;
             if (idx === 1) isCount = true;
             if (idx === 2) isBiggest = true;
-            if (idx === 3) isSpecies = true;
         }
-        
+
         // 4. Enforce strict character limits
         if (isLength) {
             if (val.length > 4) val = val.slice(0, 4); // Max 4 digits (e.g. 9999 cm)
         } else if (isBiggest) {
             if (val.length > 3) val = val.slice(0, 3); // Max 3 digits (e.g. 999 cm)
-        } else if (isCount || isSpecies) {
-            if (val.length > 2) val = val.slice(0, 2); // Max 2 digits (e.g. 99 fish/species)
+        } else if (isCount) {
+            if (val.length > 2) val = val.slice(0, 2); // Max 2 digits (e.g. 99 fish)
         }
         
         input.value = val;
