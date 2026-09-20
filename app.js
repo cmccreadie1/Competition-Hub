@@ -3396,3 +3396,302 @@ function copyWhatsAppDraw() {
         document.body.removeChild(textArea);
     }
 }
+
+/**
+ * Global Prize Fund & Distribution Engine
+ */
+
+// Calculates total pot and generates opinionated allocation suggestion based on cap rules
+function updatePrizeFundCalculations() {
+  const entryFeeInput = document.getElementById('entry-fee-input');
+  const entryFee = parseFloat(entryFeeInput ? entryFeeInput.value : 0) || 0;
+  
+  // Get opted-in anglers (defaults to all anglers if optedIn isn't explicitly false)
+  const optedInAnglers = (window.anglers || []).filter(a => a.optedIn !== false);
+  const count = optedInAnglers.length;
+  const totalPot = count * entryFee;
+
+  // Update DOM overview
+  if (document.getElementById('opted-in-count-display')) {
+    document.getElementById('opted-in-count-display').innerText = count;
+  }
+  if (document.getElementById('total-pot-display')) {
+    document.getElementById('total-pot-display').innerText = `£${totalPot}`;
+  }
+
+  // Calculate suggested breakdown
+  const suggestion = calculateSuggestedAllocation(totalPot, count);
+  renderSuggestedBreakdown(suggestion);
+}
+
+// Opinionated allocation formula enforcing caps (£75 Zone, £200 Pairs, £100 Draw)
+function calculateSuggestedAllocation(totalPot, anglerCount) {
+  if (totalPot <= 0) {
+    return { zone: { total: 0, perWinner: 0 }, pairs: [], draw: [] };
+  }
+
+  // 1. Zone Winners (~50% pool, 8 winners total, capped at £75 each)
+  let zonePool = totalPot * 0.50;
+  let zonePerWinner = zonePool / 8;
+  if (zonePerWinner > 75) {
+    zonePerWinner = 75;
+    zonePool = 600; // 8 * 75
+  } else {
+    zonePerWinner = Math.floor(zonePerWinner);
+    zonePool = zonePerWinner * 8;
+  }
+
+  let remainingPot = totalPot - zonePool;
+
+  // 2. Mystery Pairs & Bonus Draw Pools
+  let pairsPool = 0;
+  let drawPool = 0;
+
+  if (zonePool === 600) { // Capped zone scenario
+    pairsPool = remainingPot * 0.50;
+    drawPool = remainingPot * 0.50;
+  } else {
+    pairsPool = totalPot * 0.25;
+    drawPool = totalPot * 0.25;
+  }
+
+  // Determine Pair Places & Amounts
+  let pairPlaces = [];
+  if (totalPot < 600) {
+    pairPlaces.push(Math.round(pairsPool));
+  } else if (totalPot <= 1200) {
+    let p1 = Math.min(200, Math.round(pairsPool * 0.65));
+    let p2 = Math.round(pairsPool - p1);
+    pairPlaces.push(p1, p2);
+  } else {
+    let p1 = Math.min(200, Math.round(pairsPool * 0.50));
+    let p2 = Math.round(pairsPool * 0.30);
+    let p3 = Math.round(pairsPool - (p1 + p2));
+    pairPlaces.push(p1, p2, p3);
+  }
+
+  // Determine Draw Places & Amounts
+  let drawPlaces = [];
+  if (totalPot < 600) {
+    let d1 = Math.min(100, Math.round(drawPool * 0.48));
+    let d2 = Math.round(drawPool * 0.28);
+    let d3 = Math.round(drawPool - (d1 + d2));
+    drawPlaces.push(d1, d2, d3);
+  } else if (totalPot <= 1200) {
+    let d1 = Math.min(100, Math.round(drawPool * 0.38));
+    let d2 = Math.round(drawPool * 0.28);
+    let d3 = Math.round(drawPool * 0.20);
+    let d4 = Math.round(drawPool - (d1 + d2 + d3));
+    drawPlaces.push(d1, d2, d3, d4);
+  } else {
+    let d1 = 100;
+    let rem = drawPool - 100;
+    let d2 = Math.round(rem * 0.35);
+    let d3 = Math.round(rem * 0.28);
+    let d4 = Math.round(rem * 0.22);
+    let d5 = Math.round(rem - (d2 + d3 + d4));
+    drawPlaces.push(d1, d2, d3, d4, d5);
+  }
+
+  return {
+    zone: { total: zonePool, perWinner: zonePerWinner },
+    pairs: pairPlaces,
+    draw: drawPlaces
+  };
+}
+
+// Render summary card
+function renderSuggestedBreakdown(suggestion) {
+  const container = document.getElementById('suggested-breakdown-summary');
+  if (!container) return;
+
+  const pairsFormatted = suggestion.pairs.map((amt, idx) => `${idx + 1}${getOrdinalSuffix(idx + 1)}: £${amt}`).join(', ');
+  const drawFormatted = suggestion.draw.map((amt, idx) => `${idx + 1}${getOrdinalSuffix(idx + 1)}: £${amt}`).join(', ');
+
+  container.innerHTML = `
+    <div style="background: white; padding: 12px; border-radius: 10px; border: 1px solid #bbf7d0;">
+      <span style="font-size: 11px; font-weight: 800; color: var(--text-light); display: block; text-transform: uppercase;">Zone Winners (8 Winners)</span>
+      <span style="font-size: 18px; font-weight: 900; color: #166534; display: block;">£${suggestion.zone.perWinner} each</span>
+      <small style="color: var(--text-light);">(Total: £${suggestion.zone.total})</small>
+    </div>
+    <div style="background: white; padding: 12px; border-radius: 10px; border: 1px solid #bbf7d0;">
+      <span style="font-size: 11px; font-weight: 800; color: var(--text-light); display: block; text-transform: uppercase;">Mystery Pairs (${suggestion.pairs.length} Place${suggestion.pairs.length > 1 ? 's' : ''})</span>
+      <span style="font-size: 14px; font-weight: 800; color: var(--text-dark); display: block;">${pairsFormatted || '£0'}</span>
+      <small style="color: var(--text-light);">(Total: £${suggestion.pairs.reduce((a, b) => a + b, 0)})</small>
+    </div>
+    <div style="background: white; padding: 12px; border-radius: 10px; border: 1px solid #bbf7d0;">
+      <span style="font-size: 11px; font-weight: 800; color: var(--text-light); display: block; text-transform: uppercase;">Bonus Cash Draw (${suggestion.draw.length} Winners)</span>
+      <span style="font-size: 14px; font-weight: 800; color: var(--text-dark); display: block;">${drawFormatted || '£0'}</span>
+      <small style="color: var(--text-light);">(Total: £${suggestion.draw.reduce((a, b) => a + b, 0)})</small>
+    </div>
+  `;
+
+  window.currentSuggestedAllocation = suggestion;
+}
+
+// Accept suggested allocation into controls
+function acceptSuggestedBreakdown() {
+  const suggestion = window.currentSuggestedAllocation;
+  if (!suggestion) return;
+
+  const pairSelect = document.getElementById('mystery-pairs-places');
+  if (pairSelect) {
+    pairSelect.value = suggestion.pairs.length;
+  }
+
+  const drawInput = document.getElementById('bonus-draw-count');
+  if (drawInput) {
+    drawInput.value = suggestion.draw.length;
+    renderBonusDrawInputs(suggestion.draw);
+  }
+}
+
+// Render dynamic inputs for bonus draw prize slots
+function renderBonusDrawInputs(presetAmounts = null) {
+  const container = document.getElementById('bonus-draw-amounts-container');
+  const countInput = document.getElementById('bonus-draw-count');
+  if (!container || !countInput) return;
+
+  const count = parseInt(countInput.value) || 1;
+  let html = '<label style="font-size: 11px; font-weight: 800; color: var(--text-light); display: block; margin-bottom: 6px;">PRIZE AMOUNTS (£):</label><div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 8px;">';
+
+  for (let i = 0; i < count; i++) {
+    let val = presetAmounts && presetAmounts[i] !== undefined ? presetAmounts[i] : (i === 0 ? 50 : (i === 1 ? 30 : 25));
+    html += `
+      <div style="display: flex; align-items: center; background: #f8fafc; border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px;">
+        <span style="font-size: 11px; font-weight: 800; margin-right: 6px;">${i + 1}${getOrdinalSuffix(i + 1)}</span>
+        <input type="number" class="bonus-draw-amount-input" value="${val}" min="0" style="width: 100%; border: none; background: transparent; font-weight: 800;">
+      </div>
+    `;
+  }
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+// Mystery Pairs Generator
+function generateMysteryPairs() {
+  const optedIn = (window.anglers || []).filter(a => a.optedIn !== false);
+  const container = document.getElementById('mystery-pairs-results');
+  if (!container) return;
+
+  if (optedIn.length < 2) {
+    container.innerHTML = `<div style="padding: 10px; background: #fef3c7; color: #92400e; border-radius: 8px; font-size: 12px; font-weight: 800;">At least 2 opted-in anglers are required.</div>`;
+    return;
+  }
+
+  let shuffled = [...optedIn].sort(() => 0.5 - Math.random());
+  let pairs = [];
+  let soloAngler = null;
+
+  if (shuffled.length % 2 !== 0) {
+    soloAngler = shuffled.pop();
+  }
+
+  for (let i = 0; i < shuffled.length; i += 2) {
+    pairs.push({
+      angler1: shuffled[i],
+      angler2: shuffled[i + 1],
+      isSoloPair: false
+    });
+  }
+
+  pairs.forEach(p => {
+    p.totalPoints = (p.angler1.points || 0) + (p.angler2.points || 0);
+    p.totalLength = (p.angler1.length || 0) + (p.angler2.length || 0);
+    p.totalFish = (p.angler1.fishCount || 0) + (p.angler2.fishCount || 0);
+    p.biggestFish = Math.max(p.angler1.biggestFish || 0, p.angler2.biggestFish || 0);
+  });
+
+  if (soloAngler) {
+    let individualRank = [...optedIn].sort((a, b) => 
+      (a.points || 0) - (b.points || 0) || 
+      (b.length || 0) - (a.length || 0)
+    );
+
+    let partner = individualRank.find(a => a.id !== soloAngler.id) || individualRank[0];
+
+    pairs.push({
+      angler1: soloAngler,
+      angler2: partner,
+      isSoloPair: true,
+      totalPoints: (soloAngler.points || 0) + (partner.points || 0),
+      totalLength: (soloAngler.length || 0) + (partner.length || 0),
+      totalFish: (soloAngler.fishCount || 0) + (partner.fishCount || 0),
+      biggestFish: Math.max(soloAngler.biggestFish || 0, partner.biggestFish || 0)
+    });
+  }
+
+  pairs.sort((a, b) => 
+    a.totalPoints - b.totalPoints || 
+    b.totalLength - a.totalLength || 
+    b.totalFish - a.totalFish || 
+    b.biggestFish - a.biggestFish
+  );
+
+  const placesToAward = parseInt(document.getElementById('mystery-pairs-places').value) || 1;
+  let html = `<div style="display: flex; flex-direction: column; gap: 8px;">`;
+
+  for (let i = 0; i < Math.min(placesToAward, pairs.length); i++) {
+    const p = pairs[i];
+    html += `
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: #f8fafc; border: 1px solid var(--border); border-radius: 8px;">
+        <div>
+          <span style="font-size: 11px; font-weight: 900; background: var(--accent); color: white; padding: 2px 8px; border-radius: 50px; margin-right: 6px;">${i + 1}${getOrdinalSuffix(i + 1)} Place</span>
+          <strong style="font-size: 13px;">${p.angler1.name} & ${p.angler2.name}</strong>
+          ${p.isSoloPair ? '<small style="color: var(--text-light); margin-left: 4px;">(Solo Pair)</small>' : ''}
+        </div>
+        <span style="font-size: 12px; font-weight: 800; color: var(--text-dark);">${p.totalPoints} pts / ${p.totalLength} cm</span>
+      </div>
+    `;
+  }
+  html += `</div>`;
+  container.innerHTML = html;
+}
+
+// Bonus Cash Draw Engine
+function runBonusCashDraw() {
+  const optedIn = (window.anglers || []).filter(a => a.optedIn !== false);
+  const container = document.getElementById('bonus-draw-results');
+  if (!container) return;
+
+  const amountInputs = document.querySelectorAll('.bonus-draw-amount-input');
+  if (amountInputs.length === 0 || optedIn.length === 0) {
+    container.innerHTML = `<div style="padding: 10px; background: #fef3c7; color: #92400e; border-radius: 8px; font-size: 12px; font-weight: 800;">No eligible anglers or draw slots found.</div>`;
+    return;
+  }
+
+  let shuffled = [...optedIn].sort(() => 0.5 - Math.random());
+  let html = `<div style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px;">`;
+
+  amountInputs.forEach((input, idx) => {
+    const prizeAmt = parseFloat(input.value) || 0;
+    const winner = shuffled[idx % shuffled.length];
+    html += `
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px;">
+        <div>
+          <span style="font-size: 12px; margin-right: 6px;">🎟️</span>
+          <strong style="font-size: 13px;">${winner ? winner.name : 'Unknown'}</strong>
+        </div>
+        <span style="font-size: 14px; font-weight: 900; color: var(--green-color);">£${prizeAmt}</span>
+      </div>
+    `;
+  });
+
+  html += `</div>`;
+  container.innerHTML = html;
+}
+
+// Helper: Ordinal suffix generator
+function getOrdinalSuffix(i) {
+  let j = i % 10, k = i % 100;
+  if (j === 1 && k !== 11) return "st";
+  if (j === 2 && k !== 12) return "nd";
+  if (j === 3 && k !== 13) return "rd";
+  return "th";
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+  renderBonusDrawInputs();
+  updatePrizeFundCalculations();
+});
