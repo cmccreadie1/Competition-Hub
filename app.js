@@ -291,7 +291,7 @@ if (filled2 === 3) d2Filled++;
     }
 
     function exportMasterData() {
-        let tsv = "NAME\tTEAM\tDAY\tZONE\tPEG\tLENGTH\tFISH COUNT\tBIGGEST FISH\tSPECIES\tWITNESS PEG\n";
+        let tsv = "NAME\tTEAM\tDAY\tZONE\tPEG\tLENGTH\tFISH COUNT\tBIGGEST FISH\tWITNESS PEG\n";
         let dataCount = 0;
 
         appState.forEach(e => {
@@ -300,13 +300,13 @@ if (filled2 === 3) d2Filled++;
                 
                 let tName = (e.isTeam && e.tName && e.tName.trim().toUpperCase() !== "SOLO" && e.tName.trim() !== "") ? e.tName.trim() : "";
                 let k1 = `${e.id}_${i}_1`;
-                let s1 = scoreState[k1] || {len:'', count:'', big:'', spec:'', witPeg:''};
-                tsv += `${a.name}\t${tName}\t1\t${a.z1}\t${a.p1}\t${s1.len}\t${s1.count}\t${s1.big}\t${s1.spec}\t${s1.witPeg}\n`;
+                let s1 = scoreState[k1] || {len:'', count:'', big:'', witPeg:''};
+                tsv += `${a.name}\t${tName}\t1\t${a.z1}\t${a.p1}\t${s1.len}\t${s1.count}\t${s1.big}\t${s1.witPeg}\n`;
                 dataCount++;
                 if (matchDays === 2 && a.z2) {
                     let k2 = `${e.id}_${i}_2`;
-                    let s2 = scoreState[k2] || {len:'', count:'', big:'', spec:'', witPeg:''};
-                    tsv += `${a.name}\t${tName}\t2\t${a.z2}\t${a.p2}\t${s2.len}\t${s2.count}\t${s2.big}\t${s2.spec}\t${s2.witPeg}\n`;
+                    let s2 = scoreState[k2] || {len:'', count:'', big:'', witPeg:''};
+                    tsv += `${a.name}\t${tName}\t2\t${a.z2}\t${a.p2}\t${s2.len}\t${s2.count}\t${s2.big}\t${s2.witPeg}\n`;
                 }
             });
         });
