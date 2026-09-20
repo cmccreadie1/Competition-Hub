@@ -3576,17 +3576,22 @@ function renderBonusDrawInputs(presetAmounts = null) {
   container.innerHTML = html;
 }
 
-// Mystery Pairs Generator
+// Mystery Pairs Generator (Ranks pairs strictly by combined Day 1 + Day 2 length in CM)
 function generateMysteryPairs() {
-  const optedIn = (window.anglers || []).filter(a => a.optedIn !== false);
   const container = document.getElementById('mystery-pairs-results');
   if (!container) return;
+
+  // Sync latest angler data to ensure scores are fresh
+  if (typeof syncAnglersForOptIn === 'function') syncAnglersForOptIn();
+
+  const optedIn = (window.anglers || []).filter(a => a.optedIn !== false);
 
   if (optedIn.length < 2) {
     container.innerHTML = `<div style="padding: 10px; background: #fef3c7; color: #92400e; border-radius: 8px; font-size: 12px; font-weight: 800;">At least 2 opted-in anglers are required.</div>`;
     return;
   }
 
+  // Shuffle opted-in competitors for random pairing
   let shuffled = [...optedIn].sort(() => 0.5 - Math.random());
   let pairs = [];
   let soloAngler = null;
@@ -3595,46 +3600,47 @@ function generateMysteryPairs() {
     soloAngler = shuffled.pop();
   }
 
+  // Helper to extract 2-day total length for an angler
+  const getAnglerTotalCM = (angler) => {
+    let d1Len = parseFloat(angler.day1Length || angler.d1Length || angler.lengthDay1 || 0) || 0;
+    let d2Len = parseFloat(angler.day2Length || angler.d2Length || angler.lengthDay2 || 0) || 0;
+    return parseFloat(angler.totalLength || angler.length || 0) || (d1Len + d2Len);
+  };
+
+  // Form pairs
   for (let i = 0; i < shuffled.length; i += 2) {
+    const cm1 = getAnglerTotalCM(shuffled[i]);
+    const cm2 = getAnglerTotalCM(shuffled[i + 1]);
+
     pairs.push({
       angler1: shuffled[i],
       angler2: shuffled[i + 1],
-      isSoloPair: false
+      isSoloPair: false,
+      totalLength: cm1 + cm2
     });
   }
 
-  pairs.forEach(p => {
-    p.totalPoints = (p.angler1.points || 0) + (p.angler2.points || 0);
-    p.totalLength = (p.angler1.length || 0) + (p.angler2.length || 0);
-    p.totalFish = (p.angler1.fishCount || 0) + (p.angler2.fishCount || 0);
-    p.biggestFish = Math.max(p.angler1.biggestFish || 0, p.angler2.biggestFish || 0);
-  });
-
+  // Handle odd angler (Solo Pair)
   if (soloAngler) {
-    let individualRank = [...optedIn].sort((a, b) => 
-      (a.points || 0) - (b.points || 0) || 
-      (b.length || 0) - (a.length || 0)
-    );
+    let soloCM = getAnglerTotalCM(soloAngler);
+    let individualRank = [...optedIn]
+      .map(a => ({ angler: a, cm: getAnglerTotalCM(a) }))
+      .sort((a, b) => b.cm - a.cm);
 
-    let partner = individualRank.find(a => a.id !== soloAngler.id) || individualRank[0];
+    let partnerObj = individualRank.find(item => item.angler.id !== soloAngler.id) || individualRank[0];
+    let partnerCM = partnerObj ? partnerObj.cm : 0;
+    let partnerAngler = partnerObj ? partnerObj.angler : soloAngler;
 
     pairs.push({
       angler1: soloAngler,
-      angler2: partner,
+      angler2: partnerAngler,
       isSoloPair: true,
-      totalPoints: (soloAngler.points || 0) + (partner.points || 0),
-      totalLength: (soloAngler.length || 0) + (partner.length || 0),
-      totalFish: (soloAngler.fishCount || 0) + (partner.fishCount || 0),
-      biggestFish: Math.max(soloAngler.biggestFish || 0, partner.biggestFish || 0)
+      totalLength: soloCM + partnerCM
     });
   }
 
-  pairs.sort((a, b) => 
-    a.totalPoints - b.totalPoints || 
-    b.totalLength - a.totalLength || 
-    b.totalFish - a.totalFish || 
-    b.biggestFish - a.biggestFish
-  );
+  // Sort pairs strictly by HIGHEST total CM
+  pairs.sort((a, b) => b.totalLength - a.totalLength);
 
   const placesToAward = parseInt(document.getElementById('mystery-pairs-places').value) || 1;
   let html = `<div style="display: flex; flex-direction: column; gap: 8px;">`;
@@ -3648,7 +3654,7 @@ function generateMysteryPairs() {
           <strong style="font-size: 13px;">${p.angler1.name} & ${p.angler2.name}</strong>
           ${p.isSoloPair ? '<small style="color: var(--text-light); margin-left: 4px;">(Solo Pair)</small>' : ''}
         </div>
-        <span style="font-size: 12px; font-weight: 800; color: var(--text-dark);">${p.totalPoints} pts / ${p.totalLength} cm</span>
+        <span style="font-size: 13px; font-weight: 900; color: #166534;">${p.totalLength} CM</span>
       </div>
     `;
   }
