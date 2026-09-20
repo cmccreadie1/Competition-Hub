@@ -3692,36 +3692,31 @@ function getOrdinalSuffix(i) {
 
 // Sync Opt-In Status with Master Competitor Roster
 function syncAnglersForOptIn() {
-  // Check all common ShoreMatch state containers for anglers
   let sourceList = [];
 
-  if (window.anglers && window.anglers.length > 0) {
+  // 1. Check window-level angler collections
+  if (window.anglers && Array.isArray(window.anglers) && window.anglers.length > 0) {
     sourceList = window.anglers;
-  } else if (window.state && window.state.anglers && window.state.anglers.length > 0) {
+  } else if (window.state && window.state.anglers && Array.isArray(window.state.anglers) && window.state.anglers.length > 0) {
     sourceList = window.state.anglers;
   } else if (window.currentMatch && window.currentMatch.anglers) {
     sourceList = window.currentMatch.anglers;
-  } else {
-    // Check local storage keys used by ShoreMatch
-    const possibleKeys = ['shoreMatchData', 'shoreMatch_state', 'shoreMatchState', 'sm_anglers'];
-    for (let key of possibleKeys) {
-      const saved = localStorage.getItem(key);
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            sourceList = parsed;
-            break;
-          } else if (parsed.anglers && parsed.anglers.length > 0) {
-            sourceList = parsed.anglers;
-            break;
-          }
-        } catch (e) {}
-      }
+  }
+
+  // 2. Fallback: Extract live anglers directly from the app's DOM/Tables if memory is empty
+  if (sourceList.length === 0) {
+    const anglerElements = document.querySelectorAll('.angler-name, .competitor-name, [data-angler-name]');
+    if (anglerElements.length > 0) {
+      const extractedNames = new Set();
+      anglerElements.forEach(el => {
+        const name = el.innerText || el.getAttribute('data-angler-name');
+        if (name && name.trim()) extractedNames.add(name.trim());
+      });
+      sourceList = Array.from(extractedNames).map((name, idx) => ({ id: idx + 1, name: name, optedIn: true }));
     }
   }
 
-  // Assign to global window.anglers so the rest of Tab 3 can use it
+  // Assign to global window.anglers for the Prize Fund engine
   window.anglers = sourceList;
 
   // Ensure every angler has an optedIn property (defaults to true)
