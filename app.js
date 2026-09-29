@@ -1422,7 +1422,7 @@ function runDraw() {
     let basePerZone = Math.floor(totalAnglers / 4);
     let remainder = totalAnglers % 4;
 
-    // Target capacities per zone
+    // Capacity per zone
     let zoneCapacities = {
         'RED': basePerZone + (0 < remainder ? 1 : 0),
         'YELLOW': basePerZone + (1 < remainder ? 1 : 0),
@@ -1437,9 +1437,9 @@ function runDraw() {
         'BLUE': 'YELLOW'
     };
 
-    // --- MONTE CARLO DRAW ENGINE (UP TO 200 ATTEMPTS) ---
+    // --- MONTE CARLO ENGINE (UP TO 200 ATTEMPTS) ---
     for (let attempt = 0; attempt < 200; attempt++) {
-        // Build fresh peg pools for each attempt
+        // 1. Build fresh peg pools for this attempt
         let p1 = {}, p2 = {};
         let currentPeg1 = 1, currentPeg2 = 1;
 
@@ -1454,12 +1454,11 @@ function runDraw() {
             currentPeg1 += cap;
             currentPeg2 += cap;
 
-            // Shuffle available peg numbers within each zone
             p1[z].sort(() => Math.random() - 0.5);
             p2[z].sort(() => Math.random() - 0.5);
         });
 
-        // Route Anglers Across Zones
+        // 2. Assign Zones & Route Anglers
         appState.forEach(e => {
             if (e.isTeam) {
                 // --- TEAM ROUTING ---
@@ -1473,7 +1472,7 @@ function runDraw() {
                     else normIndices.push(idx);
                 });
 
-                // Assign Mobility [A] anglers across RED / YELLOW
+                // Assign Mobility [A] anglers strictly to RED / YELLOW
                 let mobD1Zones = ['RED', 'YELLOW'].sort(() => Math.random() - 0.5);
                 mobIndices.forEach((mIdx, i) => {
                     let z1 = mobD1Zones[i % mobD1Zones.length];
@@ -1481,7 +1480,7 @@ function runDraw() {
                     d2Z[mIdx] = (z1 === 'RED') ? 'YELLOW' : 'RED';
                 });
 
-                // Assign remaining team members to unused zones
+                // Assign remaining teammates to unused zones
                 let usedD1 = d1Z.filter(z => z !== null);
                 let availD1 = zones.filter(z => !usedD1.includes(z)).sort(() => Math.random() - 0.5);
 
@@ -1491,7 +1490,7 @@ function runDraw() {
                     d2Z[nIdx] = zoneJumpMap[z1];
                 });
 
-                // Pull pegs safely from respective pools
+                // Pull pegs safely
                 e.anglers.forEach((a, i) => {
                     a.z1 = d1Z[i];
                     a.z2 = d2Z[i];
@@ -1499,35 +1498,32 @@ function runDraw() {
                     a.p2 = (p2[a.z2] && p2[a.z2].length > 0) ? p2[a.z2].pop() : 9999;
                 });
             } else {
-                // --- SOLO ANGLER ROUTING ---
+                // --- SOLO ROUTING ---
                 let a = e.anglers[0];
                 let hasMobility = accEnabled && a.mobility;
 
-                let avD1 = zones.filter(z => p1[z] && p1[z].length > 0);
-                a.z1 = avD1.length > 0 ? avD1[Math.floor(Math.random() * avD1.length)] : 'RED';
-
                 if (hasMobility) {
+                    // Solo [A] anglers strictly alternate RED <-> YELLOW
+                    let mobD1Options = ['RED', 'YELLOW'].filter(z => p1[z] && p1[z].length > 0);
+                    a.z1 = mobD1Options.length > 0 ? mobD1Options[Math.floor(Math.random() * mobD1Options.length)] : 'RED';
                     a.z2 = (a.z1 === 'RED') ? 'YELLOW' : 'RED';
                 } else {
-                    let targetD2 = zoneJumpMap[a.z1];
-                    if (p2[targetD2] && p2[targetD2].length > 0) {
-                        a.z2 = targetD2;
-                    } else {
-                        let avD2 = zones.filter(z => p2[z] && p2[z].length > 0 && z !== a.z1);
-                        a.z2 = avD2.length > 0 ? avD2[Math.floor(Math.random() * avD2.length)] : a.z1;
-                    }
+                    // Standard Solo Anglers perform 2-Zone Jump
+                    let avD1 = zones.filter(z => p1[z] && p1[z].length > 0);
+                    a.z1 = avD1.length > 0 ? avD1[Math.floor(Math.random() * avD1.length)] : 'RED';
+                    a.z2 = zoneJumpMap[a.z1];
                 }
 
+                // Pull pegs safely
                 a.p1 = (p1[a.z1] && p1[a.z1].length > 0) ? p1[a.z1].pop() : 9999;
                 a.p2 = (p2[a.z2] && p2[a.z2].length > 0) ? p2[a.z2].pop() : 9999;
             }
         });
 
-        // Run internal validator to check for clashes/missing pegs
+        // 3. Validate Attempt
         let checkResult = runValidator();
         if (checkResult.list.length === 0) {
-            // Found a perfectly valid draw, stop attempting!
-            break;
+            break; // Success! Zero clashes or missing pegs
         }
     }
 
