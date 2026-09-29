@@ -1422,7 +1422,7 @@ function runDraw() {
     let basePerZone = Math.floor(totalAnglers / 4);
     let remainder = totalAnglers % 4;
 
-    // Target capacities per zone to keep pools strictly balanced
+    // Target capacities per zone
     let zoneCapacities = {
         'RED': basePerZone + (0 < remainder ? 1 : 0),
         'YELLOW': basePerZone + (1 < remainder ? 1 : 0),
@@ -1445,7 +1445,6 @@ function runDraw() {
         currentPeg1 += cap;
         currentPeg2 += cap;
 
-        // Shuffle available peg numbers within each zone
         p1[z].sort(() => Math.random() - 0.5);
         p2[z].sort(() => Math.random() - 0.5);
     });
@@ -1461,11 +1460,10 @@ function runDraw() {
     // Route Anglers Across Zones
     appState.forEach(e => {
         if (e.isTeam) {
-            // --- TEAM ROUTING (Clash-Free Zone Dispersion) ---
+            // --- TEAM ROUTING ---
             let d1Z = [null, null, null, null];
             let d2Z = [null, null, null, null];
 
-            // 1. Identify Mobility [A] anglers in the team
             let mobIndices = [];
             let normIndices = [];
             e.anglers.forEach((ang, idx) => {
@@ -1473,56 +1471,53 @@ function runDraw() {
                 else normIndices.push(idx);
             });
 
-            // 2. Assign Mobility [A] anglers to RED or YELLOW on Day 1
+            // Cycle mobility anglers safely across RED / YELLOW
             let mobD1Zones = ['RED', 'YELLOW'].sort(() => Math.random() - 0.5);
-            mobIndices.forEach(mIdx => {
-                let z1 = mobD1Zones.pop() || 'RED';
+            mobIndices.forEach((mIdx, i) => {
+                let z1 = mobD1Zones[i % mobD1Zones.length];
                 d1Z[mIdx] = z1;
                 d2Z[mIdx] = (z1 === 'RED') ? 'YELLOW' : 'RED';
             });
 
-            // 3. Assign remaining team members to unused zones on Day 1
+            // Assign remaining team members to unused zones
             let usedD1 = d1Z.filter(z => z !== null);
             let availD1 = zones.filter(z => !usedD1.includes(z)).sort(() => Math.random() - 0.5);
 
             normIndices.forEach(nIdx => {
-                let z1 = availD1.pop();
+                let z1 = availD1.pop() || zones[Math.floor(Math.random() * zones.length)];
                 d1Z[nIdx] = z1;
                 d2Z[nIdx] = zoneJumpMap[z1];
             });
 
-            // 4. Assign calculated zones and pull peg numbers
+            // Assign zones and pull pegs safely
             e.anglers.forEach((a, i) => {
                 a.z1 = d1Z[i];
                 a.z2 = d2Z[i];
-                a.p1 = p1[a.z1].pop();
-                a.p2 = p2[a.z2].pop();
+                a.p1 = (p1[a.z1] && p1[a.z1].length > 0) ? p1[a.z1].pop() : 9999;
+                a.p2 = (p2[a.z2] && p2[a.z2].length > 0) ? p2[a.z2].pop() : 9999;
             });
         } else {
             // --- SOLO ANGLER ROUTING ---
             let a = e.anglers[0];
             let hasMobility = accEnabled && a.mobility;
 
-            // Pick Day 1 zone from available pools
-            let avD1 = zones.filter(z => p1[z].length > 0);
-            a.z1 = avD1[Math.floor(Math.random() * avD1.length)];
+            let avD1 = zones.filter(z => p1[z] && p1[z].length > 0);
+            a.z1 = avD1.length > 0 ? avD1[Math.floor(Math.random() * avD1.length)] : 'RED';
 
             if (hasMobility) {
-                // [A] Anglers alternate strictly between RED and YELLOW
                 a.z2 = (a.z1 === 'RED') ? 'YELLOW' : 'RED';
             } else {
-                // Standard 2-Zone Jump
                 let targetD2 = zoneJumpMap[a.z1];
                 if (p2[targetD2] && p2[targetD2].length > 0) {
                     a.z2 = targetD2;
                 } else {
-                    let avD2 = zones.filter(z => p2[z].length > 0 && z !== a.z1);
+                    let avD2 = zones.filter(z => p2[z] && p2[z].length > 0 && z !== a.z1);
                     a.z2 = avD2.length > 0 ? avD2[Math.floor(Math.random() * avD2.length)] : a.z1;
                 }
             }
 
-            a.p1 = p1[a.z1].pop();
-            a.p2 = p2[a.z2].pop();
+            a.p1 = (p1[a.z1] && p1[a.z1].length > 0) ? p1[a.z1].pop() : 9999;
+            a.p2 = (p2[a.z2] && p2[a.z2].length > 0) ? p2[a.z2].pop() : 9999;
         }
     });
 
