@@ -1422,7 +1422,7 @@ function runDraw() {
     let basePerZone = Math.floor(totalAnglers / 4);
     let remainder = totalAnglers % 4;
 
-    // Capacity per zone
+    // Target capacities per zone
     let zoneCapacities = {
         'RED': basePerZone + (0 < remainder ? 1 : 0),
         'YELLOW': basePerZone + (1 < remainder ? 1 : 0),
@@ -1439,7 +1439,15 @@ function runDraw() {
 
     // --- MONTE CARLO ENGINE (UP TO 200 ATTEMPTS) ---
     for (let attempt = 0; attempt < 200; attempt++) {
-        // 1. Build fresh peg pools for this attempt
+        
+        // STEP 1: PRIORITIZE ENTRIES WITH [A] ANGLERS FIRST
+        appState.sort((a, b) => {
+            let aMob = accEnabled ? a.anglers.filter(ang => ang.mobility).length : 0;
+            let bMob = accEnabled ? b.anglers.filter(ang => ang.mobility).length : 0;
+            return bMob - aMob; // Entries with most [A] anglers run first
+        });
+
+        // STEP 2: BUILD FRESH PEG POOLS
         let p1 = {}, p2 = {};
         let currentPeg1 = 1, currentPeg2 = 1;
 
@@ -1458,7 +1466,7 @@ function runDraw() {
             p2[z].sort(() => Math.random() - 0.5);
         });
 
-        // 2. Assign Zones & Route Anglers
+        // STEP 3: ROUTE ANGLERS (PRIORITY ORDER)
         appState.forEach(e => {
             if (e.isTeam) {
                 // --- TEAM ROUTING ---
@@ -1472,25 +1480,25 @@ function runDraw() {
                     else normIndices.push(idx);
                 });
 
-                // Assign Mobility [A] anglers strictly to RED / YELLOW
-                let mobD1Zones = ['RED', 'YELLOW'].sort(() => Math.random() - 0.5);
+                // 1. Reserve [A] Anglers First in RED / YELLOW
+                let mobD1Zones = ['RED', 'YELLOW'].filter(z => p1[z] && p1[z].length > 0).sort(() => Math.random() - 0.5);
                 mobIndices.forEach((mIdx, i) => {
-                    let z1 = mobD1Zones[i % mobD1Zones.length];
+                    let z1 = mobD1Zones[i % mobD1Zones.length] || 'RED';
                     d1Z[mIdx] = z1;
                     d2Z[mIdx] = (z1 === 'RED') ? 'YELLOW' : 'RED';
                 });
 
-                // Assign remaining teammates to unused zones
+                // 2. Assign remaining team members to unused zones
                 let usedD1 = d1Z.filter(z => z !== null);
                 let availD1 = zones.filter(z => !usedD1.includes(z)).sort(() => Math.random() - 0.5);
 
                 normIndices.forEach(nIdx => {
-                    let z1 = availD1.pop() || zones[Math.floor(Math.random() * zones.length)];
+                    let z1 = availD1.pop() || zones.filter(z => p1[z] && p1[z].length > 0)[0] || 'GREEN';
                     d1Z[nIdx] = z1;
                     d2Z[nIdx] = zoneJumpMap[z1];
                 });
 
-                // Pull pegs safely
+                // 3. Extract Pegs
                 e.anglers.forEach((a, i) => {
                     a.z1 = d1Z[i];
                     a.z2 = d2Z[i];
@@ -1503,27 +1511,27 @@ function runDraw() {
                 let hasMobility = accEnabled && a.mobility;
 
                 if (hasMobility) {
-                    // Solo [A] anglers strictly alternate RED <-> YELLOW
+                    // Solo [A] anglers reserve RED / YELLOW pegs first
                     let mobD1Options = ['RED', 'YELLOW'].filter(z => p1[z] && p1[z].length > 0);
                     a.z1 = mobD1Options.length > 0 ? mobD1Options[Math.floor(Math.random() * mobD1Options.length)] : 'RED';
                     a.z2 = (a.z1 === 'RED') ? 'YELLOW' : 'RED';
                 } else {
-                    // Standard Solo Anglers perform 2-Zone Jump
+                    // Standard Solos perform 2-Zone Jump
                     let avD1 = zones.filter(z => p1[z] && p1[z].length > 0);
-                    a.z1 = avD1.length > 0 ? avD1[Math.floor(Math.random() * avD1.length)] : 'RED';
+                    a.z1 = avD1.length > 0 ? avD1[Math.floor(Math.random() * avD1.length)] : 'GREEN';
                     a.z2 = zoneJumpMap[a.z1];
                 }
 
-                // Pull pegs safely
+                // Extract Pegs
                 a.p1 = (p1[a.z1] && p1[a.z1].length > 0) ? p1[a.z1].pop() : 9999;
                 a.p2 = (p2[a.z2] && p2[a.z2].length > 0) ? p2[a.z2].pop() : 9999;
             }
         });
 
-        // 3. Validate Attempt
+        // STEP 4: VALIDATE ATTEMPT
         let checkResult = runValidator();
         if (checkResult.list.length === 0) {
-            break; // Success! Zero clashes or missing pegs
+            break; // Valid clash-free draw found!
         }
     }
 
