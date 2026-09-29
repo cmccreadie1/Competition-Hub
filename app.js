@@ -1,4 +1,4 @@
-const APP_VERSION = "v7.4.0"; // Version update for Embedded Manual
+const APP_VERSION = "v7.4.0"; // Version update for Embedded Manual & Single Source of Truth
     document.getElementById('vTag').innerText = APP_VERSION;
 
     const zones = ['RED', 'YELLOW', 'GREEN', 'BLUE'];
@@ -13,7 +13,7 @@ const APP_VERSION = "v7.4.0"; // Version update for Embedded Manual
     let isAppReady = false; 
     let appState = []; 
     let scoreState = {}; // SCORECARD DATA BUCKETS
-let biggestFishSpecies = { d1: ["", "", ""], d2: ["", "", ""] };
+    let biggestFishSpecies = { d1: ["", "", ""], d2: ["", "", ""] };
     let matchDays = 2;
     let currentZoneSize = 0; 
     let isSwapMode = false;
@@ -104,16 +104,16 @@ let biggestFishSpecies = { d1: ["", "", ""], d2: ["", "", ""] };
                     d1Expected++;
                     let key1 = `${e.id}_${aIdx}_1`;
                     let s1 = scoreState[key1] || {};
-                    let filled1 = (s1.len ? 1 : 0) + (s1.count ? 1 : 0) + (s1.big ? 1 : 0);
-if (filled1 === 3) d1Filled++;
+                    let filled1 = (s1.len ? 1 : 0) + (s1.count ? 1 : 0) + (s1.big ? 1 : 0) + (s1.spec ? 1 : 0);
+                    if (filled1 === 4) d1Filled++;
                 }
                 // Evaluate Day 2 Completeness
                 if (a.name && a.z2) {
                     d2Expected++;
                     let key2 = `${e.id}_${aIdx}_2`;
                     let s2 = scoreState[key2] || {};
-                    let filled2 = (s2.len ? 1 : 0) + (s2.count ? 1 : 0) + (s2.big ? 1 : 0);
-if (filled2 === 3) d2Filled++;
+                    let filled2 = (s2.len ? 1 : 0) + (s2.count ? 1 : 0) + (s2.big ? 1 : 0) + (s2.spec ? 1 : 0);
+                    if (filled2 === 4) d2Filled++;
                 }
             });
         });
@@ -205,7 +205,7 @@ if (filled2 === 3) d2Filled++;
         
         let hasDrawnData = false;
         
-      let headerRow = document.createElement('div');
+        let headerRow = document.createElement('div');
         headerRow.className = 'score-list-header';
         headerRow.innerHTML = `
             <div>ANGLER</div>
@@ -214,6 +214,7 @@ if (filled2 === 3) d2Filled++;
             <div style="text-align:center;">LENGTH</div>
             <div style="text-align:center;">FISH CT</div>
             <div style="text-align:center;">BIGGEST</div>
+            <div style="text-align:center;">SPECIES</div>
         `;
         container.appendChild(headerRow);
 
@@ -229,15 +230,15 @@ if (filled2 === 3) d2Filled++;
 
                 let tName = (e.isTeam && e.tName && e.tName.trim() !== "") ? e.tName.trim() : "";
                 let key = `${e.id}_${aIdx}_${currentScoreDay}`;
-                let s = scoreState[key] || {len:'', count:'', big:'', witPeg:''};
+                let s = scoreState[key] || {len:'', count:'', big:'', spec:'', witPeg:''};
                 let zColor = zColors[targetZ] || 'gray';
 
                 const row = document.createElement('div');
                 row.className = 'score-row';
                 row.id = 'row_' + key;
                 
-                let filledCount = (s.len ? 1 : 0) + (s.count ? 1 : 0) + (s.big ? 1 : 0);
-                if (filledCount > 0 && filledCount < 3) {
+                let filledCount = (s.len ? 1 : 0) + (s.count ? 1 : 0) + (s.big ? 1 : 0) + (s.spec ? 1 : 0);
+                if (filledCount > 0 && filledCount < 4) {
                     row.classList.add('incomplete-row');
                 }
 
@@ -260,6 +261,11 @@ if (filled2 === 3) d2Filled++;
                         onchange="saveScore('${key}', 'big', this.value)" 
                         onkeydown="handleScoreEnter(event)"
                         onfocus="highlightRow(this)" onblur="unhighlightRow(this)">
+                    <input type="text" placeholder="SPC" value="${s.spec}" 
+                        oninput="enforceLimits(this, 20)" 
+                        onchange="saveScore('${key}', 'spec', this.value)" 
+                        onkeydown="handleScoreEnter(event)"
+                        onfocus="highlightRow(this)" onblur="unhighlightRow(this)">
                 `;
                 container.appendChild(row);
             });
@@ -273,15 +279,15 @@ if (filled2 === 3) d2Filled++;
     }
 
     function saveScore(key, field, value) {
-        if (!scoreState[key]) scoreState[key] = { len:'', count:'', big:'', witPeg:'' };
+        if (!scoreState[key]) scoreState[key] = { len:'', count:'', big:'', spec:'', witPeg:'' };
         scoreState[key][field] = value;
         persistState();
         
         let s = scoreState[key];
-        let filledCount = (s.len ? 1 : 0) + (s.count ? 1 : 0) + (s.big ? 1 : 0);
+        let filledCount = (s.len ? 1 : 0) + (s.count ? 1 : 0) + (s.big ? 1 : 0) + (s.spec ? 1 : 0);
         let rowEl = document.getElementById('row_' + key);
         if (rowEl) {
-            if (filledCount > 0 && filledCount < 3) {
+            if (filledCount > 0 && filledCount < 4) {
                 rowEl.classList.add('incomplete-row');
             } else {
                 rowEl.classList.remove('incomplete-row');
@@ -291,7 +297,7 @@ if (filled2 === 3) d2Filled++;
     }
 
     function exportMasterData() {
-        let tsv = "NAME\tTEAM\tDAY\tZONE\tPEG\tLENGTH\tFISH COUNT\tBIGGEST FISH\tWITNESS PEG\n";
+        let tsv = "NAME\tTEAM\tDAY\tZONE\tPEG\tLENGTH\tFISH COUNT\tBIGGEST FISH\tSPECIES\tWITNESS PEG\n";
         let dataCount = 0;
 
         appState.forEach(e => {
@@ -300,13 +306,13 @@ if (filled2 === 3) d2Filled++;
                 
                 let tName = (e.isTeam && e.tName && e.tName.trim().toUpperCase() !== "SOLO" && e.tName.trim() !== "") ? e.tName.trim() : "";
                 let k1 = `${e.id}_${i}_1`;
-                let s1 = scoreState[k1] || {len:'', count:'', big:'', witPeg:''};
-                tsv += `${a.name}\t${tName}\t1\t${a.z1}\t${a.p1}\t${s1.len}\t${s1.count}\t${s1.big}\t${s1.witPeg}\n`;
+                let s1 = scoreState[k1] || {len:'', count:'', big:'', spec:'', witPeg:''};
+                tsv += `${a.name}\t${tName}\t1\t${a.z1}\t${a.p1}\t${s1.len}\t${s1.count}\t${s1.big}\t${s1.spec}\t${s1.witPeg}\n`;
                 dataCount++;
                 if (matchDays === 2 && a.z2) {
                     let k2 = `${e.id}_${i}_2`;
-                    let s2 = scoreState[k2] || {len:'', count:'', big:'', witPeg:''};
-                    tsv += `${a.name}\t${tName}\t2\t${a.z2}\t${a.p2}\t${s2.len}\t${s2.count}\t${s2.big}\t${s2.witPeg}\n`;
+                    let s2 = scoreState[k2] || {len:'', count:'', big:'', spec:'', witPeg:''};
+                    tsv += `${a.name}\t${tName}\t2\t${a.z2}\t${a.p2}\t${s2.len}\t${s2.count}\t${s2.big}\t${s2.spec}\t${s2.witPeg}\n`;
                 }
             });
         });
@@ -721,7 +727,31 @@ block2Zones: Array.from(document.querySelectorAll('.block2-zone:checked')).map(c
         localStorage.setItem('zonedraw_current_state_v1', JSON.stringify(stateObj));
     }
 
+function toggleBlockRotationUI() {
+    const toggle = document.getElementById('splitRotationToggle');
+    const container = document.getElementById('blockRotationSetup');
+    if (toggle && container) {
+        container.style.display = toggle.checked ? 'flex' : 'none';
+    }
+}
 
+function syncBlockSelection(sourceBlock, zone) {
+    const targetClass = sourceBlock === 1 ? '.block2-zone' : '.block1-zone';
+    const sourceClass = sourceBlock === 1 ? '.block1-zone' : '.block2-zone';
+    
+    const sourceEl = document.querySelector(`${sourceClass}[value="${zone}"]`);
+    const targetEl = document.querySelector(`${targetClass}[value="${zone}"]`);
+    
+    if (sourceEl && sourceEl.checked && targetEl) {
+        targetEl.checked = false;
+    }
+}
+
+function getSelectedBlocks() {
+    const b1 = Array.from(document.querySelectorAll('.block1-zone:checked')).map(cb => cb.value);
+    const b2 = Array.from(document.querySelectorAll('.block2-zone:checked')).map(cb => cb.value);
+    return { b1, b2 };
+}
     function formatPegs(el) {
         let val = el.value;
         let nums = val.match(/\d+/g);
@@ -1416,127 +1446,297 @@ function validateSetupInputs() {
     return errors;
 }
 function runDraw() {
+    // --- 1. SORT BY ACCESSIBILITY PRIORITY QUEUE ---
+    appState.sort((a, b) => {
+        let getPriority = (entry) => { 
+            let aCount = accEnabled ? entry.anglers.filter(ang => ang.mobility).length : 0;
+            if (entry.isTeam) {
+                if (aCount >= 2) return 4; // Highest constraint: Multi-[A] team
+                if (aCount === 1) return 2; // Moderate constraint: Single-[A] team
+                return 1;                   // Standard team
+            } else {
+                if (aCount >= 1) return 3; // Solo [A] angler
+                return 0;                   // Standard solo
+            }
+        };
+        return getPriority(b) - getPriority(a);
+    });
+
+    // --- 2. PARSE SAFE PEG LISTS ---
+    let s1A_el = document.getElementById('accPegs1_a');
+    let s2A_el = document.getElementById('accPegs2_a');
+    let s1A_str = s1A_el ? s1A_el.value || '' : '';
+    let s2A_str = s2A_el ? s2A_el.value || '' : '';
+    let s1A = s1A_str.match(/\d+/g) ? s1A_str.match(/\d+/g).map(Number) : [];
+    let s2A = s2A_str.match(/\d+/g) ? s2A_str.match(/\d+/g).map(Number) : [];
+    // --- PRE-DRAW MOBILITY PEG SUFFICIENCY CHECK ---
+    let totalMobilityCount = 0;
+    appState.forEach(entry => {
+        entry.anglers.forEach(a => {
+            if (accEnabled && a.mobility) totalMobilityCount++;
+        });
+    });
+
+    let totalSafeAvailable = s1A.length + s2A.length;
+
+    if (accEnabled && totalMobilityCount > 0 && totalSafeAvailable < (totalMobilityCount * matchDays)) {
+        alert(
+            `⚠️ DRAW BLOCKED: INSUFFICIENT SAFE PEGS\n\n` +
+            `PROBLEM:\n` +
+            `• You have ${totalMobilityCount} mobility [A] angler(s).\n` +
+            `• Across ${matchDays} day(s), you need at least ${totalMobilityCount * matchDays} safe peg slot(s) total.\n` +
+            `• You currently only have ${totalSafeAvailable} safe peg(s) defined (Day 1: ${s1A.length}, Day 2: ${s2A.length}).\n\n` +
+            `SOLUTION:\n` +
+            `1. Close this popup.\n` +
+            `2. Go to '1. DRAW SETUP' and open the 'Manage Draw Setup' menu.\n` +
+            `3. Add at least ${totalMobilityCount} safe peg(s) in the Day 1 Safe Pegs box.\n` +
+            `4. Add at least ${totalMobilityCount} safe peg(s) in the Day 2 Safe Pegs box.\n` +
+            `5. Click 'Run Draw' again.`
+        );
+        return; // Stop draw execution safely before running Monte Carlo loop
+    }
+
+    const ancZ1_el = document.getElementById('anchorZoneSelect');
+    const ancZ2_el = document.getElementById('anchorZoneSelect2');
+    const ancZ1 = ancZ1_el ? ancZ1_el.value : 'RED';
+    const ancZ2 = ancZ2_el ? ancZ2_el.value : 'YELLOW';
+
     let totalAnglers = 0;
     appState.forEach(e => { totalAnglers += e.anglers.length; });
 
-    let basePerZone = Math.floor(totalAnglers / 4);
-    let remainder = totalAnglers % 4;
-
-    // Target capacities per zone
-    let zoneCapacities = {
-        'RED': basePerZone + (0 < remainder ? 1 : 0),
-        'YELLOW': basePerZone + (1 < remainder ? 1 : 0),
-        'GREEN': basePerZone + (2 < remainder ? 1 : 0),
-        'BLUE': basePerZone + (3 < remainder ? 1 : 0)
-    };
-
-    const zoneJumpMap = {
-        'RED': 'GREEN',
-        'YELLOW': 'BLUE',
-        'GREEN': 'RED',
-        'BLUE': 'YELLOW'
-    };
-
-    // --- MONTE CARLO ENGINE (UP TO 200 ATTEMPTS) ---
-    for (let attempt = 0; attempt < 200; attempt++) {
-        
-        // STEP 1: PRIORITIZE ENTRIES WITH [A] ANGLERS FIRST
-        appState.sort((a, b) => {
-            let aMob = accEnabled ? a.anglers.filter(ang => ang.mobility).length : 0;
-            let bMob = accEnabled ? b.anglers.filter(ang => ang.mobility).length : 0;
-            return bMob - aMob; // Entries with most [A] anglers run first
-        });
-
-        // STEP 2: BUILD FRESH PEG POOLS
-        let p1 = {}, p2 = {};
-        let currentPeg1 = 1, currentPeg2 = 1;
-
-        zones.forEach((z) => {
-            let cap = zoneCapacities[z];
-            p1[z] = [];
-            p2[z] = [];
-            for (let i = 0; i < cap; i++) {
-                p1[z].push(currentPeg1 + i);
-                p2[z].push(currentPeg2 + i);
+    // Helper to check which zones contain safe pegs based on peg range
+    const getSafeZonesForList = (pegList, basePerZone, remainder) => {
+        let zMap = [];
+        let currentPeg = 1;
+        zones.forEach((z, idx) => {
+            let count = basePerZone + (idx < remainder ? 1 : 0);
+            let startPeg = currentPeg;
+            let endPeg = currentPeg + count - 1;
+            if (pegList.some(p => p >= startPeg && p <= endPeg)) {
+                zMap.push(z);
             }
-            currentPeg1 += cap;
-            currentPeg2 += cap;
+            currentPeg += count;
+        });
+        return zMap;
+    };
 
-            p1[z].sort(() => Math.random() - 0.5);
-            p2[z].sort(() => Math.random() - 0.5);
+    // --- 3. MONTE CARLO DRAW ENGINE (UP TO 200 ATTEMPTS) ---
+    for (let attempt = 0; attempt < 200; attempt++) {
+        let basePerZone = Math.floor(totalAnglers / 4);
+        let remainder = totalAnglers % 4;
+
+        let zoneCounts = zones.map((z, idx) => basePerZone + (idx < remainder ? 1 : 0));
+
+        let currentPeg = 1;
+        let p1 = [];
+        let p2 = [];
+
+        zones.forEach((z, idx) => {
+            let count = zoneCounts[idx];
+            let p1Arr = [];
+            let p2Arr = [];
+            for (let i = 0; i < count; i++) {
+                p1Arr.push(currentPeg + i);
+                p2Arr.push(currentPeg + i);
+            }
+            currentPeg += count;
+
+            p1Arr.sort(() => Math.random() - 0.5);
+            p2Arr.sort(() => Math.random() - 0.5);
+
+            p1.push({ z, p: p1Arr });
+            p2.push({ z, p: p2Arr });
         });
 
-        // STEP 3: ROUTE ANGLERS (PRIORITY ORDER)
+        // Find zones that contain user's defined safe pegs
+        let d1SafeZones = getSafeZonesForList(s1A, basePerZone, remainder);
+        let d2SafeZones = getSafeZonesForList(s2A, basePerZone, remainder);
+
+        // --- STRICT SAFE PEG ISOLATION PULL ENGINE ---
+        const pull = (z, d2, mob) => {
+            const pools = d2 ? p2 : p1;
+            const zI = zones.indexOf(z);
+            if (!pools[zI] || pools[zI].p.length === 0) return 9999;
+            
+            const sL = d2 ? s2A : s1A;
+
+            if (accEnabled && mob) {
+                // Force [A] angler to take a safe peg from this zone if available
+                let availableSafe = pools[zI].p.filter(p => sL.includes(p));
+                if (availableSafe.length > 0) {
+                    let chosenPeg = availableSafe[Math.floor(Math.random() * availableSafe.length)];
+                    let removeIndex = pools[zI].p.indexOf(chosenPeg);
+                    return pools[zI].p.splice(removeIndex, 1)[0];
+                }
+            } else if (accEnabled && sL && sL.length > 0) { 
+                // STRICT BLOCK: Standard anglers CANNOT touch safe pegs
+                let nonSafePegs = pools[zI].p.filter(p => !sL.includes(p));
+                if (nonSafePegs.length > 0) {
+                    let chosenPeg = nonSafePegs[Math.floor(Math.random() * nonSafePegs.length)];
+                    let removeIndex = pools[zI].p.indexOf(chosenPeg);
+                    return pools[zI].p.splice(removeIndex, 1)[0];
+                }
+            }
+            
+            // Fallback standard peg selection
+            let popVal = pools[zI].p.pop();
+            return popVal !== undefined ? popVal : 9999;
+        };
+
+        // --- ROUTING ENGINE ---
         appState.forEach(e => {
             if (e.isTeam) {
-                // --- TEAM ROUTING ---
-                let d1Z = [null, null, null, null];
-                let d2Z = [null, null, null, null];
+                let hasA = accEnabled && e.anglers.some(a => a.mobility);
 
-                let mobIndices = [];
-                let normIndices = [];
-                e.anglers.forEach((ang, idx) => {
-                    if (accEnabled && ang.mobility) mobIndices.push(idx);
-                    else normIndices.push(idx);
-                });
+                if (accEnabled && mobilityMode === 'B' && hasA) {
+                    let d1Z = [null, null, null, null]; let d2Z = [null, null, null, null]; 
+                    e.anglers.forEach((a, i) => { if (a.mobility) { d1Z[i] = ancZ1; d2Z[i] = ancZ2; } });
+                    
+                    let av1 = zones.filter(z => z !== ancZ1).sort(() => Math.random() - 0.5);
+                    let sI = []; e.anglers.forEach((a, i) => { if (!a.mobility) sI.push(i); });
+                    d1Z[sI[0]] = av1[0]; d1Z[sI[1]] = av1[1]; d1Z[sI[2]] = av1[2];
+                    
+                    let av2 = zones.filter(z => z !== ancZ2);
+                    let bestD2Perm = [...av2];
+                    for (let att = 0; att < 20; att++) {
+                        av2.sort(() => Math.random() - 0.5);
+                        let isValid = true;
+                        for (let k = 0; k < 3; k++) { if (d1Z[sI[k]] === av2[k]) isValid = false; }
+                        if (isValid) { bestD2Perm = [...av2]; break; }
+                    }
+                    d2Z[sI[0]] = bestD2Perm[0]; d2Z[sI[1]] = bestD2Perm[1]; d2Z[sI[2]] = bestD2Perm[2];
+                    
+                    e.anglers.forEach((a, i) => { 
+                        a.z1 = d1Z[i];
+                        a.z2 = d2Z[i];
+                    });
+                } else if (accEnabled && mobilityMode === 'A' && hasA) {
+                    let mobIndices = [];
+                    let normIndices = [];
+                    e.anglers.forEach((ang, i) => {
+                        if (ang.mobility) mobIndices.push(i);
+                        else normIndices.push(i);
+                    });
 
-                // 1. Reserve [A] Anglers First in RED / YELLOW
-                let mobD1Zones = ['RED', 'YELLOW'].filter(z => p1[z] && p1[z].length > 0).sort(() => Math.random() - 0.5);
-                mobIndices.forEach((mIdx, i) => {
-                    let z1 = mobD1Zones[i % mobD1Zones.length] || 'RED';
-                    d1Z[mIdx] = z1;
-                    d2Z[mIdx] = (z1 === 'RED') ? 'YELLOW' : 'RED';
-                });
+                    let d1Z = [null, null, null, null];
+                    let d2Z = [null, null, null, null];
 
-                // 2. Assign remaining team members to unused zones
-                let usedD1 = d1Z.filter(z => z !== null);
-                let availD1 = zones.filter(z => !usedD1.includes(z)).sort(() => Math.random() - 0.5);
+                    // Target safe zones dynamically on Day 1 and Day 2
+                    let availD1Safe = d1SafeZones.filter(z => p1[zones.indexOf(z)].p.some(p => s1A.includes(p))).sort(() => Math.random() - 0.5);
+                    let availD2Safe = d2SafeZones.filter(z => p2[zones.indexOf(z)].p.some(p => s2A.includes(p))).sort(() => Math.random() - 0.5);
 
-                normIndices.forEach(nIdx => {
-                    let z1 = availD1.pop() || zones.filter(z => p1[z] && p1[z].length > 0)[0] || 'GREEN';
-                    d1Z[nIdx] = z1;
-                    d2Z[nIdx] = zoneJumpMap[z1];
-                });
+                    mobIndices.forEach((mIdx) => {
+                        let targetD1 = availD1Safe.pop() || zones[Math.floor(Math.random() * zones.length)];
+                        
+                        // Ensure Day 2 zone respects Two-Block rotation (switch Block 1 <-> Block 2)
+                        let isBlock1 = (targetD1 === 'RED' || targetD1 === 'YELLOW');
+                        let oppositeBlockZones = isBlock1 ? ['GREEN', 'BLUE'] : ['RED', 'YELLOW'];
+                        let validD2Safe = availD2Safe.filter(z => oppositeBlockZones.includes(z));
+                        
+                        let targetD2 = validD2Safe.length > 0 ? validD2Safe.pop() : oppositeBlockZones[Math.floor(Math.random() * oppositeBlockZones.length)];
+                        
+                        // Remove chosen D2 zone from remaining pool
+                        availD2Safe = availD2Safe.filter(z => z !== targetD2);
 
-                // 3. Extract Pegs
-                e.anglers.forEach((a, i) => {
-                    a.z1 = d1Z[i];
-                    a.z2 = d2Z[i];
-                    a.p1 = (p1[a.z1] && p1[a.z1].length > 0) ? p1[a.z1].pop() : 9999;
-                    a.p2 = (p2[a.z2] && p2[a.z2].length > 0) ? p2[a.z2].pop() : 9999;
-                });
-            } else {
-                // --- SOLO ROUTING ---
-                let a = e.anglers[0];
-                let hasMobility = accEnabled && a.mobility;
+                        d1Z[mIdx] = targetD1;
+                        d2Z[mIdx] = targetD2;
+                    });
 
-                if (hasMobility) {
-                    // Solo [A] anglers reserve RED / YELLOW pegs first
-                    let mobD1Options = ['RED', 'YELLOW'].filter(z => p1[z] && p1[z].length > 0);
-                    a.z1 = mobD1Options.length > 0 ? mobD1Options[Math.floor(Math.random() * mobD1Options.length)] : 'RED';
-                    a.z2 = (a.z1 === 'RED') ? 'YELLOW' : 'RED';
+                    let usedD1 = d1Z.filter(z => z !== null);
+                    let usedD2 = d2Z.filter(z => z !== null);
+
+                    let remD1 = zones.filter(z => !usedD1.includes(z)).sort(() => Math.random() - 0.5);
+                    let remD2 = zones.filter(z => !usedD2.includes(z)).sort(() => Math.random() - 0.5);
+
+                    for (let att = 0; att < 20; att++) {
+                        let valid = true;
+                        for (let k = 0; k < normIndices.length; k++) {
+                            if (remD1[k] === remD2[k]) { valid = false; break; }
+                        }
+                        if (valid) break;
+                        remD2.sort(() => Math.random() - 0.5);
+                    }
+
+                    normIndices.forEach((nIdx, k) => {
+                        d1Z[nIdx] = remD1[k];
+                        d2Z[nIdx] = remD2[k];
+                    });
+
+                    e.anglers.forEach((ang, i) => {
+                        ang.z1 = d1Z[i];
+                        ang.z2 = d2Z[i];
+                    });
                 } else {
-                    // Standard Solos perform 2-Zone Jump
-                    let avD1 = zones.filter(z => p1[z] && p1[z].length > 0);
-                    a.z1 = avD1.length > 0 ? avD1[Math.floor(Math.random() * avD1.length)] : 'GREEN';
-                    a.z2 = zoneJumpMap[a.z1];
+                    // --- STANDARD TEAM ROUTING (STRICT TWO-BLOCK ROTATION) ---
+                    // Randomize Day 1 across all 4 zones
+                    let d1Z = [...zones].sort(() => Math.random() - 0.5);
+                    
+                    // Map Day 2 strictly to opposite block paired zones
+                    // Block 1 (RED / YELLOW) MUST swap to Block 2 (GREEN / BLUE)
+                    let b1Pairs = ['GREEN', 'BLUE'].sort(() => Math.random() - 0.5);
+                    let b2Pairs = ['RED', 'YELLOW'].sort(() => Math.random() - 0.5);
+                    let d2Z = [null, null, null, null];
+
+                    d1Z.forEach((z1, i) => {
+                        if (z1 === 'RED' || z1 === 'YELLOW') {
+                            d2Z[i] = b1Pairs.pop();
+                        } else {
+                            d2Z[i] = b2Pairs.pop();
+                        }
+                    });
+
+                    e.anglers.forEach((a, i) => { 
+                        a.z1 = d1Z[i];
+                        a.z2 = d2Z[i];
+                    });
                 }
 
-                // Extract Pegs
-                a.p1 = (p1[a.z1] && p1[a.z1].length > 0) ? p1[a.z1].pop() : 9999;
-                a.p2 = (p2[a.z2] && p2[a.z2].length > 0) ? p2[a.z2].pop() : 9999;
+                e.anglers.forEach(a => {
+                    let hasMobility = accEnabled && a.mobility;
+                    a.p1 = pull(a.z1, 0, hasMobility);
+                    a.p2 = pull(a.z2, 1, hasMobility);
+                });
+            } else {
+                // --- SOLO ANGLER ROUTING (STRICT TWO-BLOCK ROTATION) ---
+                let a = e.anglers[0];
+                let hasMobility = accEnabled && a.mobility;
+                if (accEnabled && mobilityMode === 'B' && hasMobility) { 
+                    a.z1 = ancZ1; a.z2 = ancZ2; 
+                } else if (accEnabled && mobilityMode === 'A' && hasMobility) {
+                    let targetD1 = d1SafeZones.length > 0 ? d1SafeZones[Math.floor(Math.random() * d1SafeZones.length)] : zones[Math.floor(Math.random() * zones.length)];
+                    let isBlock1 = (targetD1 === 'RED' || targetD1 === 'YELLOW');
+                    let oppositeBlockZones = isBlock1 ? ['GREEN', 'BLUE'] : ['RED', 'YELLOW'];
+                    let validD2Safe = d2SafeZones.filter(z => oppositeBlockZones.includes(z));
+                    let targetD2 = validD2Safe.length > 0 ? validD2Safe[Math.floor(Math.random() * validD2Safe.length)] : oppositeBlockZones[Math.floor(Math.random() * oppositeBlockZones.length)];
+                    
+                    a.z1 = targetD1;
+                    a.z2 = targetD2;
+                } else { 
+                    let av = zones.filter(z => p1[zones.indexOf(z)].p.length > 0);
+                    if (av.length > 0) a.z1 = av[Math.floor(Math.random() * av.length)];
+                    
+                    // Enforce strict opposite block selection for Day 2
+                    let isBlock1 = (a.z1 === 'RED' || a.z1 === 'YELLOW');
+                    let oppositeBlock = isBlock1 ? ['GREEN', 'BLUE'] : ['RED', 'YELLOW'];
+                    let av2 = oppositeBlock.filter(z => p2[zones.indexOf(z)].p.length > 0);
+                    
+                    if (av2.length === 0) av2 = zones.filter(z => z !== a.z1 && p2[zones.indexOf(z)].p.length > 0);
+                    if (av2.length > 0) a.z2 = av2[Math.floor(Math.random() * av2.length)];
+                }
+                a.p1 = pull(a.z1, 0, hasMobility);
+                a.p2 = pull(a.z2, 1, hasMobility);
             }
         });
 
-        // STEP 4: VALIDATE ATTEMPT
         let checkResult = runValidator();
         if (checkResult.list.length === 0) {
-            break; // Valid clash-free draw found!
+            break;
         }
     }
 
     displayDraw();
 }
+
     function toggleSwapMode() { 
         isSwapMode = !isSwapMode;
         swapObj1 = null; 
@@ -2233,12 +2433,24 @@ function calculateAndRenderZoneLeaderboard(dayNum, containerId) {
                     ? scoreState[scoreKey] 
                     : { len: '', count: '', big: '', spec: '' };
 
-          zoneAnglers.push({
+                // Handle string entries and species conversions cleanly
+                let rawSpecies = String(rawScore.spec || '').trim();
+                let computedSpecies = 0;
+                if (rawSpecies !== '') {
+                    if (!isNaN(rawSpecies)) {
+                        computedSpecies = Number(rawSpecies);
+                    } else {
+                        computedSpecies = rawSpecies.split(',').filter(item => item.trim().length > 0).length;
+                    }
+                }
+
+                zoneAnglers.push({
                     name: angler.name,
                     team: (teamEntry.isTeam && teamEntry.tName && teamEntry.tName.trim().toUpperCase() !== 'SOLO') ? teamEntry.tName.trim() : 'SOLO',
                     length: Number(rawScore.len) || 0,
                     count: Number(rawScore.count) || 0,
                     max: Number(rawScore.big) || 0,
+                    species: computedSpecies,
                     zonePoints: 0
                 });
             });
@@ -2248,7 +2460,8 @@ function calculateAndRenderZoneLeaderboard(dayNum, containerId) {
         zoneAnglers.sort((a, b) => {
             if (b.length !== a.length) return b.length - a.length; 
             if (b.count !== a.count) return b.count - a.count;     
-            return b.max - a.max;             
+            if (b.max !== a.max) return b.max - a.max;             
+            return b.species - a.species;                          
         });
 
         // Enforce Zone Points and handling for Blanks/No-Shows
@@ -2260,7 +2473,8 @@ function calculateAndRenderZoneLeaderboard(dayNum, containerId) {
             while (nextIdx < zoneAnglers.length && 
                    zoneAnglers[nextIdx].length === tieGroup[0].length &&
                    zoneAnglers[nextIdx].count === tieGroup[0].count &&
-                   zoneAnglers[nextIdx].max === tieGroup[0].max) {
+                   zoneAnglers[nextIdx].max === tieGroup[0].max &&
+                   zoneAnglers[nextIdx].species === tieGroup[0].species) {
                 tieGroup.push(zoneAnglers[nextIdx]);
                 nextIdx++;
             }
@@ -2303,7 +2517,7 @@ function calculateAndRenderZoneLeaderboard(dayNum, containerId) {
                         <tr style="border-bottom: 2px solid rgba(255,255,255,0.15); color: #94a3b8; font-weight: 800; font-size: 11px;">
                             <th style="padding: 6px 2px; text-align: center; width: 45px;">PTS</th>
                             <th style="padding: 6px 6px;">ANGLER</th>
-                          <th style="padding: 6px 2px; text-align: right; width: 180px;">SCORES MATRIX (CM / FISH CT / BIGGEST)</th>
+                            <th style="padding: 6px 2px; text-align: right; width: 150px;">SCORES MATRIX (L/F/B/S)</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -2313,7 +2527,7 @@ function calculateAndRenderZoneLeaderboard(dayNum, containerId) {
             htmlOutput += `<tr><td colspan="3" style="text-align:center; padding:20px; color:#64748b; font-weight:700;">No anglers assigned to this zone</td></tr>`;
         } else {
             zoneAnglers.forEach(angler => {
-                const dataString = `${angler.length} / ${angler.count} / ${angler.max}`;
+                const dataString = `${angler.length} / ${angler.count} / ${angler.max} / ${angler.species}`;
                 htmlOutput += `
                     <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.15); background: rgba(15, 23, 42, 0.1); font-weight: 600; height: 54px;">
                         <td style="padding: 6px 2px; text-align: center; color: var(--accent); font-weight: 900; font-size: 16px; font-family: monospace;">${angler.zonePoints}</td>
@@ -2382,10 +2596,11 @@ function calculateAndRenderIndividualLeaderboard(containerId) {
                 });
             });
 
-          zoneAnglers.sort((a, b) => {
+            zoneAnglers.sort((a, b) => {
                 if (b.length !== a.length) return b.length - a.length;
                 if (b.count !== a.count) return b.count - a.count;
-                return b.max - a.max;
+                if (b.max !== a.max) return b.max - a.max;
+                return b.species - a.species;
             });
 
             let currentRank = 1;
@@ -2395,7 +2610,8 @@ function calculateAndRenderIndividualLeaderboard(containerId) {
                 while (nextIdx < zoneAnglers.length && 
                        zoneAnglers[nextIdx].length === tieGroup[0].length &&
                        zoneAnglers[nextIdx].count === tieGroup[0].count &&
-                       zoneAnglers[nextIdx].max === tieGroup[0].max) {
+                       zoneAnglers[nextIdx].max === tieGroup[0].max &&
+                       zoneAnglers[nextIdx].species === tieGroup[0].species) {
                     tieGroup.push(zoneAnglers[nextIdx]);
                     nextIdx++;
                 }
@@ -2492,25 +2708,27 @@ function calculateAndRenderIndividualLeaderboard(containerId) {
                     </tr>
                     <tr style="border-bottom: 2px solid rgba(255,255,255,0.15); color: #cbd5e1; font-weight: 800; font-size: 14px; background: rgba(15, 23, 42, 0.3);">
                         <th style="padding: 12px 14px; text-align: left;">POS & ANGLER (TEAM)</th>
-                       <th style="padding: 12px 8px; background: rgba(59, 130, 246, 0.05); border-left: 1px solid rgba(255,255,255,0.05); border-right: 1px solid rgba(255,255,255,0.05); letter-spacing: 1px;">
-    <span style="display:inline-block; width:55px; color:var(--accent); font-weight: 900;">PTS</span>|
-    <span style="display:inline-block; width:65px;">CM</span>|
-    <span style="display:inline-block; width:45px;">CT</span>|
-    <span style="display:inline-block; width:55px;">BIG</span>
-</th>
-${isTwoDayMatch ? `
-<th style="padding: 12px 8px; background: rgba(16, 185, 129, 0.05); border-right: 1px solid rgba(255,255,255,0.05); letter-spacing: 1px;">
-    <span style="display:inline-block; width:55px; color:var(--accent); font-weight: 900;">PTS</span>|
-    <span style="display:inline-block; width:65px;">CM</span>|
-    <span style="display:inline-block; width:45px;">CT</span>|
-    <span style="display:inline-block; width:55px;">BIG</span>
-</th>
+                        <th style="padding: 12px 8px; background: rgba(59, 130, 246, 0.05); border-left: 1px solid rgba(255,255,255,0.05); border-right: 1px solid rgba(255,255,255,0.05); letter-spacing: 1px;">
+                            <span style="display:inline-block; width:55px; color:var(--accent); font-weight: 900;">PTS</span>|
+                            <span style="display:inline-block; width:65px;">CM</span>|
+                            <span style="display:inline-block; width:45px;">CT</span>|
+                            <span style="display:inline-block; width:55px;">BIG</span>|
+                            <span style="display:inline-block; width:45px;">SPC</span>
+                        </th>
+                        ${isTwoDayMatch ? `
+                        <th style="padding: 12px 8px; background: rgba(16, 185, 129, 0.05); border-right: 1px solid rgba(255,255,255,0.05); letter-spacing: 1px;">
+                            <span style="display:inline-block; width:55px; color:var(--accent); font-weight: 900;">PTS</span>|
+                            <span style="display:inline-block; width:65px;">CM</span>|
+                            <span style="display:inline-block; width:45px;">CT</span>|
+                            <span style="display:inline-block; width:55px;">BIG</span>|
+                            <span style="display:inline-block; width:45px;">SPC</span>
+                        </th>
                         <th style="padding: 12px 8px; background: rgba(234, 179, 8, 0.05); letter-spacing: 1px;">
                             <span style="display:inline-block; width:55px; color:var(--accent); font-weight:900;">PTS</span>|
                             <span style="display:inline-block; width:65px; font-weight:900;">CM</span>|
                             <span style="display:inline-block; width:45px; font-weight:800;">CT</span>|
                             <span style="display:inline-block; width:55px; font-weight:800;">BIG</span>|
-                           
+                            <span style="display:inline-block; width:45px; font-weight:800;">SPC</span>
                         </th>` : ''}
                     </tr>
                 </thead>
@@ -2600,20 +2818,22 @@ function calculateAndRenderTeamLeaderboard(containerId) {
                     let rawSpec = String(rawScore.spec || '').trim();
                     let compSpec = (rawSpec !== '') ? (!isNaN(rawSpec) ? Number(rawSpec) : rawSpec.split(',').filter(i => i.trim().length > 0).length) : 0;
 
-              zoneAnglers.push({
-    key: scoreKey,
-    length: Number(rawScore.len) || 0,
-    count: Number(rawScore.count) || 0,
-    max: Number(rawScore.big) || 0
-});
-});
-});
+                    zoneAnglers.push({
+                        key: scoreKey,
+                        length: Number(rawScore.len) || 0,
+                        count: Number(rawScore.count) || 0,
+                        max: Number(rawScore.big) || 0,
+                        species: compSpec
+                    });
+                });
+            });
 
-zoneAnglers.sort((a, b) => {
-    if (b.length !== a.length) return b.length - a.length;
-    if (b.count !== a.count) return b.count - a.count;
-    return b.max - a.max;
-});
+            zoneAnglers.sort((a, b) => {
+                if (b.length !== a.length) return b.length - a.length;
+                if (b.count !== a.count) return b.count - a.count;
+                if (b.max !== a.max) return b.max - a.max;
+                return b.species - a.species;
+            });
 
             let currentRank = 1;
             while (currentRank <= zoneAnglers.length) {
@@ -2622,7 +2842,8 @@ zoneAnglers.sort((a, b) => {
                 while (nextIdx < zoneAnglers.length && 
                        zoneAnglers[nextIdx].length === tieGroup[0].length &&
                        zoneAnglers[nextIdx].count === tieGroup[0].count &&
-                       zoneAnglers[nextIdx].max === tieGroup[0].max) {
+                       zoneAnglers[nextIdx].max === tieGroup[0].max &&
+                       zoneAnglers[nextIdx].species === tieGroup[0].species) {
                     tieGroup.push(zoneAnglers[nextIdx]);
                     nextIdx++;
                 }
@@ -2811,7 +3032,7 @@ function calculateAndRenderBiggestFishLeaderboard(containerId) {
                     catches.push({
                         name: angler.name,
                         team: (teamEntry.isTeam && teamEntry.tName && teamEntry.tName.trim().toUpperCase() !== 'SOLO') ? teamEntry.tName.trim() : 'SOLO',
-                        location: `${targetZone} ${targetPeg || '-'}`,
+                        location: `${targetZone}${targetPeg || '-'}`,
                         size: fishSize
                     });
                 }
@@ -2945,10 +3166,11 @@ function exportPublicResults() {
             while (currentRank <= zoneAnglers.length) {
                 let tieGroup = [zoneAnglers[currentRank - 1]];
                 let nextIdx = currentRank;
-               while (nextIdx < zoneAnglers.length && 
+                while (nextIdx < zoneAnglers.length && 
                        zoneAnglers[nextIdx].length === tieGroup[0].length &&
                        zoneAnglers[nextIdx].count === tieGroup[0].count &&
-                       zoneAnglers[nextIdx].max === tieGroup[0].max) {
+                       zoneAnglers[nextIdx].max === tieGroup[0].max &&
+                       zoneAnglers[nextIdx].species === tieGroup[0].species) {
                     tieGroup.push(zoneAnglers[nextIdx]);
                     nextIdx++;
                 }
@@ -3055,10 +3277,11 @@ function exportPublicResults() {
     });
 
     compiledList.sort((a, b) => {
-        if (b._sort.pts !== a._sort.pts) return a._sort.pts - b._sort.pts;
-            if (b._sort.len !== a._sort.len) return b._sort.len - a._sort.len;
-            if (b._sort.cnt !== a._sort.cnt) return b._sort.cnt - a._sort.cnt;
-            return b._sort.big - a._sort.big;
+        if (a._sort.pts !== b._sort.pts) return a._sort.pts - b._sort.pts;
+        if (b._sort.len !== a._sort.len) return b._sort.len - a._sort.len;
+        if (b._sort.cnt !== a._sort.cnt) return b._sort.cnt - a._sort.cnt;
+        if (b._sort.big !== a._sort.big) return b._sort.big - a._sort.big;
+        return b._sort.spc - a._sort.spc;
     });
 
     let cleanExport = compiledList.map((item, index) => {
@@ -3126,12 +3349,13 @@ function exportPublicResults() {
     const secretPairsDesc = "The computer calculated a hidden Target Length that falls strictly between the lowest and highest possible combined scores. The randomly chosen pair whose combined length finishes closest to the target wins.\n\nIf you have an uneven number of entries in the cash pool, the computer automatically generates a virtual partner named Joe Average. Joe is mathematically given the exact mean average score of the entire active field. Tie breaker if its a draw the tie breaker reverts to longest combined length.";
 
     const finalPayload = {
-    "anglers": cleanExport,
-    "biggestFishSpecies": {
-        "day1": biggestFishSpecies.d1,
-        "day2": biggestFishSpecies.d2
-    },
-    "secretPairs": {
+        "appVersion": APP_VERSION,
+        "anglers": cleanExport,
+        "biggestFishSpecies": {
+            "day1": biggestFishSpecies.d1,
+            "day2": biggestFishSpecies.d2
+        },
+        "secretPairs": {
             "description": secretPairsDesc,
             "targetLength": officialTargetLength,
             "winners": secretPairsWinners,
@@ -3201,433 +3425,4 @@ function copyWhatsAppDraw() {
         }
         document.body.removeChild(textArea);
     }
-}
-
-/**
- * Global Prize Fund & Distribution Engine
- */
-
-// Calculates total pot and generates opinionated allocation suggestion based on cap rules
-function updatePrizeFundCalculations() {
-  const entryFeeInput = document.getElementById('entry-fee-input');
-  const entryFee = parseFloat(entryFeeInput ? entryFeeInput.value : 0) || 0;
-  
-  // Get opted-in anglers (defaults to all anglers if optedIn isn't explicitly false)
-  const optedInAnglers = (window.anglers || []).filter(a => a.optedIn !== false);
-  const count = optedInAnglers.length;
-  const totalPot = count * entryFee;
-
-  // Update DOM overview
-  if (document.getElementById('opted-in-count-display')) {
-    document.getElementById('opted-in-count-display').innerText = count;
-  }
-  if (document.getElementById('total-pot-display')) {
-    document.getElementById('total-pot-display').innerText = `£${totalPot}`;
-  }
-
-  // Calculate suggested breakdown
-  const suggestion = calculateSuggestedAllocation(totalPot, count);
-  renderSuggestedBreakdown(suggestion);
-}
-
-// Opinionated allocation formula enforcing caps, £5 rounding, and 100% pot distribution
-function calculateSuggestedAllocation(totalPot, anglerCount) {
-  if (totalPot <= 0) {
-    return { zone: { total: 0, perWinner: 0 }, pairs: [], draw: [] };
-  }
-
-  // Helper function to round any amount to nearest £5
-  const round5 = (val) => Math.max(5, Math.round(val / 5) * 5);
-
-  // 1. Zone Winners (~50% pool, 8 winners total, capped at £75 each)
-  let zonePoolRaw = totalPot * 0.50;
-  let zonePerWinner = Math.min(75, round5(zonePoolRaw / 8));
-  let zonePool = zonePerWinner * 8;
-
-  let remainingPot = totalPot - zonePool;
-
-  // 2. Mystery Pairs & Bonus Draw Pools
-  let pairsPoolRaw = 0;
-  let drawPoolRaw = 0;
-
-  if (zonePerWinner === 75) {
-    pairsPoolRaw = remainingPot * 0.50;
-    drawPoolRaw = remainingPot * 0.50;
-  } else {
-    pairsPoolRaw = totalPot * 0.25;
-    drawPoolRaw = totalPot * 0.25;
-  }
-
-  // Determine Pair Places (£5 rounded)
-  let pairPlaces = [];
-  if (totalPot < 600) {
-    pairPlaces.push(round5(pairsPoolRaw));
-  } else if (totalPot <= 1200) {
-    let p1 = Math.min(200, round5(pairsPoolRaw * 0.65));
-    let p2 = round5(pairsPoolRaw - p1);
-    pairPlaces.push(p1, p2);
-  } else {
-    let p1 = Math.min(200, round5(pairsPoolRaw * 0.50));
-    let p2 = round5(pairsPoolRaw * 0.30);
-    let p3 = round5(pairsPoolRaw - (p1 + p2));
-    pairPlaces.push(p1, p2, p3);
-  }
-
-  let totalPairsAllocated = pairPlaces.reduce((a, b) => a + b, 0);
-
-  // 3. Determine Draw Places (£5 rounded)
-  let targetDrawPool = totalPot - zonePool - totalPairsAllocated;
-  let drawPlaces = [];
-
-  if (totalPot < 600) {
-    let d1 = Math.min(100, round5(targetDrawPool * 0.50));
-    let d2 = round5(targetDrawPool * 0.30);
-    let d3 = round5(targetDrawPool - d1 - d2);
-    drawPlaces.push(d1, d2, d3);
-  } else if (totalPot <= 1200) {
-    let d1 = Math.min(100, round5(targetDrawPool * 0.40));
-    let d2 = round5(targetDrawPool * 0.28);
-    let d3 = round5(targetDrawPool * 0.20);
-    let d4 = round5(targetDrawPool - d1 - d2 - d3);
-    drawPlaces.push(d1, d2, d3, d4);
-  } else {
-    let d1 = 100;
-    let rem = targetDrawPool - 100;
-    let d2 = round5(rem * 0.35);
-    let d3 = round5(rem * 0.28);
-    let d4 = round5(rem * 0.22);
-    let d5 = round5(rem - d2 - d3 - d4);
-    drawPlaces.push(d1, d2, d3, d4, d5);
-  }
-
-  // Force exact 100% pot match by balancing remaining difference into 1st Draw Prize
-  let currentTotalAllocated = zonePool + totalPairsAllocated + drawPlaces.reduce((a, b) => a + b, 0);
-  let discrepancy = totalPot - currentTotalAllocated;
-  if (discrepancy !== 0 && drawPlaces.length > 0) {
-    drawPlaces[0] += discrepancy;
-  }
-
-  return {
-    zone: { total: zonePool, perWinner: zonePerWinner },
-    pairs: pairPlaces,
-    draw: drawPlaces
-  };
-}
-
-// Render summary card
-function renderSuggestedBreakdown(suggestion) {
-  const container = document.getElementById('suggested-breakdown-summary');
-  if (!container) return;
-
-  const pairsFormatted = suggestion.pairs.map((amt, idx) => `${idx + 1}${getOrdinalSuffix(idx + 1)}: £${amt}`).join(', ');
-  const drawFormatted = suggestion.draw.map((amt, idx) => `${idx + 1}${getOrdinalSuffix(idx + 1)}: £${amt}`).join(', ');
-
-  container.innerHTML = `
-    <div style="background: white; padding: 12px; border-radius: 10px; border: 1px solid #bbf7d0;">
-      <span style="font-size: 11px; font-weight: 800; color: var(--text-light); display: block; text-transform: uppercase;">Zone Winners (8 Winners)</span>
-      <span style="font-size: 18px; font-weight: 900; color: #166534; display: block;">£${suggestion.zone.perWinner} each</span>
-      <small style="color: var(--text-light);">(Total: £${suggestion.zone.total})</small>
-    </div>
-    <div style="background: white; padding: 12px; border-radius: 10px; border: 1px solid #bbf7d0;">
-      <span style="font-size: 11px; font-weight: 800; color: var(--text-light); display: block; text-transform: uppercase;">Mystery Pairs (${suggestion.pairs.length} Place${suggestion.pairs.length > 1 ? 's' : ''})</span>
-      <span style="font-size: 14px; font-weight: 800; color: var(--text-dark); display: block;">${pairsFormatted || '£0'}</span>
-      <small style="color: var(--text-light);">(Total: £${suggestion.pairs.reduce((a, b) => a + b, 0)})</small>
-    </div>
-    <div style="background: white; padding: 12px; border-radius: 10px; border: 1px solid #bbf7d0;">
-      <span style="font-size: 11px; font-weight: 800; color: var(--text-light); display: block; text-transform: uppercase;">Bonus Cash Draw (${suggestion.draw.length} Winners)</span>
-      <span style="font-size: 14px; font-weight: 800; color: var(--text-dark); display: block;">${drawFormatted || '£0'}</span>
-      <small style="color: var(--text-light);">(Total: £${suggestion.draw.reduce((a, b) => a + b, 0)})</small>
-    </div>
-  `;
-
-  window.currentSuggestedAllocation = suggestion;
-}
-
-// Accept suggested allocation into controls
-function acceptSuggestedBreakdown() {
-  const suggestion = window.currentSuggestedAllocation;
-  if (!suggestion) return;
-
-  const pairSelect = document.getElementById('mystery-pairs-places');
-  if (pairSelect) {
-    pairSelect.value = suggestion.pairs.length;
-  }
-
-  const drawInput = document.getElementById('bonus-draw-count');
-  if (drawInput) {
-    drawInput.value = suggestion.draw.length;
-    renderBonusDrawInputs(suggestion.draw);
-  }
-}
-
-// Render dynamic inputs for bonus draw prize slots
-function renderBonusDrawInputs(presetAmounts = null) {
-  const container = document.getElementById('bonus-draw-amounts-container');
-  const countInput = document.getElementById('bonus-draw-count');
-  if (!container || !countInput) return;
-
-  const count = parseInt(countInput.value) || 1;
-  let html = '<label style="font-size: 11px; font-weight: 800; color: var(--text-light); display: block; margin-bottom: 6px;">PRIZE AMOUNTS (£):</label><div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 8px;">';
-
-  for (let i = 0; i < count; i++) {
-    let val = presetAmounts && presetAmounts[i] !== undefined ? presetAmounts[i] : (i === 0 ? 50 : (i === 1 ? 30 : 25));
-    html += `
-      <div style="display: flex; align-items: center; background: #f8fafc; border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px;">
-        <span style="font-size: 11px; font-weight: 800; margin-right: 6px;">${i + 1}${getOrdinalSuffix(i + 1)}</span>
-        <input type="number" class="bonus-draw-amount-input" value="${val}" min="0" style="width: 100%; border: none; background: transparent; font-weight: 800;">
-      </div>
-    `;
-  }
-  html += '</div>';
-  container.innerHTML = html;
-}
-
-// Mystery Pairs Generator (Reads live scorecards directly from zonedraw_current_state_v1 scores)
-function generateMysteryPairs() {
-  const container = document.getElementById('mystery-pairs-results');
-  if (!container) return;
-
-  // 1. Load active state and scores from localStorage
-  let stateData = null;
-  const rawState = localStorage.getItem('zonedraw_current_state_v1');
-  if (rawState) {
-    try {
-      stateData = JSON.parse(rawState);
-    } catch (e) {
-      console.error("Error parsing zonedraw_current_state_v1:", e);
-    }
-  }
-
-  if (!stateData || !stateData.data) {
-    container.innerHTML = `<div style="padding: 10px; background: #fef3c7; color: #92400e; border-radius: 8px; font-size: 12px; font-weight: 800;">No active competition score data found.</div>`;
-    return;
-  }
-
-  // 2. Build list of opted-in anglers with aggregated Day 1 + Day 2 length (in CM)
-  const scoresObj = stateData.scores || {};
-  const optedInRoster = window.anglers || [];
-  let anglersWithScores = [];
-
-  stateData.data.forEach((group) => {
-    // Determine exact group ID string used in score keys
-    const groupId = group.id || '';
-    if (group.anglers && Array.isArray(group.anglers)) {
-      group.anglers.forEach((a, aIdx) => {
-        const anglerName = a.name ? a.name.trim() : '';
-        if (!anglerName) return;
-
-        // Check opt-in status from roster (defaults to true)
-        const matchInRoster = optedInRoster.find(r => r.name && r.name.trim().toUpperCase() === anglerName.toUpperCase());
-        const isOptedIn = matchInRoster ? (matchInRoster.optedIn !== false) : true;
-
-        if (!isOptedIn) return;
-
-        // Resolve Day 1 and Day 2 length using group ID or fallback index format
-        let d1Len = 0;
-        let d2Len = 0;
-
-        const d1Key = `${groupId}_${aIdx}_1`;
-        const d2Key = `${groupId}_${aIdx}_2`;
-
-        if (scoresObj[d1Key] && scoresObj[d1Key].len) {
-          d1Len = parseFloat(scoresObj[d1Key].len) || 0;
-        }
-        if (scoresObj[d2Key] && scoresObj[d2Key].len) {
-          d2Len = parseFloat(scoresObj[d2Key].len) || 0;
-        }
-
-        const totalCM = d1Len + d2Len;
-
-        anglersWithScores.push({
-          name: anglerName,
-          totalCM: totalCM
-        });
-      });
-    }
-  });
-
-  if (anglersWithScores.length < 2) {
-    container.innerHTML = `<div style="padding: 10px; background: #fef3c7; color: #92400e; border-radius: 8px; font-size: 12px; font-weight: 800;">At least 2 opted-in anglers with valid scorecards are required.</div>`;
-    return;
-  }
-
-  // 3. Shuffle opted-in anglers for random pairing
-  let shuffled = [...anglersWithScores].sort(() => 0.5 - Math.random());
-  let pairs = [];
-  let soloAngler = null;
-
-  if (shuffled.length % 2 !== 0) {
-    soloAngler = shuffled.pop();
-  }
-
-  // Form pairs
-  for (let i = 0; i < shuffled.length; i += 2) {
-    const a1 = shuffled[i];
-    const a2 = shuffled[i + 1];
-
-    pairs.push({
-      angler1: a1.name,
-      angler2: a2.name,
-      isSoloPair: false,
-      combinedCM: a1.totalCM + a2.totalCM
-    });
-  }
-
-  // Handle odd solo angler (pair with top individual scorer for benchmark)
-  if (soloAngler) {
-    let sortedIndividuals = [...anglersWithScores].sort((a, b) => b.totalCM - a.totalCM);
-    let partner = sortedIndividuals.find(item => item.name !== soloAngler.name) || sortedIndividuals[0];
-
-    pairs.push({
-      angler1: soloAngler.name,
-      angler2: partner ? partner.name : soloAngler.name,
-      isSoloPair: true,
-      combinedCM: soloAngler.totalCM + (partner ? partner.totalCM : 0)
-    });
-  }
-
-  // 4. Sort pairs strictly by HIGHEST combined CM
-  pairs.sort((a, b) => b.combinedCM - a.combinedCM);
-
-  // 5. Render winners list
-  const placesToAward = parseInt(document.getElementById('mystery-pairs-places').value) || 1;
-  let html = `<div style="display: flex; flex-direction: column; gap: 8px;">`;
-
-  for (let i = 0; i < Math.min(placesToAward, pairs.length); i++) {
-    const p = pairs[i];
-    html += `
-      <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: #f8fafc; border: 1px solid var(--border); border-radius: 8px;">
-        <div>
-          <span style="font-size: 11px; font-weight: 900; background: var(--accent); color: white; padding: 2px 8px; border-radius: 50px; margin-right: 6px;">${i + 1}${getOrdinalSuffix(i + 1)} Place</span>
-          <strong style="font-size: 13px;">${p.angler1} & ${p.angler2}</strong>
-          ${p.isSoloPair ? '<small style="color: var(--text-light); margin-left: 4px;">(Solo Pair)</small>' : ''}
-        </div>
-        <span style="font-size: 13px; font-weight: 900; color: #166534;">${p.combinedCM} CM</span>
-      </div>
-    `;
-  }
-  html += `</div>`;
-  container.innerHTML = html;
-}
-// Helper: Ordinal suffix generator
-function getOrdinalSuffix(i) {
-  let j = i % 10, k = i % 100;
-  if (j === 1 && k !== 11) return "st";
-  if (j === 2 && k !== 12) return "nd";
-  if (j === 3 && k !== 13) return "rd";
-  return "th";
-}
-
-// Sync Opt-In Status with Master Competitor Roster
-function syncAnglersForOptIn() {
-  let sourceList = [];
-
-  // 1. Check window-level angler collections
-  if (window.anglers && Array.isArray(window.anglers) && window.anglers.length > 0) {
-    sourceList = window.anglers;
-  } else if (window.state && window.state.anglers && Array.isArray(window.state.anglers) && window.state.anglers.length > 0) {
-    sourceList = window.state.anglers;
-  } else if (window.currentMatch && window.currentMatch.anglers) {
-    sourceList = window.currentMatch.anglers;
-  }
-
-  // 2. Fallback: Extract live anglers directly from the app's DOM/Tables if memory is empty
-  if (sourceList.length === 0) {
-    const anglerElements = document.querySelectorAll('.angler-name, .competitor-name, [data-angler-name]');
-    if (anglerElements.length > 0) {
-      const extractedNames = new Set();
-      anglerElements.forEach(el => {
-        const name = el.innerText || el.getAttribute('data-angler-name');
-        if (name && name.trim()) extractedNames.add(name.trim());
-      });
-      sourceList = Array.from(extractedNames).map((name, idx) => ({ id: idx + 1, name: name, optedIn: true }));
-    }
-  }
-
-  // Assign to global window.anglers for the Prize Fund engine
-  window.anglers = sourceList;
-
-  // Ensure every angler has an optedIn property (defaults to true)
-  if (window.anglers && window.anglers.length > 0) {
-    window.anglers.forEach(a => {
-      if (a.optedIn === undefined) {
-        a.optedIn = true;
-      }
-    });
-  }
-
-  // Refresh calculations and UI grid
-  updatePrizeFundCalculations();
-  renderOptInRoster();
-}
-
-// Initialize on page load and tab switch
-document.addEventListener('DOMContentLoaded', function() {
-  renderBonusDrawInputs();
-  syncAnglersForOptIn();
-});
-
-// Automatically refresh Prize Fund whenever Tab 3 is clicked
-const originalSwitchTab = window.switchTab;
-window.switchTab = function(tabName) {
-  if (typeof originalSwitchTab === 'function') {
-    originalSwitchTab(tabName);
-  }
-  if (tabName === 'pairs') {
-    syncAnglersForOptIn();
-  }
-};
-
-// Toggle Roster Accordion Open/Close
-function toggleOptInRosterUI() {
-  const container = document.getElementById('opt-in-roster-container');
-  const icon = document.getElementById('opt-in-toggle-icon');
-  if (!container) return;
-
-  if (container.style.display === 'none') {
-    container.style.display = 'block';
-    if (icon) icon.innerText = '▲ CLICK TO COLLAPSE';
-    renderOptInRoster();
-  } else {
-    container.style.display = 'none';
-    if (icon) icon.innerText = '▼ CLICK TO EXPAND';
-  }
-}
-
-// Render Opt-In Angler Toggles Grid
-function renderOptInRoster() {
-  const grid = document.getElementById('opt-in-list-grid');
-  if (!grid) return;
-
-  const anglers = window.anglers || [];
-  if (anglers.length === 0) {
-    grid.innerHTML = `<div style="color: var(--text-light); font-size: 12px; grid-column: 1/-1;">No competitors added to match yet.</div>`;
-    return;
-  }
-
-  let html = '';
-  anglers.forEach((a, idx) => {
-    const isOptedIn = a.optedIn !== false;
-    
-    html += `
-      <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: ${isOptedIn ? '#f0fdf4' : '#fef2f2'}; border: 1px solid ${isOptedIn ? '#bbf7d0' : '#fecaca'}; border-radius: 8px;">
-        <span style="font-size: 12px; font-weight: 800; color: var(--text-dark);">${a.name}</span>
-        <button onclick="toggleSingleAnglerOptIn(${idx})" style="padding: 4px 8px; font-size: 11px; font-weight: 900; border-radius: 6px; border: none; cursor: pointer; background: ${isOptedIn ? '#166534' : '#991b1b'}; color: white;">
-          ${isOptedIn ? 'YES' : 'NO'}
-        </button>
-      </div>
-    `;
-  });
-
-  grid.innerHTML = html;
-}
-
-// Toggle individual angler status
-function toggleSingleAnglerOptIn(index) {
-  if (!window.anglers || !window.anglers[index]) return;
-  
-  window.anglers[index].optedIn = window.anglers[index].optedIn === false ? true : false;
-  
-  renderOptInRoster();
-  updatePrizeFundCalculations();
 }
