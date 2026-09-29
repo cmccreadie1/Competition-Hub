@@ -1422,7 +1422,7 @@ function runDraw() {
     let basePerZone = Math.floor(totalAnglers / 4);
     let remainder = totalAnglers % 4;
 
-    // Define target capacities per zone to keep pools strictly at 6-7 anglers
+    // Target capacities per zone to keep pools strictly balanced
     let zoneCapacities = {
         'RED': basePerZone + (0 < remainder ? 1 : 0),
         'YELLOW': basePerZone + (1 < remainder ? 1 : 0),
@@ -1450,7 +1450,7 @@ function runDraw() {
         p2[z].sort(() => Math.random() - 0.5);
     });
 
-    // 2-Zone Jump Lookup Table (RED -> GREEN, YELLOW -> BLUE, GREEN -> RED, BLUE -> YELLOW)
+    // 2-Zone Jump Map for Standard Anglers
     const zoneJumpMap = {
         'RED': 'GREEN',
         'YELLOW': 'BLUE',
@@ -1460,35 +1460,70 @@ function runDraw() {
 
     // Route Anglers Across Zones
     appState.forEach(e => {
-        e.anglers.forEach(a => {
+        if (e.isTeam) {
+            // --- TEAM ROUTING (Clash-Free Zone Dispersion) ---
+            let d1Z = [null, null, null, null];
+            let d2Z = [null, null, null, null];
+
+            // 1. Identify Mobility [A] anglers in the team
+            let mobIndices = [];
+            let normIndices = [];
+            e.anglers.forEach((ang, idx) => {
+                if (accEnabled && ang.mobility) mobIndices.push(idx);
+                else normIndices.push(idx);
+            });
+
+            // 2. Assign Mobility [A] anglers to RED or YELLOW on Day 1
+            let mobD1Zones = ['RED', 'YELLOW'].sort(() => Math.random() - 0.5);
+            mobIndices.forEach(mIdx => {
+                let z1 = mobD1Zones.pop() || 'RED';
+                d1Z[mIdx] = z1;
+                d2Z[mIdx] = (z1 === 'RED') ? 'YELLOW' : 'RED';
+            });
+
+            // 3. Assign remaining team members to unused zones on Day 1
+            let usedD1 = d1Z.filter(z => z !== null);
+            let availD1 = zones.filter(z => !usedD1.includes(z)).sort(() => Math.random() - 0.5);
+
+            normIndices.forEach(nIdx => {
+                let z1 = availD1.pop();
+                d1Z[nIdx] = z1;
+                d2Z[nIdx] = zoneJumpMap[z1];
+            });
+
+            // 4. Assign calculated zones and pull peg numbers
+            e.anglers.forEach((a, i) => {
+                a.z1 = d1Z[i];
+                a.z2 = d2Z[i];
+                a.p1 = p1[a.z1].pop();
+                a.p2 = p2[a.z2].pop();
+            });
+        } else {
+            // --- SOLO ANGLER ROUTING ---
+            let a = e.anglers[0];
             let hasMobility = accEnabled && a.mobility;
 
-            // 1. Assign Day 1 Zone (Pick from zones with available pegs)
+            // Pick Day 1 zone from available pools
             let avD1 = zones.filter(z => p1[z].length > 0);
-            if (!a.z1 || !avD1.includes(a.z1)) {
-                a.z1 = avD1[Math.floor(Math.random() * avD1.length)];
-            }
+            a.z1 = avD1[Math.floor(Math.random() * avD1.length)];
 
-            // 2. Assign Day 2 Zone
             if (hasMobility) {
                 // [A] Anglers alternate strictly between RED and YELLOW
                 a.z2 = (a.z1 === 'RED') ? 'YELLOW' : 'RED';
             } else {
-                // Standard Anglers perform the 2-Zone Jump
+                // Standard 2-Zone Jump
                 let targetD2 = zoneJumpMap[a.z1];
                 if (p2[targetD2] && p2[targetD2].length > 0) {
                     a.z2 = targetD2;
                 } else {
-                    // Fallback to any zone with available capacity if target zone is full
                     let avD2 = zones.filter(z => p2[z].length > 0 && z !== a.z1);
                     a.z2 = avD2.length > 0 ? avD2[Math.floor(Math.random() * avD2.length)] : a.z1;
                 }
             }
 
-            // 3. Draw Pegs from respective pools
             a.p1 = p1[a.z1].pop();
             a.p2 = p2[a.z2].pop();
-        });
+        }
     });
 
     displayDraw();
