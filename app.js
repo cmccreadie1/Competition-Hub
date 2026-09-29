@@ -721,31 +721,7 @@ block2Zones: Array.from(document.querySelectorAll('.block2-zone:checked')).map(c
         localStorage.setItem('zonedraw_current_state_v1', JSON.stringify(stateObj));
     }
 
-function toggleBlockRotationUI() {
-    const toggle = document.getElementById('splitRotationToggle');
-    const container = document.getElementById('blockRotationSetup');
-    if (toggle && container) {
-        container.style.display = toggle.checked ? 'flex' : 'none';
-    }
-}
 
-function syncBlockSelection(sourceBlock, zone) {
-    const targetClass = sourceBlock === 1 ? '.block2-zone' : '.block1-zone';
-    const sourceClass = sourceBlock === 1 ? '.block1-zone' : '.block2-zone';
-    
-    const sourceEl = document.querySelector(`${sourceClass}[value="${zone}"]`);
-    const targetEl = document.querySelector(`${targetClass}[value="${zone}"]`);
-    
-    if (sourceEl && sourceEl.checked && targetEl) {
-        targetEl.checked = false;
-    }
-}
-
-function getSelectedBlocks() {
-    const b1 = Array.from(document.querySelectorAll('.block1-zone:checked')).map(cb => cb.value);
-    const b2 = Array.from(document.querySelectorAll('.block2-zone:checked')).map(cb => cb.value);
-    return { b1, b2 };
-}
     function formatPegs(el) {
         let val = el.value;
         let nums = val.match(/\d+/g);
@@ -1440,297 +1416,83 @@ function validateSetupInputs() {
     return errors;
 }
 function runDraw() {
-    // --- 1. SORT BY ACCESSIBILITY PRIORITY QUEUE ---
-    appState.sort((a, b) => {
-        let getPriority = (entry) => { 
-            let aCount = accEnabled ? entry.anglers.filter(ang => ang.mobility).length : 0;
-            if (entry.isTeam) {
-                if (aCount >= 2) return 4; // Highest constraint: Multi-[A] team
-                if (aCount === 1) return 2; // Moderate constraint: Single-[A] team
-                return 1;                   // Standard team
-            } else {
-                if (aCount >= 1) return 3; // Solo [A] angler
-                return 0;                   // Standard solo
-            }
-        };
-        return getPriority(b) - getPriority(a);
-    });
-
-    // --- 2. PARSE SAFE PEG LISTS ---
-    let s1A_el = document.getElementById('accPegs1_a');
-    let s2A_el = document.getElementById('accPegs2_a');
-    let s1A_str = s1A_el ? s1A_el.value || '' : '';
-    let s2A_str = s2A_el ? s2A_el.value || '' : '';
-    let s1A = s1A_str.match(/\d+/g) ? s1A_str.match(/\d+/g).map(Number) : [];
-    let s2A = s2A_str.match(/\d+/g) ? s2A_str.match(/\d+/g).map(Number) : [];
-    // --- PRE-DRAW MOBILITY PEG SUFFICIENCY CHECK ---
-    let totalMobilityCount = 0;
-    appState.forEach(entry => {
-        entry.anglers.forEach(a => {
-            if (accEnabled && a.mobility) totalMobilityCount++;
-        });
-    });
-
-    let totalSafeAvailable = s1A.length + s2A.length;
-
-    if (accEnabled && totalMobilityCount > 0 && totalSafeAvailable < (totalMobilityCount * matchDays)) {
-        alert(
-            `⚠️ DRAW BLOCKED: INSUFFICIENT SAFE PEGS\n\n` +
-            `PROBLEM:\n` +
-            `• You have ${totalMobilityCount} mobility [A] angler(s).\n` +
-            `• Across ${matchDays} day(s), you need at least ${totalMobilityCount * matchDays} safe peg slot(s) total.\n` +
-            `• You currently only have ${totalSafeAvailable} safe peg(s) defined (Day 1: ${s1A.length}, Day 2: ${s2A.length}).\n\n` +
-            `SOLUTION:\n` +
-            `1. Close this popup.\n` +
-            `2. Go to '1. DRAW SETUP' and open the 'Manage Draw Setup' menu.\n` +
-            `3. Add at least ${totalMobilityCount} safe peg(s) in the Day 1 Safe Pegs box.\n` +
-            `4. Add at least ${totalMobilityCount} safe peg(s) in the Day 2 Safe Pegs box.\n` +
-            `5. Click 'Run Draw' again.`
-        );
-        return; // Stop draw execution safely before running Monte Carlo loop
-    }
-
-    const ancZ1_el = document.getElementById('anchorZoneSelect');
-    const ancZ2_el = document.getElementById('anchorZoneSelect2');
-    const ancZ1 = ancZ1_el ? ancZ1_el.value : 'RED';
-    const ancZ2 = ancZ2_el ? ancZ2_el.value : 'YELLOW';
-
     let totalAnglers = 0;
     appState.forEach(e => { totalAnglers += e.anglers.length; });
 
-    // Helper to check which zones contain safe pegs based on peg range
-    const getSafeZonesForList = (pegList, basePerZone, remainder) => {
-        let zMap = [];
-        let currentPeg = 1;
-        zones.forEach((z, idx) => {
-            let count = basePerZone + (idx < remainder ? 1 : 0);
-            let startPeg = currentPeg;
-            let endPeg = currentPeg + count - 1;
-            if (pegList.some(p => p >= startPeg && p <= endPeg)) {
-                zMap.push(z);
-            }
-            currentPeg += count;
-        });
-        return zMap;
+    let basePerZone = Math.floor(totalAnglers / 4);
+    let remainder = totalAnglers % 4;
+
+    // Define target capacities per zone to keep pools strictly at 6-7 anglers
+    let zoneCapacities = {
+        'RED': basePerZone + (0 < remainder ? 1 : 0),
+        'YELLOW': basePerZone + (1 < remainder ? 1 : 0),
+        'GREEN': basePerZone + (2 < remainder ? 1 : 0),
+        'BLUE': basePerZone + (3 < remainder ? 1 : 0)
     };
 
-    // --- 3. MONTE CARLO DRAW ENGINE (UP TO 200 ATTEMPTS) ---
-    for (let attempt = 0; attempt < 200; attempt++) {
-        let basePerZone = Math.floor(totalAnglers / 4);
-        let remainder = totalAnglers % 4;
+    // Build peg pools for Day 1 and Day 2
+    let p1 = {}, p2 = {};
+    let currentPeg1 = 1, currentPeg2 = 1;
 
-        let zoneCounts = zones.map((z, idx) => basePerZone + (idx < remainder ? 1 : 0));
-
-        let currentPeg = 1;
-        let p1 = [];
-        let p2 = [];
-
-        zones.forEach((z, idx) => {
-            let count = zoneCounts[idx];
-            let p1Arr = [];
-            let p2Arr = [];
-            for (let i = 0; i < count; i++) {
-                p1Arr.push(currentPeg + i);
-                p2Arr.push(currentPeg + i);
-            }
-            currentPeg += count;
-
-            p1Arr.sort(() => Math.random() - 0.5);
-            p2Arr.sort(() => Math.random() - 0.5);
-
-            p1.push({ z, p: p1Arr });
-            p2.push({ z, p: p2Arr });
-        });
-
-        // Find zones that contain user's defined safe pegs
-        let d1SafeZones = getSafeZonesForList(s1A, basePerZone, remainder);
-        let d2SafeZones = getSafeZonesForList(s2A, basePerZone, remainder);
-
-        // --- STRICT SAFE PEG ISOLATION PULL ENGINE ---
-        const pull = (z, d2, mob) => {
-            const pools = d2 ? p2 : p1;
-            const zI = zones.indexOf(z);
-            if (!pools[zI] || pools[zI].p.length === 0) return 9999;
-            
-            const sL = d2 ? s2A : s1A;
-
-            if (accEnabled && mob) {
-                // Force [A] angler to take a safe peg from this zone if available
-                let availableSafe = pools[zI].p.filter(p => sL.includes(p));
-                if (availableSafe.length > 0) {
-                    let chosenPeg = availableSafe[Math.floor(Math.random() * availableSafe.length)];
-                    let removeIndex = pools[zI].p.indexOf(chosenPeg);
-                    return pools[zI].p.splice(removeIndex, 1)[0];
-                }
-            } else if (accEnabled && sL && sL.length > 0) { 
-                // STRICT BLOCK: Standard anglers CANNOT touch safe pegs
-                let nonSafePegs = pools[zI].p.filter(p => !sL.includes(p));
-                if (nonSafePegs.length > 0) {
-                    let chosenPeg = nonSafePegs[Math.floor(Math.random() * nonSafePegs.length)];
-                    let removeIndex = pools[zI].p.indexOf(chosenPeg);
-                    return pools[zI].p.splice(removeIndex, 1)[0];
-                }
-            }
-            
-            // Fallback standard peg selection
-            let popVal = pools[zI].p.pop();
-            return popVal !== undefined ? popVal : 9999;
-        };
-
-        // --- ROUTING ENGINE ---
-        appState.forEach(e => {
-            if (e.isTeam) {
-                let hasA = accEnabled && e.anglers.some(a => a.mobility);
-
-                if (accEnabled && mobilityMode === 'B' && hasA) {
-                    let d1Z = [null, null, null, null]; let d2Z = [null, null, null, null]; 
-                    e.anglers.forEach((a, i) => { if (a.mobility) { d1Z[i] = ancZ1; d2Z[i] = ancZ2; } });
-                    
-                    let av1 = zones.filter(z => z !== ancZ1).sort(() => Math.random() - 0.5);
-                    let sI = []; e.anglers.forEach((a, i) => { if (!a.mobility) sI.push(i); });
-                    d1Z[sI[0]] = av1[0]; d1Z[sI[1]] = av1[1]; d1Z[sI[2]] = av1[2];
-                    
-                    let av2 = zones.filter(z => z !== ancZ2);
-                    let bestD2Perm = [...av2];
-                    for (let att = 0; att < 20; att++) {
-                        av2.sort(() => Math.random() - 0.5);
-                        let isValid = true;
-                        for (let k = 0; k < 3; k++) { if (d1Z[sI[k]] === av2[k]) isValid = false; }
-                        if (isValid) { bestD2Perm = [...av2]; break; }
-                    }
-                    d2Z[sI[0]] = bestD2Perm[0]; d2Z[sI[1]] = bestD2Perm[1]; d2Z[sI[2]] = bestD2Perm[2];
-                    
-                    e.anglers.forEach((a, i) => { 
-                        a.z1 = d1Z[i];
-                        a.z2 = d2Z[i];
-                    });
-                } else if (accEnabled && mobilityMode === 'A' && hasA) {
-                    let mobIndices = [];
-                    let normIndices = [];
-                    e.anglers.forEach((ang, i) => {
-                        if (ang.mobility) mobIndices.push(i);
-                        else normIndices.push(i);
-                    });
-
-                    let d1Z = [null, null, null, null];
-                    let d2Z = [null, null, null, null];
-
-                    // Target safe zones dynamically on Day 1 and Day 2
-                    let availD1Safe = d1SafeZones.filter(z => p1[zones.indexOf(z)].p.some(p => s1A.includes(p))).sort(() => Math.random() - 0.5);
-                    let availD2Safe = d2SafeZones.filter(z => p2[zones.indexOf(z)].p.some(p => s2A.includes(p))).sort(() => Math.random() - 0.5);
-
-                    mobIndices.forEach((mIdx) => {
-                        let targetD1 = availD1Safe.pop() || zones[Math.floor(Math.random() * zones.length)];
-                        
-                        // Ensure Day 2 zone respects Two-Block rotation (switch Block 1 <-> Block 2)
-                        let isBlock1 = (targetD1 === 'RED' || targetD1 === 'YELLOW');
-                        let oppositeBlockZones = isBlock1 ? ['GREEN', 'BLUE'] : ['RED', 'YELLOW'];
-                        let validD2Safe = availD2Safe.filter(z => oppositeBlockZones.includes(z));
-                        
-                        let targetD2 = validD2Safe.length > 0 ? validD2Safe.pop() : oppositeBlockZones[Math.floor(Math.random() * oppositeBlockZones.length)];
-                        
-                        // Remove chosen D2 zone from remaining pool
-                        availD2Safe = availD2Safe.filter(z => z !== targetD2);
-
-                        d1Z[mIdx] = targetD1;
-                        d2Z[mIdx] = targetD2;
-                    });
-
-                    let usedD1 = d1Z.filter(z => z !== null);
-                    let usedD2 = d2Z.filter(z => z !== null);
-
-                    let remD1 = zones.filter(z => !usedD1.includes(z)).sort(() => Math.random() - 0.5);
-                    let remD2 = zones.filter(z => !usedD2.includes(z)).sort(() => Math.random() - 0.5);
-
-                    for (let att = 0; att < 20; att++) {
-                        let valid = true;
-                        for (let k = 0; k < normIndices.length; k++) {
-                            if (remD1[k] === remD2[k]) { valid = false; break; }
-                        }
-                        if (valid) break;
-                        remD2.sort(() => Math.random() - 0.5);
-                    }
-
-                    normIndices.forEach((nIdx, k) => {
-                        d1Z[nIdx] = remD1[k];
-                        d2Z[nIdx] = remD2[k];
-                    });
-
-                    e.anglers.forEach((ang, i) => {
-                        ang.z1 = d1Z[i];
-                        ang.z2 = d2Z[i];
-                    });
-                } else {
-                    // --- STANDARD TEAM ROUTING (STRICT TWO-BLOCK ROTATION) ---
-                    // Randomize Day 1 across all 4 zones
-                    let d1Z = [...zones].sort(() => Math.random() - 0.5);
-                    
-                    // Map Day 2 strictly to opposite block paired zones
-                    // Block 1 (RED / YELLOW) MUST swap to Block 2 (GREEN / BLUE)
-                    let b1Pairs = ['GREEN', 'BLUE'].sort(() => Math.random() - 0.5);
-                    let b2Pairs = ['RED', 'YELLOW'].sort(() => Math.random() - 0.5);
-                    let d2Z = [null, null, null, null];
-
-                    d1Z.forEach((z1, i) => {
-                        if (z1 === 'RED' || z1 === 'YELLOW') {
-                            d2Z[i] = b1Pairs.pop();
-                        } else {
-                            d2Z[i] = b2Pairs.pop();
-                        }
-                    });
-
-                    e.anglers.forEach((a, i) => { 
-                        a.z1 = d1Z[i];
-                        a.z2 = d2Z[i];
-                    });
-                }
-
-                e.anglers.forEach(a => {
-                    let hasMobility = accEnabled && a.mobility;
-                    a.p1 = pull(a.z1, 0, hasMobility);
-                    a.p2 = pull(a.z2, 1, hasMobility);
-                });
-            } else {
-                // --- SOLO ANGLER ROUTING (STRICT TWO-BLOCK ROTATION) ---
-                let a = e.anglers[0];
-                let hasMobility = accEnabled && a.mobility;
-                if (accEnabled && mobilityMode === 'B' && hasMobility) { 
-                    a.z1 = ancZ1; a.z2 = ancZ2; 
-                } else if (accEnabled && mobilityMode === 'A' && hasMobility) {
-                    let targetD1 = d1SafeZones.length > 0 ? d1SafeZones[Math.floor(Math.random() * d1SafeZones.length)] : zones[Math.floor(Math.random() * zones.length)];
-                    let isBlock1 = (targetD1 === 'RED' || targetD1 === 'YELLOW');
-                    let oppositeBlockZones = isBlock1 ? ['GREEN', 'BLUE'] : ['RED', 'YELLOW'];
-                    let validD2Safe = d2SafeZones.filter(z => oppositeBlockZones.includes(z));
-                    let targetD2 = validD2Safe.length > 0 ? validD2Safe[Math.floor(Math.random() * validD2Safe.length)] : oppositeBlockZones[Math.floor(Math.random() * oppositeBlockZones.length)];
-                    
-                    a.z1 = targetD1;
-                    a.z2 = targetD2;
-                } else { 
-                    let av = zones.filter(z => p1[zones.indexOf(z)].p.length > 0);
-                    if (av.length > 0) a.z1 = av[Math.floor(Math.random() * av.length)];
-                    
-                    // Enforce strict opposite block selection for Day 2
-                    let isBlock1 = (a.z1 === 'RED' || a.z1 === 'YELLOW');
-                    let oppositeBlock = isBlock1 ? ['GREEN', 'BLUE'] : ['RED', 'YELLOW'];
-                    let av2 = oppositeBlock.filter(z => p2[zones.indexOf(z)].p.length > 0);
-                    
-                    if (av2.length === 0) av2 = zones.filter(z => z !== a.z1 && p2[zones.indexOf(z)].p.length > 0);
-                    if (av2.length > 0) a.z2 = av2[Math.floor(Math.random() * av2.length)];
-                }
-                a.p1 = pull(a.z1, 0, hasMobility);
-                a.p2 = pull(a.z2, 1, hasMobility);
-            }
-        });
-
-        let checkResult = runValidator();
-        if (checkResult.list.length === 0) {
-            break;
+    zones.forEach((z) => {
+        let cap = zoneCapacities[z];
+        p1[z] = [];
+        p2[z] = [];
+        for (let i = 0; i < cap; i++) {
+            p1[z].push(currentPeg1 + i);
+            p2[z].push(currentPeg2 + i);
         }
-    }
+        currentPeg1 += cap;
+        currentPeg2 += cap;
+
+        // Shuffle available peg numbers within each zone
+        p1[z].sort(() => Math.random() - 0.5);
+        p2[z].sort(() => Math.random() - 0.5);
+    });
+
+    // 2-Zone Jump Lookup Table (RED -> GREEN, YELLOW -> BLUE, GREEN -> RED, BLUE -> YELLOW)
+    const zoneJumpMap = {
+        'RED': 'GREEN',
+        'YELLOW': 'BLUE',
+        'GREEN': 'RED',
+        'BLUE': 'YELLOW'
+    };
+
+    // Route Anglers Across Zones
+    appState.forEach(e => {
+        e.anglers.forEach(a => {
+            let hasMobility = accEnabled && a.mobility;
+
+            // 1. Assign Day 1 Zone (Pick from zones with available pegs)
+            let avD1 = zones.filter(z => p1[z].length > 0);
+            if (!a.z1 || !avD1.includes(a.z1)) {
+                a.z1 = avD1[Math.floor(Math.random() * avD1.length)];
+            }
+
+            // 2. Assign Day 2 Zone
+            if (hasMobility) {
+                // [A] Anglers alternate strictly between RED and YELLOW
+                a.z2 = (a.z1 === 'RED') ? 'YELLOW' : 'RED';
+            } else {
+                // Standard Anglers perform the 2-Zone Jump
+                let targetD2 = zoneJumpMap[a.z1];
+                if (p2[targetD2] && p2[targetD2].length > 0) {
+                    a.z2 = targetD2;
+                } else {
+                    // Fallback to any zone with available capacity if target zone is full
+                    let avD2 = zones.filter(z => p2[z].length > 0 && z !== a.z1);
+                    a.z2 = avD2.length > 0 ? avD2[Math.floor(Math.random() * avD2.length)] : a.z1;
+                }
+            }
+
+            // 3. Draw Pegs from respective pools
+            a.p1 = p1[a.z1].pop();
+            a.p2 = p2[a.z2].pop();
+        });
+    });
 
     displayDraw();
 }
-
     function toggleSwapMode() { 
         isSwapMode = !isSwapMode;
         swapObj1 = null; 
