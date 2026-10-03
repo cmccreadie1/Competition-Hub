@@ -1,4 +1,4 @@
-const APP_VERSION = "v7.4.0"; // Version update for Embedded Manual & Single Source of Truth
+const APP_VERSION = "v7.4.0"; // Version update for Embedded Manual
     document.getElementById('vTag').innerText = APP_VERSION;
 
     const zones = ['RED', 'YELLOW', 'GREEN', 'BLUE'];
@@ -13,7 +13,7 @@ const APP_VERSION = "v7.4.0"; // Version update for Embedded Manual & Single Sou
     let isAppReady = false; 
     let appState = []; 
     let scoreState = {}; // SCORECARD DATA BUCKETS
-    let biggestFishSpecies = { d1: ["", "", ""], d2: ["", "", ""] };
+let biggestFishSpecies = { d1: ["", "", ""], d2: ["", "", ""] };
     let matchDays = 2;
     let currentZoneSize = 0; 
     let isSwapMode = false;
@@ -1462,14 +1462,13 @@ function runDraw() {
         return getPriority(b) - getPriority(a);
     });
 
-    // --- 2. PARSE SAFE PEG LISTS (TYPE-SAFE STRINGS) ---
+    // --- 2. PARSE SAFE PEG LISTS ---
     let s1A_el = document.getElementById('accPegs1_a');
     let s2A_el = document.getElementById('accPegs2_a');
     let s1A_str = s1A_el ? s1A_el.value || '' : '';
     let s2A_str = s2A_el ? s2A_el.value || '' : '';
-    let s1A = (s1A_str.match(/\d+/g) || []).map(p => String(p));
-    let s2A = (s2A_str.match(/\d+/g) || []).map(p => String(p));
-
+    let s1A = s1A_str.match(/\d+/g) ? s1A_str.match(/\d+/g).map(Number) : [];
+    let s2A = s2A_str.match(/\d+/g) ? s2A_str.match(/\d+/g).map(Number) : [];
     // --- PRE-DRAW MOBILITY PEG SUFFICIENCY CHECK ---
     let totalMobilityCount = 0;
     appState.forEach(entry => {
@@ -1478,7 +1477,7 @@ function runDraw() {
         });
     });
 
-    let totalSafeAvailable = s1A.length + (matchDays === 2 ? s2A.length : 0);
+    let totalSafeAvailable = s1A.length + s2A.length;
 
     if (accEnabled && totalMobilityCount > 0 && totalSafeAvailable < (totalMobilityCount * matchDays)) {
         alert(
@@ -1513,20 +1512,12 @@ function runDraw() {
             let count = basePerZone + (idx < remainder ? 1 : 0);
             let startPeg = currentPeg;
             let endPeg = currentPeg + count - 1;
-            if (pegList.some(p => {
-                let pNum = parseInt(String(p).replace(/\D/g, ''), 10);
-                return pNum >= startPeg && pNum <= endPeg;
-            })) {
+            if (pegList.some(p => p >= startPeg && p <= endPeg)) {
                 zMap.push(z);
             }
             currentPeg += count;
         });
         return zMap;
-    };
-
-    // Helper: Determine Block (Block 1 = RED/YELLOW, Block 2 = GREEN/BLUE)
-    const getBlockZones = (z) => {
-        return (z === 'RED' || z === 'YELLOW') ? ['GREEN', 'BLUE'] : ['RED', 'YELLOW'];
     };
 
     // --- 3. MONTE CARLO DRAW ENGINE (UP TO 200 ATTEMPTS) ---
@@ -1561,7 +1552,7 @@ function runDraw() {
         let d1SafeZones = getSafeZonesForList(s1A, basePerZone, remainder);
         let d2SafeZones = getSafeZonesForList(s2A, basePerZone, remainder);
 
-        // --- STRICT TYPE-SAFE PEG ISOLATION PULL ENGINE ---
+        // --- STRICT SAFE PEG ISOLATION PULL ENGINE ---
         const pull = (z, d2, mob) => {
             const pools = d2 ? p2 : p1;
             const zI = zones.indexOf(z);
@@ -1570,8 +1561,8 @@ function runDraw() {
             const sL = d2 ? s2A : s1A;
 
             if (accEnabled && mob) {
-                // Strict String Comparison: Force [A] angler to take a safe peg from this zone if available
-                let availableSafe = pools[zI].p.filter(p => sL.includes(String(p)));
+                // Force [A] angler to take a safe peg from this zone if available
+                let availableSafe = pools[zI].p.filter(p => sL.includes(p));
                 if (availableSafe.length > 0) {
                     let chosenPeg = availableSafe[Math.floor(Math.random() * availableSafe.length)];
                     let removeIndex = pools[zI].p.indexOf(chosenPeg);
@@ -1579,7 +1570,7 @@ function runDraw() {
                 }
             } else if (accEnabled && sL && sL.length > 0) { 
                 // STRICT BLOCK: Standard anglers CANNOT touch safe pegs
-                let nonSafePegs = pools[zI].p.filter(p => !sL.includes(String(p)));
+                let nonSafePegs = pools[zI].p.filter(p => !sL.includes(p));
                 if (nonSafePegs.length > 0) {
                     let chosenPeg = nonSafePegs[Math.floor(Math.random() * nonSafePegs.length)];
                     let removeIndex = pools[zI].p.indexOf(chosenPeg);
@@ -1620,7 +1611,6 @@ function runDraw() {
                         a.z2 = d2Z[i];
                     });
                 } else if (accEnabled && mobilityMode === 'A' && hasA) {
-                    let d1Z = [...zones].sort(() => Math.random() - 0.5);
                     let mobIndices = [];
                     let normIndices = [];
                     e.anglers.forEach((ang, i) => {
@@ -1628,42 +1618,48 @@ function runDraw() {
                         else normIndices.push(i);
                     });
 
-                    // Ensure [A] anglers sit in Day 1 safe zones if possible
-                    let availD1Safe = d1SafeZones.filter(z => p1[zones.indexOf(z)].p.some(p => s1A.includes(String(p))));
-                    if (availD1Safe.length > 0) {
-                        let chosenD1Safe = availD1Safe[Math.floor(Math.random() * availD1Safe.length)];
-                        let curIdx = d1Z.indexOf(chosenD1Safe);
-                        let targetMobIdx = mobIndices[0];
-                        if (curIdx !== targetMobIdx) {
-                            let tmp = d1Z[targetMobIdx];
-                            d1Z[targetMobIdx] = d1Z[curIdx];
-                            d1Z[curIdx] = tmp;
-                        }
-                    }
-
-                    // STRICT TWO-BLOCK ROTATION FOR ALL MEMBERS (Block 1 <-> Block 2)
+                    let d1Z = [null, null, null, null];
                     let d2Z = [null, null, null, null];
-                    let assignedD2 = [];
 
-                    // 1. Assign [A] anglers first to Day 2 safe zones in opposite block
-                    mobIndices.forEach(mIdx) => {
-                        let z1 = d1Z[mIdx];
-                        let oppBlock = getBlockZones(z1);
-                        let validD2Safe = d2SafeZones.filter(z => oppBlock.includes(z) && p2[zones.indexOf(z)].p.some(p => s2A.includes(String(p))) && !assignedD2.includes(z));
+                    // Target safe zones dynamically on Day 1 and Day 2
+                    let availD1Safe = d1SafeZones.filter(z => p1[zones.indexOf(z)].p.some(p => s1A.includes(p))).sort(() => Math.random() - 0.5);
+                    let availD2Safe = d2SafeZones.filter(z => p2[zones.indexOf(z)].p.some(p => s2A.includes(p))).sort(() => Math.random() - 0.5);
+
+                    mobIndices.forEach((mIdx) => {
+                        let targetD1 = availD1Safe.pop() || zones[Math.floor(Math.random() * zones.length)];
                         
-                        let targetD2 = validD2Safe.length > 0 ? validD2Safe[Math.floor(Math.random() * validD2Safe.length)] : oppBlock.filter(z => !assignedD2.includes(z))[0] || oppBlock[0];
+                        // Ensure Day 2 zone respects Two-Block rotation (switch Block 1 <-> Block 2)
+                        let isBlock1 = (targetD1 === 'RED' || targetD1 === 'YELLOW');
+                        let oppositeBlockZones = isBlock1 ? ['GREEN', 'BLUE'] : ['RED', 'YELLOW'];
+                        let validD2Safe = availD2Safe.filter(z => oppositeBlockZones.includes(z));
+                        
+                        let targetD2 = validD2Safe.length > 0 ? validD2Safe.pop() : oppositeBlockZones[Math.floor(Math.random() * oppositeBlockZones.length)];
+                        
+                        // Remove chosen D2 zone from remaining pool
+                        availD2Safe = availD2Safe.filter(z => z !== targetD2);
+
+                        d1Z[mIdx] = targetD1;
                         d2Z[mIdx] = targetD2;
-                        assignedD2.push(targetD2);
                     });
 
-                    // 2. Assign standard anglers strictly into remaining opposite block zones
-                    normIndices.forEach(nIdx => {
-                        let z1 = d1Z[nIdx];
-                        let oppBlock = getBlockZones(z1);
-                        let availOpp = oppBlock.filter(z => !assignedD2.includes(z));
-                        let targetD2 = availOpp.length > 0 ? availOpp[Math.floor(Math.random() * availOpp.length)] : oppBlock[0];
-                        d2Z[nIdx] = targetD2;
-                        assignedD2.push(targetD2);
+                    let usedD1 = d1Z.filter(z => z !== null);
+                    let usedD2 = d2Z.filter(z => z !== null);
+
+                    let remD1 = zones.filter(z => !usedD1.includes(z)).sort(() => Math.random() - 0.5);
+                    let remD2 = zones.filter(z => !usedD2.includes(z)).sort(() => Math.random() - 0.5);
+
+                    for (let att = 0; att < 20; att++) {
+                        let valid = true;
+                        for (let k = 0; k < normIndices.length; k++) {
+                            if (remD1[k] === remD2[k]) { valid = false; break; }
+                        }
+                        if (valid) break;
+                        remD2.sort(() => Math.random() - 0.5);
+                    }
+
+                    normIndices.forEach((nIdx, k) => {
+                        d1Z[nIdx] = remD1[k];
+                        d2Z[nIdx] = remD2[k];
                     });
 
                     e.anglers.forEach((ang, i) => {
@@ -1672,7 +1668,11 @@ function runDraw() {
                     });
                 } else {
                     // --- STANDARD TEAM ROUTING (STRICT TWO-BLOCK ROTATION) ---
+                    // Randomize Day 1 across all 4 zones
                     let d1Z = [...zones].sort(() => Math.random() - 0.5);
+                    
+                    // Map Day 2 strictly to opposite block paired zones
+                    // Block 1 (RED / YELLOW) MUST swap to Block 2 (GREEN / BLUE)
                     let b1Pairs = ['GREEN', 'BLUE'].sort(() => Math.random() - 0.5);
                     let b2Pairs = ['RED', 'YELLOW'].sort(() => Math.random() - 0.5);
                     let d2Z = [null, null, null, null];
@@ -1703,11 +1703,10 @@ function runDraw() {
                 if (accEnabled && mobilityMode === 'B' && hasMobility) { 
                     a.z1 = ancZ1; a.z2 = ancZ2; 
                 } else if (accEnabled && mobilityMode === 'A' && hasMobility) {
-                    let availD1Safe = d1SafeZones.filter(z => p1[zones.indexOf(z)].p.some(p => s1A.includes(String(p))));
-                    let targetD1 = availD1Safe.length > 0 ? availD1Safe[Math.floor(Math.random() * availD1Safe.length)] : zones[Math.floor(Math.random() * zones.length)];
-                    
-                    let oppositeBlockZones = getBlockZones(targetD1);
-                    let validD2Safe = d2SafeZones.filter(z => oppositeBlockZones.includes(z) && p2[zones.indexOf(z)].p.some(p => s2A.includes(String(p))));
+                    let targetD1 = d1SafeZones.length > 0 ? d1SafeZones[Math.floor(Math.random() * d1SafeZones.length)] : zones[Math.floor(Math.random() * zones.length)];
+                    let isBlock1 = (targetD1 === 'RED' || targetD1 === 'YELLOW');
+                    let oppositeBlockZones = isBlock1 ? ['GREEN', 'BLUE'] : ['RED', 'YELLOW'];
+                    let validD2Safe = d2SafeZones.filter(z => oppositeBlockZones.includes(z));
                     let targetD2 = validD2Safe.length > 0 ? validD2Safe[Math.floor(Math.random() * validD2Safe.length)] : oppositeBlockZones[Math.floor(Math.random() * oppositeBlockZones.length)];
                     
                     a.z1 = targetD1;
@@ -1717,7 +1716,8 @@ function runDraw() {
                     if (av.length > 0) a.z1 = av[Math.floor(Math.random() * av.length)];
                     
                     // Enforce strict opposite block selection for Day 2
-                    let oppositeBlock = getBlockZones(a.z1);
+                    let isBlock1 = (a.z1 === 'RED' || a.z1 === 'YELLOW');
+                    let oppositeBlock = isBlock1 ? ['GREEN', 'BLUE'] : ['RED', 'YELLOW'];
                     let av2 = oppositeBlock.filter(z => p2[zones.indexOf(z)].p.length > 0);
                     
                     if (av2.length === 0) av2 = zones.filter(z => z !== a.z1 && p2[zones.indexOf(z)].p.length > 0);
@@ -1912,7 +1912,7 @@ function runDraw() {
         if (mobilityMode === 'A') {
             let safeEl = d === 1 ? document.getElementById('accPegs1_a') : document.getElementById('accPegs2_a');
             let safeStr = safeEl ? safeEl.value : '';
-            let safeArr = (safeStr.match(/\d+/g) || []).map(x => String(x));
+            let safeArr = safeStr.match(/\d+/g) || [];
             return safeArr.includes(String(p).replace(/[a-zA-Z]/g, ''));
         }
         return false;
@@ -3032,7 +3032,7 @@ function calculateAndRenderBiggestFishLeaderboard(containerId) {
                     catches.push({
                         name: angler.name,
                         team: (teamEntry.isTeam && teamEntry.tName && teamEntry.tName.trim().toUpperCase() !== 'SOLO') ? teamEntry.tName.trim() : 'SOLO',
-                        location: `${targetZone}${targetPeg || '-'}`,
+                        location: `${targetZone} ${targetPeg || '-'}`,
                         size: fishSize
                     });
                 }
@@ -3349,13 +3349,12 @@ function exportPublicResults() {
     const secretPairsDesc = "The computer calculated a hidden Target Length that falls strictly between the lowest and highest possible combined scores. The randomly chosen pair whose combined length finishes closest to the target wins.\n\nIf you have an uneven number of entries in the cash pool, the computer automatically generates a virtual partner named Joe Average. Joe is mathematically given the exact mean average score of the entire active field. Tie breaker if its a draw the tie breaker reverts to longest combined length.";
 
     const finalPayload = {
-        "appVersion": APP_VERSION,
-        "anglers": cleanExport,
-        "biggestFishSpecies": {
-            "day1": biggestFishSpecies.d1,
-            "day2": biggestFishSpecies.d2
-        },
-        "secretPairs": {
+    "anglers": cleanExport,
+    "biggestFishSpecies": {
+        "day1": biggestFishSpecies.d1,
+        "day2": biggestFishSpecies.d2
+    },
+    "secretPairs": {
             "description": secretPairsDesc,
             "targetLength": officialTargetLength,
             "winners": secretPairsWinners,
